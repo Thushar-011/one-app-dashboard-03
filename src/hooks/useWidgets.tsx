@@ -1,18 +1,12 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-
-interface Widget {
-  id: string;
-  type: "alarm" | "todo";
-  position: { x: number; y: number };
-  size: { width: number; height: number };
-}
+import { Widget, WidgetType } from "@/types/widget";
 
 interface WidgetsContextType {
   widgets: Widget[];
   trashedWidgets: Widget[];
   editMode: boolean;
   toggleEditMode: () => void;
-  addWidget: (type: Widget["type"]) => void;
+  addWidget: (type: WidgetType) => void;
   removeWidget: (id: string) => void;
   updateWidget: (id: string, updates: Partial<Widget>) => void;
   restoreWidget: (id: string) => void;
@@ -28,12 +22,14 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
       type: "alarm",
       position: { x: 0, y: 0 },
       size: { width: 150, height: 150 },
+      data: { alarms: [] },
     },
     {
       id: "todo-1",
       type: "todo",
       position: { x: 0, y: 170 },
       size: { width: 150, height: 150 },
+      data: { tasks: [] },
     },
   ]);
   const [trashedWidgets, setTrashedWidgets] = useState<Widget[]>([]);
@@ -41,12 +37,13 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
 
   const toggleEditMode = () => setEditMode(!editMode);
 
-  const addWidget = (type: Widget["type"]) => {
+  const addWidget = (type: WidgetType) => {
     const newWidget: Widget = {
       id: `${type}-${Date.now()}`,
       type,
       position: { x: 0, y: widgets.length * 170 },
       size: { width: 150, height: 150 },
+      data: type === "alarm" ? { alarms: [] } : type === "todo" ? { tasks: [] } : {},
     };
     setWidgets([...widgets, newWidget]);
   };

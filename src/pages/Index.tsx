@@ -1,12 +1,13 @@
 import Layout from "@/components/Layout";
-import { Plus, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useWidgets } from "@/hooks/useWidgets";
 import Widget from "@/components/Widget";
 import TrashList from "@/components/TrashList";
 import { useState } from "react";
+import WidgetSelector from "@/components/WidgetSelector";
 
 export default function Index() {
-  const { widgets, editMode, toggleEditMode, addWidget } = useWidgets();
+  const { widgets, editMode, toggleEditMode } = useWidgets();
   const [isTrashOpen, setIsTrashOpen] = useState(false);
 
   return (
@@ -31,12 +32,7 @@ export default function Index() {
             <Trash2 className="w-6 h-6" />
           </button>
           
-          <button
-            onClick={() => addWidget("alarm")}
-            className="bg-secondary text-white p-2 rounded-full shadow-lg hover:opacity-90 transition-opacity"
-          >
-            <Plus className="w-6 h-6" />
-          </button>
+          <WidgetSelector />
         </div>
 
         <TrashList isOpen={isTrashOpen} onClose={() => setIsTrashOpen(false)} />

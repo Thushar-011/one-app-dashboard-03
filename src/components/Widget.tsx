@@ -1,30 +1,41 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Trash2 } from "lucide-react";
+import { Trash2, AlarmClock, ListTodo, Calendar, FileText, DollarSign } from "lucide-react";
+import { Widget as WidgetType } from "@/types/widget";
+import AlarmWidget from "./widgets/AlarmWidget";
+import TodoWidget from "./widgets/TodoWidget";
 
-interface WidgetProps {
-  id: string;
-  type: "alarm" | "todo";
-  position: { x: number; y: number };
-  size: { width: number; height: number };
-}
-
-export default function Widget({ id, type, position, size }: WidgetProps) {
+export default function Widget({ id, type, position, size, data }: WidgetType) {
   const { editMode, updateWidget, removeWidget } = useWidgets();
   const [isDragging, setIsDragging] = useState(false);
   const [isDetailView, setIsDetailView] = useState(false);
 
-  const content = {
-    alarm: {
-      title: "Alarms",
-      preview: "2 active alarms",
-    },
-    todo: {
-      title: "To-Do List",
-      preview: "3 tasks pending",
-    },
-  }[type];
+  const getWidgetIcon = () => {
+    switch (type) {
+      case "alarm":
+        return <AlarmClock className="w-5 h-5" />;
+      case "todo":
+        return <ListTodo className="w-5 h-5" />;
+      case "reminder":
+        return <Calendar className="w-5 h-5" />;
+      case "note":
+        return <FileText className="w-5 h-5" />;
+      case "expense":
+        return <DollarSign className="w-5 h-5" />;
+    }
+  };
+
+  const renderWidgetContent = () => {
+    switch (type) {
+      case "alarm":
+        return <AlarmWidget id={id} data={data} isDetailView={isDetailView} />;
+      case "todo":
+        return <TodoWidget id={id} data={data} isDetailView={isDetailView} />;
+      default:
+        return <div>Widget type not implemented yet</div>;
+    }
+  };
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -62,7 +73,10 @@ export default function Widget({ id, type, position, size }: WidgetProps) {
     >
       <div className="widget-content">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold">{content.title}</h3>
+          <div className="flex items-center gap-2">
+            {getWidgetIcon()}
+            <h3 className="font-semibold capitalize">{type}</h3>
+          </div>
           {editMode && (
             <button
               onClick={handleDelete}
@@ -72,7 +86,7 @@ export default function Widget({ id, type, position, size }: WidgetProps) {
             </button>
           )}
         </div>
-        <p className="text-sm text-gray-600">{content.preview}</p>
+        {renderWidgetContent()}
       </div>
     </motion.div>
   );
