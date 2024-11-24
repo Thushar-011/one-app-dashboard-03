@@ -17,7 +17,8 @@ export default function TodoWidget({ id, data, isDetailView }: TodoWidgetProps) 
 
   const tasks = data?.tasks || [];
 
-  const addTask = () => {
+  const addTask = (e: React.MouseEvent | React.KeyboardEvent) => {
+    e.stopPropagation();
     if (!newTask.trim()) return;
     
     const newTaskItem = {
@@ -35,7 +36,8 @@ export default function TodoWidget({ id, data, isDetailView }: TodoWidgetProps) 
     setNewTask("");
   };
 
-  const removeTask = (taskId: string) => {
+  const removeTask = (e: React.MouseEvent, taskId: string) => {
+    e.stopPropagation();
     updateWidget(id, {
       data: {
         tasks: tasks.filter((task) => task.id !== taskId),
@@ -43,7 +45,8 @@ export default function TodoWidget({ id, data, isDetailView }: TodoWidgetProps) 
     });
   };
 
-  const toggleTask = (taskId: string) => {
+  const toggleTask = (e: React.MouseEvent, taskId: string) => {
+    e.stopPropagation();
     updateWidget(id, {
       data: {
         tasks: tasks.map((task) =>
@@ -67,7 +70,7 @@ export default function TodoWidget({ id, data, isDetailView }: TodoWidgetProps) 
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" onClick={(e) => e.stopPropagation()}>
       <div className="flex gap-2">
         <Input
           type="text"
@@ -75,9 +78,9 @@ export default function TodoWidget({ id, data, isDetailView }: TodoWidgetProps) 
           onChange={(e) => setNewTask(e.target.value)}
           placeholder="Add a new task"
           className="flex-1"
-          onKeyDown={(e) => e.key === "Enter" && addTask()}
+          onKeyDown={(e) => e.key === "Enter" && addTask(e)}
         />
-        <Button onClick={addTask} size="icon">
+        <Button onClick={(e) => addTask(e)} size="icon">
           <Plus className="w-4 h-4" />
         </Button>
       </div>
@@ -89,7 +92,7 @@ export default function TodoWidget({ id, data, isDetailView }: TodoWidgetProps) 
             className="flex items-center justify-between bg-gray-50 p-2 rounded"
           >
             <button
-              onClick={() => toggleTask(task.id)}
+              onClick={(e) => toggleTask(e, task.id)}
               className={`flex-1 text-left ${
                 task.completed && "text-gray-400 line-through"
               }`}
@@ -97,7 +100,7 @@ export default function TodoWidget({ id, data, isDetailView }: TodoWidgetProps) 
               {task.text}
             </button>
             <button
-              onClick={() => removeTask(task.id)}
+              onClick={(e) => removeTask(e, task.id)}
               className="p-1 hover:bg-gray-200 rounded"
             >
               <X className="w-4 h-4" />
