@@ -1,6 +1,6 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Trash2, AlarmClock, ListTodo, Calendar, FileText, DollarSign, ArrowLeft } from "lucide-react";
 import { Widget as WidgetType } from "@/types/widget";
 import AlarmWidget from "./widgets/AlarmWidget";
@@ -49,84 +49,86 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
     }
   };
 
-  if (isDetailView) {
-    return (
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 20 }}
-        className="fixed inset-0 bg-white z-50 overflow-auto"
-        style={{ maxWidth: "640px", margin: "0 auto" }}
+  return (
+    <>
+      <motion.div
+        className="widget absolute"
+        style={{
+          width: size.width,
+          height: size.height,
+        }}
+        initial={position}
+        animate={{
+          x: position.x,
+          y: position.y,
+          scale: isDragging ? 1.05 : 1,
+        }}
+        drag={editMode}
+        dragMomentum={false}
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={(_, info) => {
+          setIsDragging(false);
+          updateWidget(id, {
+            position: {
+              x: position.x + info.offset.x,
+              y: position.y + info.offset.y,
+            },
+          });
+        }}
+        onClick={() => !editMode && setIsDetailView(!isDetailView)}
+        whileHover={{ scale: editMode ? 1 : 1.02 }}
+        transition={{ duration: 0.2 }}
       >
-        <div className="sticky top-0 bg-white/80 backdrop-blur-sm border-b p-4 mb-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsDetailView(false)}
-              className="shrink-0"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
+        <div className="widget-content">
+          <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               {getWidgetIcon()}
-              <h2 className="text-xl font-semibold capitalize">{type}</h2>
+              <h3 className="font-semibold capitalize">{type}</h3>
             </div>
+            {editMode && (
+              <button
+                onClick={handleDelete}
+                className="p-1.5 hover:bg-red-100 rounded-full transition-colors"
+              >
+                <Trash2 className="w-4 h-4 text-red-500" />
+              </button>
+            )}
           </div>
-        </div>
-        <div className="p-4">
           {renderWidgetContent()}
         </div>
       </motion.div>
-    );
-  }
 
-  return (
-    <motion.div
-      className="widget absolute"
-      style={{
-        width: size.width,
-        height: size.height,
-      }}
-      initial={position}
-      animate={{
-        x: position.x,
-        y: position.y,
-        scale: isDragging ? 1.05 : 1,
-      }}
-      drag={editMode}
-      dragMomentum={false}
-      onDragStart={() => setIsDragging(true)}
-      onDragEnd={(_, info) => {
-        setIsDragging(false);
-        updateWidget(id, {
-          position: {
-            x: position.x + info.offset.x,
-            y: position.y + info.offset.y,
-          },
-        });
-      }}
-      onClick={() => !editMode && setIsDetailView(!isDetailView)}
-      whileHover={{ scale: editMode ? 1 : 1.02 }}
-      transition={{ duration: 0.2 }}
-    >
-      <div className="widget-content">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            {getWidgetIcon()}
-            <h3 className="font-semibold capitalize">{type}</h3>
-          </div>
-          {editMode && (
-            <button
-              onClick={handleDelete}
-              className="p-1.5 hover:bg-red-100 rounded-full transition-colors"
-            >
-              <Trash2 className="w-4 h-4 text-red-500" />
-            </button>
-          )}
-        </div>
-        {renderWidgetContent()}
-      </div>
-    </motion.div>
+      <AnimatePresence>
+        {isDetailView && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed inset-0 bg-white z-50 overflow-auto"
+            style={{ maxWidth: "640px", margin: "0 auto", left: "50%", transform: "translateX(-50%)" }}
+          >
+            <div className="sticky top-0 bg-white/80 backdrop-blur-sm border-b p-4 mb-4">
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsDetailView(false)}
+                  className="shrink-0"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </Button>
+                <div className="flex items-center gap-2">
+                  {getWidgetIcon()}
+                  <h2 className="text-xl font-semibold capitalize">{type}</h2>
+                </div>
+              </div>
+            </div>
+            <div className="p-4">
+              {renderWidgetContent()}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
