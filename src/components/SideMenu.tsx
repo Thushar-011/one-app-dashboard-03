@@ -9,9 +9,42 @@ interface SideMenuProps {
 export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
   const { widgets } = useWidgets();
 
+  // Calculate stats from actual widget data
   const stats = {
-    alarm: { total: 3, nextIn: "2h 30m" },
-    todo: { total: 5, completed: 2, pending: 3 },
+    alarm: {
+      total: widgets
+        .filter(w => w.type === "alarm")
+        .reduce((acc, w) => acc + (w.data?.alarms?.length || 0), 0),
+      nextIn: (() => {
+        const allAlarms = widgets
+          .filter(w => w.type === "alarm")
+          .flatMap(w => w.data?.alarms || [])
+          .filter(a => a.enabled)
+          .map(a => a.time);
+        
+        if (allAlarms.length === 0) return "No alarms";
+        
+        const now = new Date();
+        const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        
+        const nextAlarm = allAlarms
+          .sort()
+          .find(time => time > currentTime) || allAlarms[0];
+          
+        return nextAlarm;
+      })()
+    },
+    todo: {
+      total: widgets
+        .filter(w => w.type === "todo")
+        .reduce((acc, w) => acc + (w.data?.tasks?.length || 0), 0),
+      completed: widgets
+        .filter(w => w.type === "todo")
+        .reduce((acc, w) => acc + ((w.data?.tasks || []).filter(t => t.completed)?.length || 0), 0),
+      pending: widgets
+        .filter(w => w.type === "todo")
+        .reduce((acc, w) => acc + ((w.data?.tasks || []).filter(t => !t.completed)?.length || 0), 0)
+    }
   };
 
   return (
