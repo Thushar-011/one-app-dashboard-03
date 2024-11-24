@@ -5,6 +5,8 @@ import { Trash2, AlarmClock, ListTodo, Calendar, FileText, DollarSign, ArrowLeft
 import { Widget as WidgetType } from "@/types/widget";
 import AlarmWidget from "./widgets/AlarmWidget";
 import TodoWidget from "./widgets/TodoWidget";
+import NoteWidget from "./widgets/NoteWidget";
+import ReminderWidget from "./widgets/ReminderWidget";
 import { Button } from "./ui/button";
 
 export default function Widget({ id, type, position, size, data }: WidgetType) {
@@ -38,6 +40,10 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         return <AlarmWidget id={id} data={data} isDetailView={isDetailView} />;
       case "todo":
         return <TodoWidget id={id} data={data} isDetailView={isDetailView} />;
+      case "note":
+        return <NoteWidget id={id} data={data} isDetailView={isDetailView} />;
+      case "reminder":
+        return <ReminderWidget id={id} data={data} isDetailView={isDetailView} />;
       default:
         return <div>Widget type not implemented yet</div>;
     }

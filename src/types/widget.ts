@@ -23,3 +23,20 @@ export interface TodoData {
     completed: boolean;
   }>;
 }
+
+export interface NoteData {
+  notes: Array<{
+    id: string;
+    text: string;
+    createdAt: string;
+  }>;
+}
+
+export interface ReminderData {
+  reminders: Array<{
+    id: string;
+    text: string;
+    date: string;
+    completed: boolean;
+  }>;
+}
