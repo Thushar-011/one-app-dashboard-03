@@ -1,6 +1,7 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Trash2 } from "lucide-react";
 
 interface WidgetProps {
   id: string;
@@ -10,8 +11,9 @@ interface WidgetProps {
 }
 
 export default function Widget({ id, type, position, size }: WidgetProps) {
-  const { editMode, updateWidget } = useWidgets();
+  const { editMode, updateWidget, removeWidget } = useWidgets();
   const [isDragging, setIsDragging] = useState(false);
+  const [isDetailView, setIsDetailView] = useState(false);
 
   const content = {
     alarm: {
@@ -23,6 +25,11 @@ export default function Widget({ id, type, position, size }: WidgetProps) {
       preview: "3 tasks pending",
     },
   }[type];
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    removeWidget(id);
+  };
 
   return (
     <motion.div
@@ -49,9 +56,22 @@ export default function Widget({ id, type, position, size }: WidgetProps) {
           },
         });
       }}
+      onClick={() => !editMode && setIsDetailView(!isDetailView)}
+      whileHover={{ scale: editMode ? 1 : 1.02 }}
+      transition={{ duration: 0.2 }}
     >
       <div className="widget-content">
-        <h3 className="font-semibold mb-2">{content.title}</h3>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="font-semibold">{content.title}</h3>
+          {editMode && (
+            <button
+              onClick={handleDelete}
+              className="p-1.5 hover:bg-red-100 rounded-full transition-colors"
+            >
+              <Trash2 className="w-4 h-4 text-red-500" />
+            </button>
+          )}
+        </div>
         <p className="text-sm text-gray-600">{content.preview}</p>
       </div>
     </motion.div>

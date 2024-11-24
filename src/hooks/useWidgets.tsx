@@ -9,11 +9,14 @@ interface Widget {
 
 interface WidgetsContextType {
   widgets: Widget[];
+  trashedWidgets: Widget[];
   editMode: boolean;
   toggleEditMode: () => void;
   addWidget: (type: Widget["type"]) => void;
   removeWidget: (id: string) => void;
   updateWidget: (id: string, updates: Partial<Widget>) => void;
+  restoreWidget: (id: string) => void;
+  clearTrash: () => void;
 }
 
 const WidgetsContext = createContext<WidgetsContextType | null>(null);
@@ -33,6 +36,7 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
       size: { width: 150, height: 150 },
     },
   ]);
+  const [trashedWidgets, setTrashedWidgets] = useState<Widget[]>([]);
   const [editMode, setEditMode] = useState(false);
 
   const toggleEditMode = () => setEditMode(!editMode);
@@ -41,14 +45,30 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
     const newWidget: Widget = {
       id: `${type}-${Date.now()}`,
       type,
-      position: { x: 0, y: 0 },
+      position: { x: 0, y: widgets.length * 170 },
       size: { width: 150, height: 150 },
     };
     setWidgets([...widgets, newWidget]);
   };
 
   const removeWidget = (id: string) => {
-    setWidgets(widgets.filter((w) => w.id !== id));
+    const widgetToRemove = widgets.find(w => w.id === id);
+    if (widgetToRemove) {
+      setWidgets(widgets.filter(w => w.id !== id));
+      setTrashedWidgets([...trashedWidgets, widgetToRemove]);
+    }
+  };
+
+  const restoreWidget = (id: string) => {
+    const widgetToRestore = trashedWidgets.find(w => w.id === id);
+    if (widgetToRestore) {
+      setTrashedWidgets(trashedWidgets.filter(w => w.id !== id));
+      setWidgets([...widgets, widgetToRestore]);
+    }
+  };
+
+  const clearTrash = () => {
+    setTrashedWidgets([]);
   };
 
   const updateWidget = (id: string, updates: Partial<Widget>) => {
@@ -61,11 +81,14 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
     <WidgetsContext.Provider
       value={{
         widgets,
+        trashedWidgets,
         editMode,
         toggleEditMode,
         addWidget,
         removeWidget,
         updateWidget,
+        restoreWidget,
+        clearTrash,
       }}
     >
       {children}
