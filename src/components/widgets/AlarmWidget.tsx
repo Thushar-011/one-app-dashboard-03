@@ -60,7 +60,8 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
 
   if (!isDetailView) {
     return (
-      <div className="text-sm text-gray-600">
+      <div className="text-sm text-gray-600 flex items-center gap-2">
+        <div className="w-2 h-2 rounded-full bg-primary/50" />
         {alarms.length === 0
           ? "No alarms set"
           : `${alarms.length} alarm${alarms.length === 1 ? "" : "s"} set`}

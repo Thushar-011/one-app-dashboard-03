@@ -1,15 +1,21 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Trash2, AlarmClock, ListTodo, Calendar, FileText, DollarSign } from "lucide-react";
+import { Trash2, AlarmClock, ListTodo, Calendar, FileText, DollarSign, ArrowLeft } from "lucide-react";
 import { Widget as WidgetType } from "@/types/widget";
 import AlarmWidget from "./widgets/AlarmWidget";
 import TodoWidget from "./widgets/TodoWidget";
+import { Button } from "./ui/button";
 
 export default function Widget({ id, type, position, size, data }: WidgetType) {
   const { editMode, updateWidget, removeWidget } = useWidgets();
   const [isDragging, setIsDragging] = useState(false);
   const [isDetailView, setIsDetailView] = useState(false);
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    removeWidget(id);
+  };
 
   const getWidgetIcon = () => {
     switch (type) {
@@ -37,10 +43,37 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
     }
   };
 
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    removeWidget(id);
-  };
+  if (isDetailView) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 20 }}
+        className="fixed inset-0 bg-white z-50 overflow-auto"
+        style={{ maxWidth: "640px", margin: "0 auto" }}
+      >
+        <div className="sticky top-0 bg-white/80 backdrop-blur-sm border-b p-4 mb-4">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsDetailView(false)}
+              className="shrink-0"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div className="flex items-center gap-2">
+              {getWidgetIcon()}
+              <h2 className="text-xl font-semibold capitalize">{type}</h2>
+            </div>
+          </div>
+        </div>
+        <div className="p-4">
+          {renderWidgetContent()}
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
