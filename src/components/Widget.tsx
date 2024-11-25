@@ -1,31 +1,22 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, AlarmClock, ListTodo, Calendar, FileText, DollarSign, ArrowLeft, Star } from "lucide-react";
+import { Trash2, AlarmClock, ListTodo, Calendar, FileText, DollarSign, ArrowLeft } from "lucide-react";
 import { Widget as WidgetType } from "@/types/widget";
 import AlarmWidget from "./widgets/AlarmWidget";
 import TodoWidget from "./widgets/TodoWidget";
 import NoteWidget from "./widgets/NoteWidget";
 import ReminderWidget from "./widgets/ReminderWidget";
 import { Button } from "./ui/button";
-import { toast } from "sonner";
 
 export default function Widget({ id, type, position, size, data }: WidgetType) {
   const { editMode, updateWidget, removeWidget } = useWidgets();
   const [isDragging, setIsDragging] = useState(false);
   const [isDetailView, setIsDetailView] = useState(false);
-  const [isStarred, setIsStarred] = useState(false);
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     removeWidget(id);
-    toast.success("Widget removed");
-  };
-
-  const toggleStar = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsStarred(!isStarred);
-    toast.success(isStarred ? "Removed from favorites" : "Added to favorites");
   };
 
   const getWidgetIcon = () => {
@@ -137,14 +128,6 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
                       <h2 className="text-xl font-semibold capitalize">{type}</h2>
                     </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={toggleStar}
-                    className={`shrink-0 ${isStarred ? 'text-yellow-500' : ''}`}
-                  >
-                    <Star className="w-5 h-5" />
-                  </Button>
                 </div>
               </div>
               <div className="max-w-2xl mx-auto p-4">

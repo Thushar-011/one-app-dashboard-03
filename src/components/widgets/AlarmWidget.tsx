@@ -60,7 +60,7 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
 
   if (!isDetailView) {
     return (
-      <div className="text-sm text-gray-600 flex items-center gap-2">
+      <div className="text-sm text-muted-foreground flex items-center gap-2">
         <div className="w-2 h-2 rounded-full bg-primary/50" />
         {alarms.length === 0
           ? "No alarms set"
@@ -88,19 +88,19 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
         {alarms.map((alarm) => (
           <div
             key={alarm.id}
-            className="flex items-center justify-between bg-gray-50 p-2 rounded"
+            className="widget-list-item flex items-center justify-between p-2 rounded"
           >
             <button
               onClick={(e) => toggleAlarm(e, alarm.id)}
               className={`flex-1 text-left ${
-                !alarm.enabled && "text-gray-400 line-through"
+                !alarm.enabled && "text-muted-foreground line-through"
               }`}
             >
               {alarm.time}
             </button>
             <button
               onClick={(e) => removeAlarm(e, alarm.id)}
-              className="p-1 hover:bg-gray-200 rounded"
+              className="p-1 hover:bg-white/5 rounded"
             >
               <X className="w-4 h-4" />
             </button>

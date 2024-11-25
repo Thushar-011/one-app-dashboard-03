@@ -79,4 +79,18 @@
   .dark .glass-card {
     @apply bg-white/[0.02] border border-white/[0.05] backdrop-blur-xl;
   }
+
+  /* Dark mode improvements for widget items */
+  .dark .widget-item {
+    @apply bg-white/[0.02] border border-white/[0.03];
+  }
+
+  .dark input,
+  .dark textarea {
+    @apply bg-white/[0.02] border-white/[0.05] text-white/90;
+  }
+
+  .dark .widget-list-item {
+    @apply bg-white/[0.02] border border-white/[0.03] text-white/90;
+  }
 }
