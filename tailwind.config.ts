@@ -52,6 +52,7 @@ export default {
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],
+        display: ["Satoshi", "sans-serif"],
       },
       keyframes: {
         "fade-in": {
