@@ -105,7 +105,6 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             className="fixed inset-0 bg-white z-50 overflow-auto"
-            style={{ maxWidth: "640px", margin: "0 auto", left: "50%", transform: "translateX(-50%)" }}
           >
             <div className="sticky top-0 bg-white/80 backdrop-blur-sm border-b p-4 mb-4">
               <div className="flex items-center gap-4">
