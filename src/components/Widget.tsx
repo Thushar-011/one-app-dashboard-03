@@ -1,22 +1,31 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, AlarmClock, ListTodo, Calendar, FileText, DollarSign, ArrowLeft } from "lucide-react";
+import { Trash2, AlarmClock, ListTodo, Calendar, FileText, DollarSign, ArrowLeft, Star } from "lucide-react";
 import { Widget as WidgetType } from "@/types/widget";
 import AlarmWidget from "./widgets/AlarmWidget";
 import TodoWidget from "./widgets/TodoWidget";
 import NoteWidget from "./widgets/NoteWidget";
 import ReminderWidget from "./widgets/ReminderWidget";
 import { Button } from "./ui/button";
+import { toast } from "sonner";
 
 export default function Widget({ id, type, position, size, data }: WidgetType) {
   const { editMode, updateWidget, removeWidget } = useWidgets();
   const [isDragging, setIsDragging] = useState(false);
   const [isDetailView, setIsDetailView] = useState(false);
+  const [isStarred, setIsStarred] = useState(false);
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     removeWidget(id);
+    toast.success("Widget removed");
+  };
+
+  const toggleStar = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsStarred(!isStarred);
+    toast.success(isStarred ? "Removed from favorites" : "Added to favorites");
   };
 
   const getWidgetIcon = () => {
@@ -88,7 +97,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
             {editMode && (
               <button
                 onClick={handleDelete}
-                className="p-1.5 hover:bg-red-100 rounded-full transition-colors"
+                className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-full transition-colors"
               >
                 <Trash2 className="w-4 h-4 text-red-500" />
               </button>
@@ -101,30 +110,47 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
       <AnimatePresence>
         {isDetailView && (
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="fixed inset-0 bg-white z-50 overflow-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50"
           >
-            <div className="sticky top-0 bg-white/80 backdrop-blur-sm border-b p-4 mb-4">
-              <div className="flex items-center gap-4">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsDetailView(false)}
-                  className="shrink-0"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </Button>
-                <div className="flex items-center gap-2">
-                  {getWidgetIcon()}
-                  <h2 className="text-xl font-semibold capitalize">{type}</h2>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="fixed inset-0 bg-background overflow-auto"
+            >
+              <div className="sticky top-0 bg-card/80 backdrop-blur-sm border-b p-4 mb-4">
+                <div className="flex items-center justify-between max-w-2xl mx-auto">
+                  <div className="flex items-center gap-4">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsDetailView(false)}
+                      className="shrink-0"
+                    >
+                      <ArrowLeft className="w-5 h-5" />
+                    </Button>
+                    <div className="flex items-center gap-2">
+                      {getWidgetIcon()}
+                      <h2 className="text-xl font-semibold capitalize">{type}</h2>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={toggleStar}
+                    className={`shrink-0 ${isStarred ? 'text-yellow-500' : ''}`}
+                  >
+                    <Star className="w-5 h-5" />
+                  </Button>
                 </div>
               </div>
-            </div>
-            <div className="p-4">
-              {renderWidgetContent()}
-            </div>
+              <div className="max-w-2xl mx-auto p-4">
+                {renderWidgetContent()}
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
