@@ -53,7 +53,7 @@
   }
 
   .dark .widget {
-    @apply border border-white/[0.03] bg-black/40 backdrop-blur-xl shadow-2xl;
+    @apply border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl;
   }
 
   .widget-content {
