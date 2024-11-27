@@ -90,6 +90,10 @@
   }
 
   .widget-list-item {
-    @apply bg-white border text-foreground;
+    @apply bg-gray-800 border-gray-700 text-white;
+  }
+
+  .dark .widget-list-item {
+    @apply bg-gray-800 border-gray-700 text-white;
   }
 }
