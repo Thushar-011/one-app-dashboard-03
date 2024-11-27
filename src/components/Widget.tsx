@@ -112,7 +112,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
               exit={{ opacity: 0, y: 20 }}
               className="fixed inset-0 bg-background overflow-auto"
             >
-              <div className="sticky top-0 bg-card/80 backdrop-blur-sm border-b p-4 mb-4">
+              <div className="sticky top-0 bg-background/80 backdrop-blur-sm border-b p-4 mb-4">
                 <div className="flex items-center justify-between max-w-2xl mx-auto">
                   <div className="flex items-center gap-4">
                     <Button

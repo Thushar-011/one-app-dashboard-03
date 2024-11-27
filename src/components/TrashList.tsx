@@ -21,7 +21,7 @@ export default function TrashList({ isOpen, onClose }: TrashListProps) {
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent className="max-w-md mx-auto">
+      <AlertDialogContent className="max-w-md mx-auto bg-background">
         <AlertDialogHeader>
           <AlertDialogTitle>Trash</AlertDialogTitle>
           <AlertDialogDescription>
@@ -31,21 +31,21 @@ export default function TrashList({ isOpen, onClose }: TrashListProps) {
 
         <div className="py-4">
           {trashedWidgets.length === 0 ? (
-            <p className="text-center text-gray-500">No items in trash</p>
+            <p className="text-center text-muted-foreground">No items in trash</p>
           ) : (
             <div className="space-y-2">
               {trashedWidgets.map((widget) => (
                 <div
                   key={widget.id}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  className="flex items-center justify-between p-3 bg-card rounded-lg border border-border"
                 >
-                  <span className="capitalize">{widget.type}</span>
+                  <span className="capitalize text-foreground">{widget.type}</span>
                   <button
                     onClick={() => {
                       restoreWidget(widget.id);
                       onClose();
                     }}
-                    className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+                    className="p-2 hover:bg-muted rounded-full transition-colors"
                   >
                     <RotateCcw className="w-4 h-4" />
                   </button>
@@ -60,7 +60,7 @@ export default function TrashList({ isOpen, onClose }: TrashListProps) {
           {trashedWidgets.length > 0 && (
             <AlertDialogAction
               onClick={clearTrash}
-              className="bg-red-500 hover:bg-red-600"
+              className="bg-destructive hover:bg-destructive/90"
             >
               Clear All
             </AlertDialogAction>
