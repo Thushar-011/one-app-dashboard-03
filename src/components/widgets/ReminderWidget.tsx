@@ -66,7 +66,7 @@ export default function ReminderWidget({ id, data, isDetailView }: ReminderWidge
   if (!isDetailView) {
     const pendingReminders = reminders.filter((reminder) => !reminder.completed).length;
     return (
-      <div className="text-sm text-gray-600 flex items-center gap-2">
+      <div className="text-sm text-muted-foreground flex items-center gap-2">
         <div className="w-2 h-2 rounded-full bg-primary/50" />
         {pendingReminders === 0
           ? "No pending reminders"
@@ -89,7 +89,7 @@ export default function ReminderWidget({ id, data, isDetailView }: ReminderWidge
           mode="single"
           selected={selectedDate}
           onSelect={setSelectedDate}
-          className="rounded-md border"
+          className="rounded-md border dark:bg-card"
         />
         <Button 
           onClick={(e) => addReminder(e)}
@@ -104,22 +104,22 @@ export default function ReminderWidget({ id, data, isDetailView }: ReminderWidge
         {reminders.map((reminder) => (
           <div
             key={reminder.id}
-            className="flex items-center justify-between bg-gray-50 p-3 rounded"
+            className="widget-list-item flex items-center justify-between p-3 rounded-lg"
           >
             <button
               onClick={(e) => toggleReminder(e, reminder.id)}
               className={`flex-1 text-left ${
-                reminder.completed && "text-gray-400 line-through"
+                reminder.completed && "text-muted-foreground line-through"
               }`}
             >
               <p>{reminder.text}</p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground mt-1">
                 {format(new Date(reminder.date), "PPP")}
               </p>
             </button>
             <button
               onClick={(e) => removeReminder(e, reminder.id)}
-              className="p-1 hover:bg-gray-200 rounded ml-2"
+              className="p-1 hover:bg-muted rounded"
             >
               <X className="w-4 h-4" />
             </button>
