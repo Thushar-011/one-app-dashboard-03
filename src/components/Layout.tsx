@@ -7,7 +7,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('darkMode') === 'true';
+      return document.documentElement.classList.contains('dark');
     }
     return false;
   });
@@ -20,6 +20,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
     localStorage.setItem('darkMode', isDarkMode.toString());
   }, [isDarkMode]);
+
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    setIsDarkMode(savedDarkMode);
+    if (savedDarkMode) {
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
 
   return (
     <div className="min-h-screen w-full max-w-md mx-auto relative bg-background">
