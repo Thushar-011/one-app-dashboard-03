@@ -60,10 +60,6 @@
     touch-action: none;
   }
 
-  .dark .widget {
-    @apply border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl;
-  }
-
   .widget-content {
     @apply w-full h-full flex flex-col;
   }
@@ -80,24 +76,12 @@
     @apply font-display tracking-tight;
   }
 
-  .dark :is(h1, h2, h3, h4, h5, h6) {
-    @apply text-white/90;
-  }
-
   .glass-card {
     @apply bg-white/90 backdrop-blur-xl;
   }
 
-  .dark .glass-card {
-    @apply bg-white/[0.02] border border-white/[0.05] backdrop-blur-xl;
-  }
-
   .widget-item {
     @apply bg-white border;
-  }
-
-  .dark .widget-item {
-    @apply bg-white/[0.02] border border-white/[0.03];
   }
 
   input,
@@ -105,16 +89,7 @@
     @apply bg-white border text-foreground;
   }
 
-  .dark input,
-  .dark textarea {
-    @apply bg-white/[0.02] border-white/[0.05] text-white/90;
-  }
-
   .widget-list-item {
     @apply bg-white border text-foreground;
-  }
-
-  .dark .widget-list-item {
-    @apply bg-white/[0.02] border border-white/[0.03] text-white/90;
   }
 }
