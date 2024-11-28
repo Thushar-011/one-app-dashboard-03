@@ -1,33 +1,11 @@
-import { Menu, Moon, Sun } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Menu } from "lucide-react";
+import { useState } from "react";
 import SideMenu from "./SideMenu";
 import { Button } from "./ui/button";
+import WidgetSelector from "./WidgetSelector";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return document.documentElement.classList.contains('dark');
-    }
-    return false;
-  });
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('darkMode', isDarkMode.toString());
-  }, [isDarkMode]);
-
-  useEffect(() => {
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-    setIsDarkMode(savedDarkMode);
-    if (savedDarkMode) {
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
 
   return (
     <div className="min-h-screen w-full max-w-md mx-auto relative bg-background">
@@ -42,18 +20,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <Menu className="w-6 h-6" />
           </Button>
           <h1 className="text-xl font-semibold mx-auto">ONE APP</h1>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsDarkMode(!isDarkMode)}
-            className="shrink-0"
-          >
-            {isDarkMode ? (
-              <Sun className="w-6 h-6" />
-            ) : (
-              <Moon className="w-6 h-6" />
-            )}
-          </Button>
+          <WidgetSelector />
         </div>
       </header>
 

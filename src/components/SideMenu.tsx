@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { useWidgets } from "@/hooks/useWidgets";
+import { formatIndianCurrency } from "@/lib/utils";
 
 interface SideMenuProps {
   isOpen: boolean;
@@ -9,7 +10,6 @@ interface SideMenuProps {
 export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
   const { widgets } = useWidgets();
 
-  // Calculate stats from actual widget data
   const stats = {
     alarm: {
       total: widgets
@@ -44,6 +44,27 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
       pending: widgets
         .filter(w => w.type === "todo")
         .reduce((acc, w) => acc + ((w.data?.tasks || []).filter(t => !t.completed)?.length || 0), 0)
+    },
+    expense: {
+      total: widgets
+        .filter(w => w.type === "expense")
+        .reduce((acc, w) => acc + (w.data?.expenses?.reduce((sum: number, exp: any) => sum + exp.amount, 0) || 0), 0),
+      categories: widgets
+        .filter(w => w.type === "expense")
+        .reduce((acc, w) => acc + (w.data?.categories?.length || 0), 0)
+    },
+    note: {
+      total: widgets
+        .filter(w => w.type === "note")
+        .reduce((acc, w) => acc + (w.data?.notes?.length || 0), 0)
+    },
+    reminder: {
+      total: widgets
+        .filter(w => w.type === "reminder")
+        .reduce((acc, w) => acc + (w.data?.reminders?.length || 0), 0),
+      active: widgets
+        .filter(w => w.type === "reminder")
+        .reduce((acc, w) => acc + ((w.data?.reminders || []).filter(r => !r.completed)?.length || 0), 0)
     }
   };
 
@@ -56,37 +77,60 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
         onClick={onClose}
       />
       <div
-        className={`fixed top-0 left-0 bottom-0 w-80 bg-background dark:bg-background/80 shadow-xl z-50 transition-transform duration-300 ${
+        className={`fixed top-0 left-0 bottom-0 w-80 bg-background shadow-xl z-50 transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="p-4 border-b border-border">
+        <div className="p-4 border-b">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-foreground">Widget Analytics</h2>
+            <h2 className="text-xl font-semibold">Widget Analytics</h2>
             <button
               onClick={onClose}
               className="p-2 hover:bg-muted rounded-full transition-colors"
             >
-              <X className="w-5 h-5 text-foreground" />
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
         <div className="p-4 space-y-4">
           <div className="space-y-2">
-            <h3 className="font-medium text-foreground">Alarms</h3>
-            <div className="bg-card dark:bg-card/50 p-3 rounded-lg border border-border">
-              <p className="text-foreground">Total Alarms: {stats.alarm.total}</p>
-              <p className="text-foreground">Next Alarm: {stats.alarm.nextIn}</p>
+            <h3 className="font-medium">Alarms</h3>
+            <div className="bg-card p-3 rounded-lg border">
+              <p>Total Alarms: {stats.alarm.total}</p>
+              <p>Next Alarm: {stats.alarm.nextIn}</p>
             </div>
           </div>
 
           <div className="space-y-2">
-            <h3 className="font-medium text-foreground">To-Do List</h3>
-            <div className="bg-card dark:bg-card/50 p-3 rounded-lg border border-border">
-              <p className="text-foreground">Total Tasks: {stats.todo.total}</p>
-              <p className="text-foreground">Completed: {stats.todo.completed}</p>
-              <p className="text-foreground">Pending: {stats.todo.pending}</p>
+            <h3 className="font-medium">To-Do List</h3>
+            <div className="bg-card p-3 rounded-lg border">
+              <p>Total Tasks: {stats.todo.total}</p>
+              <p>Completed: {stats.todo.completed}</p>
+              <p>Pending: {stats.todo.pending}</p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="font-medium">Expenses</h3>
+            <div className="bg-card p-3 rounded-lg border">
+              <p>Total Spent: {formatIndianCurrency(stats.expense.total)}</p>
+              <p>Categories: {stats.expense.categories}</p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="font-medium">Notes</h3>
+            <div className="bg-card p-3 rounded-lg border">
+              <p>Total Notes: {stats.note.total}</p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="font-medium">Reminders</h3>
+            <div className="bg-card p-3 rounded-lg border">
+              <p>Total Reminders: {stats.reminder.total}</p>
+              <p>Active Reminders: {stats.reminder.active}</p>
             </div>
           </div>
         </div>

@@ -28,28 +28,6 @@
     --ring: 262 100% 74%;
   }
 
-  .dark {
-    --background: 240 10% 4%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 8%;
-    --card-foreground: 0 0% 100%;
-    --popover: 240 10% 4%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 262 100% 74%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 166 95% 43%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 240 3.7% 40%;
-    --muted-foreground: 240 5% 60%;
-    --accent: 262 100% 74%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-  }
-
   body {
     @apply bg-background text-foreground antialiased touch-manipulation;
     -webkit-tap-highlight-color: transparent;
@@ -90,10 +68,6 @@
   }
 
   .widget-list-item {
-    @apply bg-gray-800 border-gray-700 text-white;
-  }
-
-  .dark .widget-list-item {
-    @apply bg-gray-800 border-gray-700 text-white;
+    @apply bg-gray-50 border-gray-200 text-gray-900;
   }
 }
