@@ -7,6 +7,7 @@ import AlarmWidget from "./widgets/AlarmWidget";
 import TodoWidget from "./widgets/TodoWidget";
 import NoteWidget from "./widgets/NoteWidget";
 import ReminderWidget from "./widgets/ReminderWidget";
+import ExpenseWidget from "./widgets/ExpenseWidget";
 import { Button } from "./ui/button";
 
 export default function Widget({ id, type, position, size, data }: WidgetType) {
@@ -44,6 +45,8 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         return <NoteWidget id={id} data={data} isDetailView={isDetailView} />;
       case "reminder":
         return <ReminderWidget id={id} data={data} isDetailView={isDetailView} />;
+      case "expense":
+        return <ExpenseWidget id={id} data={data} isDetailView={isDetailView} />;
       default:
         return <div>Widget type not implemented yet</div>;
     }

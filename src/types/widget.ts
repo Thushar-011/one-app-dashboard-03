@@ -40,3 +40,22 @@ export interface ReminderData {
     completed: boolean;
   }>;
 }
+
+export interface ExpenseCategory {
+  id: string;
+  name: string;
+  color: string;
+}
+
+export interface Expense {
+  id: string;
+  amount: number;
+  description: string;
+  categoryId: string;
+  date: string;
+}
+
+export interface ExpenseData {
+  categories: ExpenseCategory[];
+  expenses: Expense[];
+}

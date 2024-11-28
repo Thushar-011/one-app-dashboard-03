@@ -43,7 +43,13 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
       type,
       position: { x: 0, y: widgets.length * 170 },
       size: { width: 150, height: 150 },
-      data: type === "alarm" ? { alarms: [] } : type === "todo" ? { tasks: [] } : {},
+      data: type === "alarm" 
+        ? { alarms: [] } 
+        : type === "todo" 
+        ? { tasks: [] }
+        : type === "expense"
+        ? { categories: [], expenses: [] }
+        : {},
     };
     setWidgets([...widgets, newWidget]);
   };
