@@ -1,21 +1,33 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { Widget, WidgetType } from "@/types/widget";
 
+/**
+ * Context interface defining the shape of our widget management system
+ */
 interface WidgetsContextType {
-  widgets: Widget[];
-  trashedWidgets: Widget[];
-  editMode: boolean;
-  toggleEditMode: () => void;
-  addWidget: (type: WidgetType) => void;
-  removeWidget: (id: string) => void;
-  updateWidget: (id: string, updates: Partial<Widget>) => void;
-  restoreWidget: (id: string) => void;
-  clearTrash: () => void;
+  widgets: Widget[];              // Active widgets
+  trashedWidgets: Widget[];       // Deleted widgets stored in trash
+  editMode: boolean;              // Whether edit mode is active
+  toggleEditMode: () => void;     // Toggle edit mode on/off
+  addWidget: (type: WidgetType) => void;  // Add new widget
+  removeWidget: (id: string) => void;      // Move widget to trash
+  updateWidget: (id: string, updates: Partial<Widget>) => void;  // Update widget properties
+  restoreWidget: (id: string) => void;     // Restore widget from trash
+  clearTrash: () => void;                  // Empty trash
 }
 
 const WidgetsContext = createContext<WidgetsContextType | null>(null);
 
+/**
+ * Provider component that wraps app to provide widget management functionality
+ * Manages state for:
+ * - Active widgets
+ * - Trashed widgets
+ * - Edit mode
+ * Provides methods for widget CRUD operations
+ */
 export function WidgetsProvider({ children }: { children: ReactNode }) {
+  // Initialize with default widgets
   const [widgets, setWidgets] = useState<Widget[]>([
     {
       id: "alarm-1",
@@ -99,6 +111,10 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Custom hook to access widget context
+ * Throws error if used outside WidgetsProvider
+ */
 export function useWidgets() {
   const context = useContext(WidgetsContext);
   if (!context) {

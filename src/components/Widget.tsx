@@ -10,6 +10,19 @@ import ReminderWidget from "./widgets/ReminderWidget";
 import ExpenseWidget from "./widgets/ExpenseWidget";
 import { Button } from "./ui/button";
 
+/**
+ * Widget Component
+ * Renders a draggable widget with:
+ * - Header with icon and title
+ * - Content based on widget type
+ * - Delete button in edit mode
+ * - Expandable detail view
+ * 
+ * Features:
+ * - Drag and drop in edit mode
+ * - Animations for interactions
+ * - Responsive detail view
+ */
 export default function Widget({ id, type, position, size, data }: WidgetType) {
   const { editMode, updateWidget, removeWidget } = useWidgets();
   const [isDragging, setIsDragging] = useState(false);
@@ -99,6 +112,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         whileHover={{ scale: editMode ? 1 : 1.02 }}
         transition={{ duration: 0.2 }}
       >
+        {/* Widget content */}
         <div className="widget-content">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -118,6 +132,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         </div>
       </motion.div>
 
+      {/* Detail View Modal */}
       <AnimatePresence>
         {isDetailView && (
           <motion.div 

@@ -1,13 +1,23 @@
+/**
+ * Available widget types in the application
+ */
 export type WidgetType = "alarm" | "todo" | "reminder" | "note" | "expense";
 
+/**
+ * Base widget interface
+ * Defines common properties for all widgets
+ */
 export interface Widget {
-  id: string;
-  type: WidgetType;
-  position: { x: number; y: number };
-  size: { width: number; height: number };
-  data?: any;
+  id: string;                     // Unique identifier
+  type: WidgetType;              // Widget type
+  position: { x: number; y: number };  // Position on dashboard
+  size: { width: number; height: number };  // Widget dimensions
+  data?: any;                    // Widget-specific data
 }
 
+/**
+ * Alarm widget data structure
+ */
 export interface AlarmData {
   alarms: Array<{
     id: string;
@@ -16,6 +26,9 @@ export interface AlarmData {
   }>;
 }
 
+/**
+ * Todo widget data structure
+ */
 export interface TodoData {
   tasks: Array<{
     id: string;
@@ -24,6 +37,9 @@ export interface TodoData {
   }>;
 }
 
+/**
+ * Note widget data structure
+ */
 export interface NoteData {
   notes: Array<{
     id: string;
@@ -32,6 +48,9 @@ export interface NoteData {
   }>;
 }
 
+/**
+ * Reminder widget data structure
+ */
 export interface ReminderData {
   reminders: Array<{
     id: string;
@@ -41,12 +60,18 @@ export interface ReminderData {
   }>;
 }
 
+/**
+ * Expense category definition
+ */
 export interface ExpenseCategory {
   id: string;
   name: string;
   color: string;
 }
 
+/**
+ * Individual expense entry
+ */
 export interface Expense {
   id: string;
   amount: number;
@@ -55,6 +80,9 @@ export interface Expense {
   date: string;
 }
 
+/**
+ * Expense widget data structure
+ */
 export interface ExpenseData {
   categories: ExpenseCategory[];
   expenses: Expense[];

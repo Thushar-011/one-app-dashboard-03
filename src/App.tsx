@@ -6,8 +6,18 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { WidgetsProvider } from "./hooks/useWidgets";
 import Index from "./pages/Index";
 
+// Initialize React Query client for data fetching and caching
 const queryClient = new QueryClient();
 
+/**
+ * Root Application Component
+ * Sets up core providers and routing:
+ * - QueryClientProvider: For data fetching and caching
+ * - TooltipProvider: For UI tooltips
+ * - WidgetsProvider: Custom context for widget management
+ * - Toaster components: For notifications
+ * - React Router: For page routing
+ */
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
