@@ -25,9 +25,9 @@ export default function WidgetSelector() {
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          variant="secondary"
+          variant="ghost"
           size="icon"
-          className="rounded-full shadow-lg hover:shadow-xl transition-shadow"
+          className="shrink-0"
         >
           <Plus className="w-6 h-6" />
         </Button>

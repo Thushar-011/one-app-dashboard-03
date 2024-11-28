@@ -4,7 +4,6 @@ import { useWidgets } from "@/hooks/useWidgets";
 import Widget from "@/components/Widget";
 import TrashList from "@/components/TrashList";
 import { useState } from "react";
-import WidgetSelector from "@/components/WidgetSelector";
 
 export default function Index() {
   const { widgets, editMode, toggleEditMode } = useWidgets();
@@ -20,7 +19,7 @@ export default function Index() {
         <div className="fixed bottom-4 right-4 flex gap-2">
           <button
             onClick={toggleEditMode}
-            className="bg-primary text-white px-4 py-2 rounded-full shadow-lg hover:bg-primary-dark transition-colors"
+            className="bg-primary text-white px-4 py-2 rounded-full shadow-lg hover:bg-primary/90 transition-colors"
           >
             {editMode ? "Done" : "Edit Widgets"}
           </button>
@@ -31,8 +30,6 @@ export default function Index() {
           >
             <Trash2 className="w-6 h-6" />
           </button>
-          
-          <WidgetSelector />
         </div>
 
         <TrashList isOpen={isTrashOpen} onClose={() => setIsTrashOpen(false)} />

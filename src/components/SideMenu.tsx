@@ -77,7 +77,7 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
         onClick={onClose}
       />
       <div
-        className={`fixed top-0 left-0 bottom-0 w-80 bg-background shadow-xl z-50 transition-transform duration-300 ${
+        className={`fixed top-0 left-0 bottom-0 w-80 bg-background shadow-xl z-50 transition-transform duration-300 flex flex-col ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -93,7 +93,7 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
           </div>
         </div>
 
-        <div className="p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div className="space-y-2">
             <h3 className="font-medium">Alarms</h3>
             <div className="bg-card p-3 rounded-lg border">

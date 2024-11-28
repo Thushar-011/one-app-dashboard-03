@@ -1,7 +1,7 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, AlarmClock, ListTodo, Calendar, FileText, DollarSign, ArrowLeft } from "lucide-react";
+import { Trash2, AlarmClock, ListTodo, Calendar, FileText, IndianRupee, ArrowLeft } from "lucide-react";
 import { Widget as WidgetType } from "@/types/widget";
 import AlarmWidget from "./widgets/AlarmWidget";
 import TodoWidget from "./widgets/TodoWidget";
@@ -31,7 +31,24 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
       case "note":
         return <FileText className="w-5 h-5" />;
       case "expense":
-        return <DollarSign className="w-5 h-5" />;
+        return <IndianRupee className="w-5 h-5" />;
+    }
+  };
+
+  const getWidgetTitle = () => {
+    switch (type) {
+      case "alarm":
+        return "Alarm";
+      case "todo":
+        return "To-Do List";
+      case "reminder":
+        return "Reminders";
+      case "note":
+        return "Notes";
+      case "expense":
+        return "Expense Tracker";
+      default:
+        return type;
     }
   };
 
@@ -86,12 +103,12 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               {getWidgetIcon()}
-              <h3 className="font-semibold capitalize">{type}</h3>
+              <h3 className="font-semibold">{getWidgetTitle()}</h3>
             </div>
             {editMode && (
               <button
                 onClick={handleDelete}
-                className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-full transition-colors"
+                className="p-1.5 hover:bg-red-100 rounded-full transition-colors"
               >
                 <Trash2 className="w-4 h-4 text-red-500" />
               </button>
@@ -128,7 +145,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
                     </Button>
                     <div className="flex items-center gap-2">
                       {getWidgetIcon()}
-                      <h2 className="text-xl font-semibold capitalize">{type}</h2>
+                      <h2 className="text-xl font-semibold">{getWidgetTitle()}</h2>
                     </div>
                   </div>
                 </div>
