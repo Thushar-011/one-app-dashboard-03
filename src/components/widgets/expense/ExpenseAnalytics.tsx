@@ -180,8 +180,17 @@ export default function ExpenseAnalytics({ categories, expenses }: ExpenseAnalyt
                     type="monotone" 
                     dataKey="amount" 
                     stroke="var(--primary)"
-                    strokeWidth={2}
-                    dot={{ fill: "var(--primary)", strokeWidth: 2 }}
+                    strokeWidth={3}
+                    dot={{ 
+                      fill: "var(--primary)",
+                      strokeWidth: 2,
+                      r: 4,
+                      strokeOpacity: 1
+                    }}
+                    activeDot={{
+                      r: 6,
+                      strokeWidth: 3
+                    }}
                   />
                 </LineChart>
               </ResponsiveContainer>
