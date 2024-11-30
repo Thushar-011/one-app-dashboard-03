@@ -4,6 +4,7 @@ import { BarChart2, X } from "lucide-react";
 import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { ExpenseCategory, Expense } from "@/types/widget";
+import { format, parseISO } from "date-fns";
 
 interface ExpenseAnalyticsProps {
   categories: ExpenseCategory[];
@@ -31,15 +32,26 @@ export default function ExpenseAnalytics({ categories, expenses }: ExpenseAnalyt
   };
 
   const getExpensesByDate = () => {
-    const expensesByDate = expenses.reduce((acc: Record<string, number>, exp) => {
-      const date = exp.date.split('T')[0];
-      acc[date] = (acc[date] || 0) + exp.amount;
-      return acc;
-    }, {});
+    // Create a map to store daily totals
+    const dailyTotals = new Map<string, number>();
 
-    return Object.entries(expensesByDate)
-      .map(([date, amount]) => ({ date, amount }))
+    // Process each expense
+    expenses.forEach(exp => {
+      const date = exp.date.split('T')[0]; // Get just the date part
+      const currentTotal = dailyTotals.get(date) || 0;
+      dailyTotals.set(date, currentTotal + exp.amount);
+    });
+
+    // Convert to array and sort by date
+    const sortedData = Array.from(dailyTotals.entries())
+      .map(([date, amount]) => ({
+        date,
+        amount,
+        formattedDate: format(parseISO(date), 'MMM d') // Format date for display
+      }))
       .sort((a, b) => a.date.localeCompare(b.date));
+
+    return sortedData;
   };
 
   if (!showAnalytics) {
@@ -55,6 +67,20 @@ export default function ExpenseAnalytics({ categories, expenses }: ExpenseAnalyt
       </div>
     );
   }
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-background border rounded-lg p-2 shadow-lg">
+          <p className="font-medium">{payload[0].payload.formattedDate}</p>
+          <p className="text-sm text-muted-foreground">
+            {formatIndianCurrency(payload[0].value)}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50">
@@ -102,11 +128,33 @@ export default function ExpenseAnalytics({ categories, expenses }: ExpenseAnalyt
             <div className="h-[400px] mt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={getExpensesByCategory()}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => formatIndianCurrency(value as number)} />
-                  <Bar dataKey="amount" fill="#8B5CF6" />
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis 
+                    dataKey="name"
+                    tick={{ fill: 'currentColor' }}
+                    tickLine={{ stroke: 'currentColor' }}
+                  />
+                  <YAxis 
+                    tick={{ fill: 'currentColor' }}
+                    tickLine={{ stroke: 'currentColor' }}
+                    tickFormatter={(value) => `₹${value}`}
+                  />
+                  <Tooltip 
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-background border rounded-lg p-2 shadow-lg">
+                            <p className="font-medium">{label}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {formatIndianCurrency(payload[0].value as number)}
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Bar dataKey="amount" fill="var(--primary)" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -116,11 +164,25 @@ export default function ExpenseAnalytics({ categories, expenses }: ExpenseAnalyt
             <div className="h-[400px] mt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={getExpensesByDate()}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => formatIndianCurrency(value as number)} />
-                  <Line type="monotone" dataKey="amount" stroke="#8B5CF6" />
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis 
+                    dataKey="formattedDate"
+                    tick={{ fill: 'currentColor' }}
+                    tickLine={{ stroke: 'currentColor' }}
+                  />
+                  <YAxis 
+                    tick={{ fill: 'currentColor' }}
+                    tickLine={{ stroke: 'currentColor' }}
+                    tickFormatter={(value) => `₹${value}`}
+                  />
+                  <Tooltip content={CustomTooltip} />
+                  <Line 
+                    type="monotone" 
+                    dataKey="amount" 
+                    stroke="var(--primary)"
+                    strokeWidth={2}
+                    dot={{ fill: "var(--primary)", strokeWidth: 2 }}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
