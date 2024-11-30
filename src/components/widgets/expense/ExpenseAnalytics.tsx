@@ -154,7 +154,7 @@ export default function ExpenseAnalytics({ categories, expenses }: ExpenseAnalyt
                       return null;
                     }}
                   />
-                  <Bar dataKey="amount" fill="var(--primary)" />
+                  <Bar dataKey="amount" fill="#8B5CF6" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
