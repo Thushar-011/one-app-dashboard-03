@@ -3,7 +3,9 @@ import { AlarmData } from "@/types/widget";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useState } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Clock } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import AnalogClock from "./alarm/AnalogClock";
 
 interface AlarmWidgetProps {
   id: string;
@@ -14,6 +16,7 @@ interface AlarmWidgetProps {
 export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps) {
   const { updateWidget } = useWidgets();
   const [newAlarmTime, setNewAlarmTime] = useState("");
+  const [isAnalogMode, setIsAnalogMode] = useState(false);
 
   const alarms = data?.alarms || [];
 
@@ -71,18 +74,50 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
 
   return (
     <div className="space-y-4" onClick={(e) => e.stopPropagation()}>
-      <div className="flex gap-2">
-        <Input
-          type="time"
-          value={newAlarmTime}
-          onChange={(e) => setNewAlarmTime(e.target.value)}
-          className="flex-1"
-          onKeyDown={(e) => e.key === "Enter" && addAlarm(e)}
-        />
-        <Button onClick={(e) => addAlarm(e)} size="icon">
-          <Plus className="w-4 h-4" />
-        </Button>
-      </div>
+      <AnimatePresence mode="wait">
+        {isAnalogMode ? (
+          <motion.div
+            key="analog"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+          >
+            <AnalogClock
+              time={newAlarmTime}
+              onTimeChange={setNewAlarmTime}
+              onSwitchMode={() => setIsAnalogMode(false)}
+            />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="digital"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="flex gap-2"
+          >
+            <Input
+              type="time"
+              value={newAlarmTime}
+              onChange={(e) => setNewAlarmTime(e.target.value)}
+              className="flex-1"
+              onKeyDown={(e) => e.key === "Enter" && addAlarm(e)}
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setIsAnalogMode(true)}
+            >
+              <Clock className="w-4 h-4" />
+            </Button>
+            <Button onClick={(e) => addAlarm(e)} size="icon">
+              <Plus className="w-4 h-4" />
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="space-y-2">
         {alarms.map((alarm) => (
