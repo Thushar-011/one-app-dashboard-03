@@ -63,8 +63,7 @@ export default function ReminderWidget({ id, data, isDetailView }: ReminderWidge
     });
   };
 
-  const toggleReminder = (e: React.MouseEvent, reminderId: string) => {
-    e.stopPropagation();
+  const toggleReminder = (reminderId: string) => {
     updateWidget(id, {
       data: {
         reminders: reminders.map((reminder) =>
@@ -147,7 +146,7 @@ export default function ReminderWidget({ id, data, isDetailView }: ReminderWidge
                   <Checkbox
                     id={reminder.id}
                     checked={reminder.completed}
-                    onCheckedChange={() => toggleReminder({} as React.MouseEvent, reminder.id)}
+                    onCheckedChange={() => toggleReminder(reminder.id)}
                   />
                   <div className={reminder.completed ? "text-muted-foreground" : ""}>
                     <p className="text-sm">{reminder.text}</p>
