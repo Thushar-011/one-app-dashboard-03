@@ -53,8 +53,7 @@ export default function TodoWidget({ id, data, isDetailView }: TodoWidgetProps) 
     });
   };
 
-  const toggleTask = (e: React.MouseEvent, taskId: string) => {
-    e.stopPropagation();
+  const toggleTask = (taskId: string) => {
     updateWidget(id, {
       data: {
         tasks: tasks.map((task) =>
@@ -113,7 +112,7 @@ export default function TodoWidget({ id, data, isDetailView }: TodoWidgetProps) 
                   <Checkbox
                     id={task.id}
                     checked={task.completed}
-                    onCheckedChange={() => toggleTask({} as React.MouseEvent, task.id)}
+                    onCheckedChange={() => toggleTask(task.id)}
                   />
                   <label
                     htmlFor={task.id}
