@@ -1,11 +1,12 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { AlarmData } from "@/types/widget";
-import { Plus } from "lucide-react";
+import { Plus, Keyboard, Clock } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { toast } from "../ui/use-toast";
+import AnalogClock from "./alarm/AnalogClock";
 
 interface AlarmWidgetProps {
   id: string;
@@ -15,9 +16,11 @@ interface AlarmWidgetProps {
 
 export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps) {
   const { updateWidget } = useWidgets();
-  const [showTimeDialog, setShowTimeDialog] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
   const [hour, setHour] = useState("");
   const [minute, setMinute] = useState("");
+  const [useClockInterface, setUseClockInterface] = useState(false);
+  const [clockMode, setClockMode] = useState<'hour' | 'minute'>('hour');
 
   const alarms = data?.alarms || [];
 
@@ -56,8 +59,6 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
       sound: "Waves",
       snoozeEnabled: false,
       snoozeInterval: 5,
-      isAM: true,
-      isPM: false,
       enabled: true,
     };
 
@@ -66,18 +67,38 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
         alarms: [...alarms, newAlarm],
       },
     });
-    setShowTimeDialog(false);
+    setShowDialog(false);
     setHour("");
     setMinute("");
+    setUseClockInterface(false);
+    setClockMode('hour');
+  };
+
+  const handleClockHourChange = (value: number) => {
+    setHour(value.toString());
+  };
+
+  const handleClockMinuteChange = (value: number) => {
+    setMinute(value.toString());
   };
 
   if (!isDetailView) {
     return (
-      <div className="text-sm text-muted-foreground flex items-center gap-2">
-        <div className="w-2 h-2 rounded-full bg-primary/50" />
-        {alarms.length === 0
-          ? "No alarms set"
-          : `${alarms.length} alarm${alarms.length === 1 ? "" : "s"} set`}
+      <div className="text-sm text-muted-foreground flex flex-col items-center justify-between h-full relative">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-primary/50" />
+          {alarms.length === 0
+            ? "No alarms set"
+            : `${alarms.length} alarm${alarms.length === 1 ? "" : "s"} set`}
+        </div>
+        
+        <Button
+          size="icon"
+          className="rounded-full w-12 h-12 bg-primary hover:bg-primary/90 absolute bottom-0 left-1/2 -translate-x-1/2"
+          onClick={() => setShowDialog(true)}
+        >
+          <Plus className="w-6 h-6 text-white" />
+        </Button>
       </div>
     );
   }
@@ -106,62 +127,103 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
         <Button
           size="icon"
-          className="rounded-full w-12 h-12 bg-primary hover:bg-primary/90 shadow-lg"
-          onClick={() => setShowTimeDialog(true)}
+          className="rounded-full w-12 h-12 bg-primary hover:bg-primary/90"
+          onClick={() => setShowDialog(true)}
         >
           <Plus className="w-6 h-6 text-white" />
         </Button>
       </div>
 
       {/* Time Selection Dialog */}
-      <Dialog open={showTimeDialog} onOpenChange={setShowTimeDialog}>
-        <DialogContent className="bg-background/95 backdrop-blur-sm border-none shadow-lg p-6 w-[300px]">
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent className="bg-gray-900/95 backdrop-blur-sm border-none shadow-lg p-6 max-w-md">
           <div className="space-y-6">
-            <h2 className="text-lg font-medium text-center">Set alarm time</h2>
+            <h2 className="text-lg font-medium text-center text-gray-200">Set alarm time</h2>
             
-            <div className="flex items-center justify-center gap-2">
-              <div className="space-y-1">
-                <Input
-                  type="text"
-                  value={hour}
-                  onChange={(e) => setHour(e.target.value)}
-                  placeholder="00"
-                  className="text-4xl text-center w-24 bg-background/50"
-                  maxLength={2}
+            {useClockInterface ? (
+              <>
+                <div className="text-center text-3xl font-medium text-gray-200 mb-4">
+                  {hour.padStart(2, '0')}:{minute.padStart(2, '0')}
+                </div>
+                <AnalogClock
+                  mode={clockMode}
+                  value={clockMode === 'hour' ? parseInt(hour || '0') : parseInt(minute || '0')}
+                  onChange={clockMode === 'hour' ? handleClockHourChange : handleClockMinuteChange}
+                  onSwitchMode={() => setUseClockInterface(false)}
                 />
-                <div className="text-sm text-center text-muted-foreground">Hour</div>
+                <div className="flex justify-center gap-4">
+                  <Button
+                    variant="outline"
+                    className={`px-6 ${clockMode === 'hour' ? 'bg-primary text-white' : 'text-gray-300'}`}
+                    onClick={() => setClockMode('hour')}
+                  >
+                    Hour
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className={`px-6 ${clockMode === 'minute' ? 'bg-primary text-white' : 'text-gray-300'}`}
+                    onClick={() => setClockMode('minute')}
+                  >
+                    Minute
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-center gap-2">
+                <div className="space-y-1">
+                  <Input
+                    type="text"
+                    value={hour}
+                    onChange={(e) => setHour(e.target.value)}
+                    placeholder="00"
+                    className="text-4xl text-center w-24 bg-gray-800/50 border-gray-700 text-gray-200"
+                    maxLength={2}
+                  />
+                  <div className="text-sm text-center text-gray-400">Hour</div>
+                </div>
+                
+                <div className="text-4xl text-gray-200">:</div>
+                
+                <div className="space-y-1">
+                  <Input
+                    type="text"
+                    value={minute}
+                    onChange={(e) => setMinute(e.target.value)}
+                    placeholder="00"
+                    className="text-4xl text-center w-24 bg-gray-800/50 border-gray-700 text-gray-200"
+                    maxLength={2}
+                  />
+                  <div className="text-sm text-center text-gray-400">Minute</div>
+                </div>
               </div>
-              
-              <div className="text-4xl">:</div>
-              
-              <div className="space-y-1">
-                <Input
-                  type="text"
-                  value={minute}
-                  onChange={(e) => setMinute(e.target.value)}
-                  placeholder="00"
-                  className="text-4xl text-center w-24 bg-background/50"
-                  maxLength={2}
-                />
-                <div className="text-sm text-center text-muted-foreground">Minute</div>
-              </div>
-            </div>
+            )}
 
             <div className="flex justify-between items-center pt-4">
               <Button
                 variant="ghost"
                 onClick={() => {
-                  setShowTimeDialog(false);
+                  setShowDialog(false);
                   setHour("");
                   setMinute("");
+                  setUseClockInterface(false);
+                  setClockMode('hour');
                 }}
-                className="hover:bg-background/80"
+                className="text-gray-300 hover:text-white hover:bg-gray-800/50"
               >
                 Cancel
               </Button>
+              {!useClockInterface && (
+                <Button
+                  variant="ghost"
+                  onClick={() => setUseClockInterface(true)}
+                  className="absolute bottom-6 left-6 text-gray-300 hover:text-white hover:bg-gray-800/50"
+                >
+                  <Clock className="w-5 h-5" />
+                </Button>
+              )}
               <Button
                 onClick={handleSave}
-                className="bg-primary hover:bg-primary/90"
+                className="bg-primary hover:bg-primary/90 text-white"
               >
                 OK
               </Button>
