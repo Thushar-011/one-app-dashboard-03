@@ -1,10 +1,10 @@
 import { useWidgets } from "@/hooks/useWidgets";
-import { AlarmData, Alarm } from "@/types/widget";
-import { Button } from "../ui/button";
-import { useState } from "react";
+import { AlarmData } from "@/types/widget";
 import { Plus } from "lucide-react";
-import AlarmForm from "./alarm/AlarmForm";
-import { formatTime } from "@/lib/utils";
+import { useState } from "react";
+import { Button } from "../ui/button";
+import { Dialog, DialogContent } from "../ui/dialog";
+import { Input } from "../ui/input";
 
 interface AlarmWidgetProps {
   id: string;
@@ -14,17 +14,39 @@ interface AlarmWidgetProps {
 
 export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps) {
   const { updateWidget } = useWidgets();
-  const [showForm, setShowForm] = useState(false);
+  const [showTimeDialog, setShowTimeDialog] = useState(false);
+  const [hour, setHour] = useState("00");
+  const [minute, setMinute] = useState("00");
 
   const alarms = data?.alarms || [];
 
-  const handleSaveAlarm = (alarm: Alarm) => {
+  const handleSave = () => {
+    // Basic validation
+    const hourNum = parseInt(hour);
+    const minuteNum = parseInt(minute);
+    
+    if (hourNum < 0 || hourNum > 23 || minuteNum < 0 || minuteNum > 59) {
+      return;
+    }
+
+    const newAlarm = {
+      id: Date.now().toString(),
+      time: new Date().toISOString(), // This will be replaced with actual selected time
+      repeat: [],
+      sound: "Waves",
+      snoozeEnabled: false,
+      snoozeInterval: 5,
+      isAM: true,
+      isPM: false,
+      enabled: true,
+    };
+
     updateWidget(id, {
       data: {
-        alarms: [...alarms, alarm],
+        alarms: [...alarms, newAlarm],
       },
     });
-    setShowForm(false);
+    setShowTimeDialog(false);
   };
 
   if (!isDetailView) {
@@ -39,40 +61,78 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
   }
 
   return (
-    <div className="space-y-4" onClick={(e) => e.stopPropagation()}>
-      {showForm ? (
-        <AlarmForm onSave={handleSaveAlarm} onCancel={() => setShowForm(false)} />
+    <div className="h-full flex flex-col items-center justify-center relative">
+      {alarms.length === 0 ? (
+        <div className="flex flex-col items-center gap-4">
+          <div className="text-muted-foreground">No Alarms</div>
+        </div>
       ) : (
-        <>
-          <div className="flex justify-end">
-            <Button onClick={() => setShowForm(true)} size="sm">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Alarm
-            </Button>
-          </div>
-          <div className="space-y-2">
-            {alarms.map((alarm) => (
-              <div
-                key={alarm.id}
-                className="widget-list-item flex items-center justify-between p-3 rounded"
-              >
-                <div>
-                  <div className="font-medium">{formatTime(alarm.time)}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {alarm.repeat.length > 0
-                      ? alarm.repeat.join(", ")
-                      : "Never repeats"}
-                  </div>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {alarm.sound}
-                  {alarm.snoozeEnabled && " · Snooze"}
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
+        <div className="w-full space-y-2">
+          {/* We'll implement the alarm list view later */}
+        </div>
       )}
+
+      {/* Add Alarm Button */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
+        <Button
+          size="lg"
+          className="rounded-full w-14 h-14 bg-primary hover:bg-primary/90"
+          onClick={() => setShowTimeDialog(true)}
+        >
+          <Plus className="w-6 h-6" />
+        </Button>
+      </div>
+
+      {/* Time Selection Dialog */}
+      <Dialog open={showTimeDialog} onOpenChange={setShowTimeDialog}>
+        <DialogContent className="bg-background/95 backdrop-blur-sm border-none shadow-lg p-6 w-[300px]">
+          <div className="space-y-6">
+            <h2 className="text-lg font-medium text-center">Select time</h2>
+            
+            <div className="flex items-center justify-center gap-2">
+              <div className="space-y-1">
+                <Input
+                  type="text"
+                  value={hour}
+                  onChange={(e) => setHour(e.target.value.padStart(2, '0'))}
+                  className="text-4xl text-center w-24 bg-gray-800/50"
+                  maxLength={2}
+                />
+                <div className="text-sm text-center text-muted-foreground">Hour</div>
+              </div>
+              
+              <div className="text-4xl">:</div>
+              
+              <div className="space-y-1">
+                <Input
+                  type="text"
+                  value={minute}
+                  onChange={(e) => setMinute(e.target.value.padStart(2, '0'))}
+                  className="text-4xl text-center w-24 bg-gray-800/50"
+                  maxLength={2}
+                />
+                <div className="text-sm text-center text-muted-foreground">Minute</div>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center pt-4">
+              <Button
+                variant="ghost"
+                onClick={() => setShowTimeDialog(false)}
+                className="text-primary hover:text-primary/90"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSave}
+                className="text-primary hover:text-primary/90"
+              >
+                OK
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
