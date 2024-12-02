@@ -1,7 +1,7 @@
 /**
  * Available widget types in the application
  */
-export type WidgetType = "alarm" | "todo" | "reminder" | "note" | "expense";
+export type WidgetType = "alarm" | "todo" | "reminder" | "note";
 
 /**
  * Base widget interface
@@ -58,32 +58,4 @@ export interface ReminderData {
     date: string;
     completed: boolean;
   }>;
-}
-
-/**
- * Expense category definition
- */
-export interface ExpenseCategory {
-  id: string;
-  name: string;
-  color: string;
-}
-
-/**
- * Individual expense entry
- */
-export interface Expense {
-  id: string;
-  amount: number;
-  description: string;
-  categoryId: string;
-  date: string;
-}
-
-/**
- * Expense widget data structure
- */
-export interface ExpenseData {
-  categories: ExpenseCategory[];
-  expenses: Expense[];
 }

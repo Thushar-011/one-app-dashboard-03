@@ -1,28 +1,14 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, AlarmClock, ListTodo, Calendar, FileText, IndianRupee, ArrowLeft } from "lucide-react";
+import { Trash2, AlarmClock, ListTodo, Calendar, FileText, ArrowLeft } from "lucide-react";
 import { Widget as WidgetType } from "@/types/widget";
 import AlarmWidget from "./widgets/AlarmWidget";
 import TodoWidget from "./widgets/TodoWidget";
 import NoteWidget from "./widgets/NoteWidget";
 import ReminderWidget from "./widgets/ReminderWidget";
-import ExpenseWidget from "./widgets/ExpenseWidget";
 import { Button } from "./ui/button";
 
-/**
- * Widget Component
- * Renders a draggable widget with:
- * - Header with icon and title
- * - Content based on widget type
- * - Delete button in edit mode
- * - Expandable detail view
- * 
- * Features:
- * - Drag and drop in edit mode
- * - Animations for interactions
- * - Responsive detail view
- */
 export default function Widget({ id, type, position, size, data }: WidgetType) {
   const { editMode, updateWidget, removeWidget } = useWidgets();
   const [isDragging, setIsDragging] = useState(false);
@@ -43,8 +29,6 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         return <Calendar className="w-5 h-5" />;
       case "note":
         return <FileText className="w-5 h-5" />;
-      case "expense":
-        return <IndianRupee className="w-5 h-5" />;
     }
   };
 
@@ -58,8 +42,6 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         return "Reminders";
       case "note":
         return "Notes";
-      case "expense":
-        return "Expense Tracker";
       default:
         return type;
     }
@@ -75,8 +57,6 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         return <NoteWidget id={id} data={data} isDetailView={isDetailView} />;
       case "reminder":
         return <ReminderWidget id={id} data={data} isDetailView={isDetailView} />;
-      case "expense":
-        return <ExpenseWidget id={id} data={data} isDetailView={isDetailView} />;
       default:
         return <div>Widget type not implemented yet</div>;
     }
