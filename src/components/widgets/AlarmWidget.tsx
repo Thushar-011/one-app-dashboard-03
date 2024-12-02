@@ -85,16 +85,16 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
   return (
     <div className="h-full flex flex-col relative">
       <AlarmList alarms={alarms} />
-      <div className="absolute bottom-0 left-0 right-0 flex justify-center pb-4">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 transform">
         <Button
           variant="outline"
           onClick={() => {
             setShowDialog(true);
             setShowKeyboard(true);
           }}
-          className="w-14 h-14 rounded-full bg-primary hover:bg-primary/90 border-none shadow-lg flex items-center justify-center"
+          className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/90 to-primary hover:from-primary hover:to-primary/90 border-none shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-xl"
         >
-          <span className="text-white text-2xl font-light">+</span>
+          <span className="text-white text-3xl font-light select-none">+</span>
         </Button>
       </div>
 
