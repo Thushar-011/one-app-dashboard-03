@@ -20,8 +20,21 @@ interface ExpenseAnalyticsProps {
   }>;
 }
 
+// Complementary colors optimized for data visualization
+const CHART_COLORS = [
+  '#FF9F40', // Orange
+  '#4B77BE', // Blue
+  '#FF6B6B', // Red
+  '#36A2EB', // Light Blue
+  '#FFC233', // Yellow
+  '#5D9CEC', // Sky Blue
+  '#FF7043', // Deep Orange
+  '#4FC3F7', // Bright Blue
+  '#FFB74D', // Light Orange
+  '#64B5F6'  // Royal Blue
+];
+
 export default function ExpenseAnalytics({ expenses, categories }: ExpenseAnalyticsProps) {
-  // Calculate total expenses per category
   const categoryTotals = expenses.reduce((acc, expense) => {
     const category = categories.find(c => c.id === expense.categoryId);
     if (!category) return acc;
@@ -32,35 +45,23 @@ export default function ExpenseAnalytics({ expenses, categories }: ExpenseAnalyt
     };
   }, {} as { [key: string]: number });
 
-  // Prepare data for pie chart
-  const data = categories.map(category => ({
+  const data = categories.map((category, index) => ({
     name: category.name,
     value: categoryTotals[category.id] || 0,
-    color: category.color
+    color: CHART_COLORS[index % CHART_COLORS.length]
   })).filter(item => item.value > 0);
 
-  // Calculate total expenses
   const totalExpenses = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
 
-  // Chart configuration
-  const chartConfig = {
-    expenses: {
-      theme: {
-        light: "#10b981",
-        dark: "#34d399"
-      }
-    }
-  };
-
   return (
-    <div className="space-y-4">
-      <div className="text-center">
+    <div className="space-y-2">
+      <div className="text-center mb-4">
         <h3 className="text-lg font-semibold">Total Expenses</h3>
         <p className="text-2xl font-bold">₹{totalExpenses.toLocaleString()}</p>
       </div>
 
-      <div className="h-[300px]">
-        <ChartContainer config={chartConfig}>
+      <div className="h-[200px]">
+        <ChartContainer config={{}}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -82,9 +83,9 @@ export default function ExpenseAnalytics({ expenses, categories }: ExpenseAnalyt
         </ChartContainer>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1 mt-2">
         {data.map((entry) => (
-          <div key={entry.name} className="flex justify-between items-center">
+          <div key={entry.name} className="flex justify-between items-center text-sm">
             <div className="flex items-center gap-2">
               <div
                 className="w-3 h-3 rounded-full"
