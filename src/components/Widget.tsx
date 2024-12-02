@@ -14,6 +14,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
   const { editMode, updateWidget, removeWidget } = useWidgets();
   const [isDragging, setIsDragging] = useState(false);
   const [isDetailView, setIsDetailView] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -126,7 +127,19 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
               </button>
             )}
           </div>
-          {renderWidgetContent()}
+          <AnimatePresence mode="wait">
+            {!isTransitioning && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onAnimationStart={() => setIsTransitioning(true)}
+                onAnimationComplete={() => setIsTransitioning(false)}
+              >
+                {renderWidgetContent()}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
 
