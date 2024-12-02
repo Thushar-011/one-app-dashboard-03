@@ -1,5 +1,6 @@
 import { Trash2, RotateCcw } from "lucide-react";
 import { useWidgets } from "@/hooks/useWidgets";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +18,20 @@ interface TrashListProps {
 }
 
 export default function TrashList({ isOpen, onClose }: TrashListProps) {
-  const { trashedWidgets, restoreWidget, clearTrash } = useWidgets();
+  const { widgets, trashedWidgets, restoreWidget, clearTrash } = useWidgets();
+
+  const handleRestore = (widgetId: string) => {
+    const widgetToRestore = trashedWidgets.find(w => w.id === widgetId);
+    if (widgetToRestore && widgets.some(w => w.type === widgetToRestore.type)) {
+      toast.error(`Cannot restore ${widgetToRestore.type} widget as one already exists. Delete the existing widget first.`, {
+        duration: 2000,
+      });
+      return;
+    }
+    restoreWidget(widgetId);
+    onClose();
+    toast.success("Widget restored successfully", { duration: 1000 });
+  };
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -41,10 +55,7 @@ export default function TrashList({ isOpen, onClose }: TrashListProps) {
                 >
                   <span className="capitalize text-foreground">{widget.type}</span>
                   <button
-                    onClick={() => {
-                      restoreWidget(widget.id);
-                      onClose();
-                    }}
+                    onClick={() => handleRestore(widget.id)}
                     className="p-2 hover:bg-muted rounded-full transition-colors"
                   >
                     <RotateCcw className="w-4 h-4" />
@@ -59,7 +70,10 @@ export default function TrashList({ isOpen, onClose }: TrashListProps) {
           <AlertDialogCancel>Close</AlertDialogCancel>
           {trashedWidgets.length > 0 && (
             <AlertDialogAction
-              onClick={clearTrash}
+              onClick={() => {
+                clearTrash();
+                toast.success("Trash cleared successfully", { duration: 1000 });
+              }}
               className="bg-destructive hover:bg-destructive/90"
             >
               Clear All

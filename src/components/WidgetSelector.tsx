@@ -20,12 +20,20 @@ const WIDGET_OPTIONS: Array<{ type: WidgetType; label: string }> = [
 ];
 
 export default function WidgetSelector() {
-  const { widgets, addWidget } = useWidgets();
+  const { widgets, trashedWidgets, addWidget } = useWidgets();
 
   const handleAddWidget = (type: WidgetType) => {
+    // Check if widget exists in active widgets or trash
     if (widgets.some(widget => widget.type === type)) {
       toast.error(`${type.charAt(0).toUpperCase() + type.slice(1)} widget already exists`, {
         duration: 1000,
+      });
+      return;
+    }
+
+    if (trashedWidgets.some(widget => widget.type === type)) {
+      toast.error(`${type.charAt(0).toUpperCase() + type.slice(1)} widget is in trash. Please restore or clear it from trash first.`, {
+        duration: 2000,
       });
       return;
     }
@@ -51,8 +59,13 @@ export default function WidgetSelector() {
       
       // If no gap found, place at the end
       if (newY === 0) {
-        newY = sortedPositions[sortedPositions.length - 1] + 170;
+        newY = Math.max(...existingPositions) + 170;
       }
+    }
+
+    // Check for overlapping widgets at the calculated position
+    while (widgets.some(w => Math.abs(w.position.y - newY) < 150)) {
+      newY += 170; // Move down if position is occupied
     }
 
     addWidget(type, { x: 0, y: newY });
@@ -88,12 +101,12 @@ export default function WidgetSelector() {
               key={option.type}
               variant="outline"
               className={`h-20 flex flex-col gap-2 transition-all duration-300 ${
-                widgets.some(w => w.type === option.type)
+                widgets.some(w => w.type === option.type) || trashedWidgets.some(w => w.type === option.type)
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:scale-105"
               }`}
               onClick={() => handleAddWidget(option.type)}
-              disabled={widgets.some(w => w.type === option.type)}
+              disabled={widgets.some(w => w.type === option.type) || trashedWidgets.some(w => w.type === option.type)}
             >
               {option.label}
             </Button>
