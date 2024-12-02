@@ -24,6 +24,11 @@ interface ExpenseFormProps {
   };
 }
 
+const CATEGORY_COLORS = [
+  "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEEAD",
+  "#D4A5A5", "#9B6B6B", "#E9967A", "#A8E6CF", "#FFB6B9"
+];
+
 export default function ExpenseForm({ id, data }: ExpenseFormProps) {
   const { updateWidget } = useWidgets();
   const [amount, setAmount] = useState("");
@@ -31,7 +36,6 @@ export default function ExpenseForm({ id, data }: ExpenseFormProps) {
   const [date, setDate] = useState<Date>();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
-  const [newCategoryColor, setNewCategoryColor] = useState("#10b981");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +59,6 @@ export default function ExpenseForm({ id, data }: ExpenseFormProps) {
       },
     });
 
-    // Reset form
     setAmount("");
     setDescription("");
     setDate(undefined);
@@ -72,7 +75,7 @@ export default function ExpenseForm({ id, data }: ExpenseFormProps) {
     const newCategory = {
       id: Date.now().toString(),
       name: newCategoryName.trim(),
-      color: newCategoryColor,
+      color: CATEGORY_COLORS[data.categories.length % CATEGORY_COLORS.length],
     };
 
     updateWidget(id, {
@@ -160,14 +163,6 @@ export default function ExpenseForm({ id, data }: ExpenseFormProps) {
                     placeholder="Category Name"
                     value={newCategoryName}
                     onChange={(e) => setNewCategoryName(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Input
-                    type="color"
-                    value={newCategoryColor}
-                    onChange={(e) => setNewCategoryColor(e.target.value)}
-                    className="h-10 px-2"
                   />
                 </div>
                 <Button onClick={handleAddCategory} className="w-full">

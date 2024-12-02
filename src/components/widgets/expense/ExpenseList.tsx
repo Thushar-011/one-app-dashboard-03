@@ -3,8 +3,10 @@ import { useWidgets } from "@/hooks/useWidgets";
 import { format } from "date-fns";
 import { Pencil, Save, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface ExpenseListProps {
+  id: string;
   expenses: Array<{
     id: string;
     amount: number;
@@ -20,13 +22,42 @@ interface ExpenseListProps {
   isCompact?: boolean;
 }
 
-export default function ExpenseList({ expenses, categories, isCompact = false }: ExpenseListProps) {
+export default function ExpenseList({ id, expenses, categories, isCompact = false }: ExpenseListProps) {
   const [editMode, setEditMode] = useState(false);
   const [editingAmount, setEditingAmount] = useState<{ [key: string]: string }>({});
   const { updateWidget } = useWidgets();
 
   const getCategoryName = (categoryId: string) => {
     return categories.find(cat => cat.id === categoryId)?.name || 'Unknown';
+  };
+
+  const handleSave = () => {
+    const updatedExpenses = expenses.map(expense => ({
+      ...expense,
+      amount: editingAmount[expense.id] ? parseFloat(editingAmount[expense.id]) : expense.amount
+    }));
+
+    updateWidget(id, {
+      data: {
+        categories,
+        expenses: updatedExpenses
+      }
+    });
+
+    setEditMode(false);
+    setEditingAmount({});
+    toast.success("Changes saved successfully");
+  };
+
+  const handleDelete = (expenseId: string) => {
+    const updatedExpenses = expenses.filter(expense => expense.id !== expenseId);
+    updateWidget(id, {
+      data: {
+        categories,
+        expenses: updatedExpenses
+      }
+    });
+    toast.success("Expense deleted successfully");
   };
 
   if (isCompact) {
@@ -50,11 +81,14 @@ export default function ExpenseList({ expenses, categories, isCompact = false }:
           size="sm"
           onClick={() => {
             if (editMode) {
-              // Save changes
-              setEditMode(false);
-              setEditingAmount({});
+              handleSave();
             } else {
               setEditMode(true);
+              const currentAmounts: { [key: string]: string } = {};
+              expenses.forEach(expense => {
+                currentAmounts[expense.id] = expense.amount.toString();
+              });
+              setEditingAmount(currentAmounts);
             }
           }}
         >
@@ -91,7 +125,7 @@ export default function ExpenseList({ expenses, categories, isCompact = false }:
                     <input
                       type="number"
                       className="w-24 p-1 border rounded"
-                      value={editingAmount[expense.id] || expense.amount}
+                      value={editingAmount[expense.id]}
                       onChange={(e) =>
                         setEditingAmount({
                           ...editingAmount,
@@ -112,6 +146,7 @@ export default function ExpenseList({ expenses, categories, isCompact = false }:
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-red-500 hover:text-red-600"
+                      onClick={() => handleDelete(expense.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
