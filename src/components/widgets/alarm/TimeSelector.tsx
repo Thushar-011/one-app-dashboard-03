@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Keyboard } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { Clock } from "lucide-react";
 
 interface TimeSelectorProps {
   time: Date;
@@ -11,167 +10,140 @@ interface TimeSelectorProps {
   onToggleKeyboard: () => void;
 }
 
-export default function TimeSelector({ time, onChange, showKeyboard, onToggleKeyboard }: TimeSelectorProps) {
-  const [isDragging, setIsDragging] = useState(false);
-  const [angle, setAngle] = useState(0);
-  const [selectedMinute, setSelectedMinute] = useState(0);
-  const [showMinutes, setShowMinutes] = useState(false);
+export default function TimeSelector({ time, onChange, onToggleKeyboard }: TimeSelectorProps) {
+  const [mode, setMode] = useState<'hours' | 'minutes'>('hours');
+  const [selectedHour, setSelectedHour] = useState(time.getHours());
+  const [selectedMinute, setSelectedMinute] = useState(time.getMinutes());
 
-  useEffect(() => {
-    const hours = time.getHours() % 12;
-    const minutes = time.getMinutes();
-    setAngle(hours * 30 + minutes / 2);
-    setSelectedMinute(minutes);
-  }, [time]);
-
-  const handleClockDrag = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDragging) return;
-
-    const rect = (e.target as HTMLElement).getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-
-    const x = clientX - centerX;
-    const y = clientY - centerY;
-    const newAngle = Math.atan2(y, x) * 180 / Math.PI + 90;
-
-    setAngle(newAngle);
-
-    const hours = Math.round(((newAngle + 360) % 360) / 30) % 12;
-    const newTime = new Date(time);
-    newTime.setHours(hours);
-    onChange(newTime);
+  // Update the clock hands based on selected time
+  const getHandRotation = () => {
+    if (mode === 'hours') {
+      return selectedHour * 15; // 360 / 24 = 15 degrees per hour
+    }
+    return selectedMinute * 6; // 360 / 60 = 6 degrees per minute
   };
 
-  const handleMinuteSelect = (minute: number) => {
-    setSelectedMinute(minute);
-    const newTime = new Date(time);
-    newTime.setMinutes(minute);
-    onChange(newTime);
-    setShowMinutes(false);
-  };
-
-  const handleKeyboardInput = (value: string) => {
-    const [hours, minutes] = value.split(':').map(Number);
-    if (isNaN(hours) || isNaN(minutes)) return;
+  // Handle clock face clicks
+  const handleClockClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
     
-    const newTime = new Date(time);
-    newTime.setHours(hours);
-    newTime.setMinutes(minutes);
-    onChange(newTime);
+    const x = e.clientX - rect.left - centerX;
+    const y = e.clientY - rect.top - centerY;
+    
+    // Calculate angle from center
+    let angle = Math.atan2(y, x) * 180 / Math.PI + 90;
+    if (angle < 0) angle += 360;
+
+    if (mode === 'hours') {
+      const hour = Math.round(angle / 15) % 24;
+      setSelectedHour(hour);
+      const newTime = new Date(time);
+      newTime.setHours(hour);
+      onChange(newTime);
+    } else {
+      const minute = Math.round(angle / 6) % 60;
+      setSelectedMinute(minute);
+      const newTime = new Date(time);
+      newTime.setMinutes(minute);
+      onChange(newTime);
+    }
   };
+
+  // Switch between hours and minutes
+  useEffect(() => {
+    if (mode === 'hours') {
+      const timeout = setTimeout(() => setMode('minutes'), 2000);
+      return () => clearTimeout(timeout);
+    }
+  }, [selectedHour, mode]);
 
   return (
-    <div className="relative">
-      <AnimatePresence>
-        {showKeyboard ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="p-4"
-          >
-            <Input
-              type="time"
-              className="text-2xl text-center"
-              onChange={(e) => handleKeyboardInput(e.target.value)}
-              value={`${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`}
-            />
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="relative w-48 h-48 mx-auto"
-          >
-            {/* Clock face */}
-            <div
-              className="absolute inset-0 rounded-full bg-gray-50 border-2 border-gray-200 shadow-inner"
-              onMouseDown={() => setIsDragging(true)}
-              onMouseUp={() => setIsDragging(false)}
-              onMouseMove={handleClockDrag}
-              onTouchStart={() => setIsDragging(true)}
-              onTouchEnd={() => setIsDragging(false)}
-              onTouchMove={handleClockDrag}
-            >
-              {/* Hour numbers */}
-              {Array.from({ length: 12 }, (_, i) => (
-                <div
-                  key={i}
-                  className="absolute font-medium text-gray-600"
-                  style={{
-                    left: `${50 + 40 * Math.cos(((i + 1) * 30 - 90) * Math.PI / 180)}%`,
-                    top: `${50 + 40 * Math.sin(((i + 1) * 30 - 90) * Math.PI / 180)}%`,
-                    transform: 'translate(-50%, -50%)'
-                  }}
-                >
-                  {i + 1}
-                </div>
-              ))}
+    <div className="relative w-full max-w-sm mx-auto">
+      <div className="text-center mb-4 text-2xl font-light">
+        {String(selectedHour).padStart(2, '0')}:{String(selectedMinute).padStart(2, '0')}
+      </div>
 
-              {/* Clock hand */}
-              <div
-                className="absolute w-1 h-20 bg-primary origin-bottom rounded-full"
-                style={{
-                  left: '50%',
-                  bottom: '50%',
-                  transform: `rotate(${angle}deg)`
-                }}
-              />
-
-              {/* Center dot */}
-              <div className="absolute w-3 h-3 bg-primary rounded-full left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2" />
-            </div>
-
-            {/* Minutes */}
-            <div
-              className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-lg font-medium cursor-pointer"
-              onClick={() => setShowMinutes(true)}
-            >
-              {selectedMinute.toString().padStart(2, '0')}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Minute picker */}
-      <AnimatePresence>
-        {showMinutes && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="absolute inset-0 bg-white rounded-lg shadow-lg overflow-auto max-h-48"
-          >
-            <div className="grid grid-cols-4 gap-2 p-4">
-              {Array.from({ length: 60 }, (_, i) => (
-                <Button
-                  key={i}
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleMinuteSelect(i)}
-                >
-                  {i.toString().padStart(2, '0')}
-                </Button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Keyboard toggle */}
-      <Button
-        variant="ghost"
-        size="sm"
-        className="absolute bottom-2 left-2"
-        onClick={onToggleKeyboard}
+      <div 
+        className="relative w-64 h-64 mx-auto bg-background rounded-full border-2 border-primary/20 cursor-pointer"
+        onClick={handleClockClick}
       >
-        <Keyboard className="w-4 h-4" />
-      </Button>
+        {/* Clock numbers */}
+        {mode === 'hours' ? (
+          // 24-hour numbers
+          Array.from({ length: 24 }, (_, i) => (
+            <div
+              key={i}
+              className={`absolute text-sm font-medium ${
+                selectedHour === i ? 'text-primary' : 'text-muted-foreground'
+              }`}
+              style={{
+                left: `${50 + 40 * Math.cos(((i * 15) - 90) * Math.PI / 180)}%`,
+                top: `${50 + 40 * Math.sin(((i * 15) - 90) * Math.PI / 180)}%`,
+                transform: 'translate(-50%, -50%)'
+              }}
+            >
+              {String(i).padStart(2, '0')}
+            </div>
+          ))
+        ) : (
+          // Minute numbers (by 5s)
+          Array.from({ length: 12 }, (_, i) => (
+            <div
+              key={i}
+              className={`absolute text-sm font-medium ${
+                selectedMinute === i * 5 ? 'text-primary' : 'text-muted-foreground'
+              }`}
+              style={{
+                left: `${50 + 40 * Math.cos(((i * 30) - 90) * Math.PI / 180)}%`,
+                top: `${50 + 40 * Math.sin(((i * 30) - 90) * Math.PI / 180)}%`,
+                transform: 'translate(-50%, -50%)'
+              }}
+            >
+              {String(i * 5).padStart(2, '0')}
+            </div>
+          ))
+        )}
+
+        {/* Clock hand */}
+        <motion.div
+          animate={{ rotate: getHandRotation() }}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}
+          className="absolute w-1 bg-primary origin-bottom rounded-full"
+          style={{
+            height: '40%',
+            left: '50%',
+            bottom: '50%',
+            transformOrigin: 'bottom'
+          }}
+        />
+
+        {/* Center dot */}
+        <div className="absolute w-3 h-3 bg-primary rounded-full left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+      </div>
+
+      <div className="mt-4 flex justify-between items-center">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onToggleKeyboard}
+          className="text-primary hover:text-primary/90"
+        >
+          <Clock className="w-4 h-4" />
+        </Button>
+        <div className="text-sm text-muted-foreground">
+          {mode === 'hours' ? 'Select hour' : 'Select minute'}
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setMode(mode === 'hours' ? 'minutes' : 'hours')}
+          className="text-primary hover:text-primary/90"
+        >
+          {mode === 'hours' ? 'MIN' : 'HR'}
+        </Button>
+      </div>
     </div>
   );
 }
