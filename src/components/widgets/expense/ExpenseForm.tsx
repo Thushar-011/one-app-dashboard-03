@@ -23,6 +23,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ExpenseCategory } from "@/types/widget";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface ExpenseFormProps {
   onAddExpense: (expense: {
@@ -41,6 +42,8 @@ export default function ExpenseForm({ onAddExpense, onAddCategory, categories = 
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedCategory, setSelectedCategory] = useState<string>();
   const [open, setOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [showCategoryDialog, setShowCategoryDialog] = useState(false);
 
   const handleSubmit = () => {
     if (!description.trim() || !amount || !selectedDate || !selectedCategory) return;
@@ -56,6 +59,13 @@ export default function ExpenseForm({ onAddExpense, onAddCategory, categories = 
     setAmount("");
     setSelectedDate(undefined);
     setSelectedCategory(undefined);
+  };
+
+  const handleAddCategory = () => {
+    if (!newCategoryName.trim()) return;
+    onAddCategory(newCategoryName.trim());
+    setNewCategoryName("");
+    setShowCategoryDialog(false);
   };
 
   return (
@@ -101,62 +111,72 @@ export default function ExpenseForm({ onAddExpense, onAddCategory, categories = 
         </TooltipContent>
       </Tooltip>
 
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-full justify-between"
-          >
-            {selectedCategory
-              ? categories.find((category) => category.id === selectedCategory)?.name
-              : "Select category"}
-            <Plus className={cn("ml-2 h-4 w-4 shrink-0 opacity-50", open && "hidden")} />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-full p-0">
-          <Command>
-            <CommandInput placeholder="Search or add category..." />
-            <CommandEmpty>
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
-                onClick={() => {
-                  const input = document.querySelector<HTMLInputElement>('[cmdk-input]');
-                  if (input?.value) {
-                    onAddCategory(input.value);
-                    input.value = '';
-                  }
-                }}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Add category
-              </Button>
-            </CommandEmpty>
-            <CommandGroup>
-              {(categories || []).map((category) => (
-                <CommandItem
-                  key={category.id}
-                  value={category.name}
-                  onSelect={() => {
-                    setSelectedCategory(category.id);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selectedCategory === category.id ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {category.name}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </Command>
-        </PopoverContent>
-      </Popover>
+      <div className="flex gap-2">
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-full justify-between"
+            >
+              {selectedCategory
+                ? categories.find((category) => category.id === selectedCategory)?.name
+                : "Select category"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[200px] p-0">
+            <Command>
+              <CommandInput placeholder="Search category..." />
+              <CommandEmpty>
+                <p className="p-2 text-sm text-muted-foreground">No categories found.</p>
+              </CommandEmpty>
+              <CommandGroup>
+                {categories.map((category) => (
+                  <CommandItem
+                    key={category.id}
+                    value={category.name}
+                    onSelect={() => {
+                      setSelectedCategory(category.id);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        selectedCategory === category.id ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {category.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </Command>
+          </PopoverContent>
+        </Popover>
+
+        <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="icon">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Category</DialogTitle>
+            </DialogHeader>
+            <div className="flex gap-2 mt-4">
+              <Input
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                placeholder="Category name"
+                className="flex-1"
+              />
+              <Button onClick={handleAddCategory}>Add</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       <Button 
         onClick={handleSubmit}
