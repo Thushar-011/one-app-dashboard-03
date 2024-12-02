@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 interface ExpenseFormProps {
   id: string;
@@ -28,10 +30,15 @@ export default function ExpenseForm({ id, data }: ExpenseFormProps) {
   const [description, setDescription] = useState("");
   const [date, setDate] = useState<Date>();
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryColor, setNewCategoryColor] = useState("#10b981");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || !date || !selectedCategory) return;
+    if (!amount || !date || !selectedCategory) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
 
     const newExpense = {
       id: Date.now().toString(),
@@ -53,6 +60,30 @@ export default function ExpenseForm({ id, data }: ExpenseFormProps) {
     setDescription("");
     setDate(undefined);
     setSelectedCategory("");
+    toast.success("Expense added successfully");
+  };
+
+  const handleAddCategory = () => {
+    if (!newCategoryName.trim()) {
+      toast.error("Please enter a category name");
+      return;
+    }
+
+    const newCategory = {
+      id: Date.now().toString(),
+      name: newCategoryName.trim(),
+      color: newCategoryColor,
+    };
+
+    updateWidget(id, {
+      data: {
+        ...data,
+        categories: [...data.categories, newCategory],
+      },
+    });
+
+    setNewCategoryName("");
+    toast.success("Category added successfully");
   };
 
   return (
@@ -100,18 +131,52 @@ export default function ExpenseForm({ id, data }: ExpenseFormProps) {
       </div>
 
       <div className="space-y-2">
-        <select
-          className="w-full p-2 border rounded-md"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          <option value="">Select Category</option>
-          {data.categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
+        <div className="flex gap-2">
+          <select
+            className="flex-1 w-full p-2 border rounded-md"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            <option value="">Select Category</option>
+            {data.categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Category</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Category Name"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Input
+                    type="color"
+                    value={newCategoryColor}
+                    onChange={(e) => setNewCategoryColor(e.target.value)}
+                    className="h-10 px-2"
+                  />
+                </div>
+                <Button onClick={handleAddCategory} className="w-full">
+                  Add Category
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Button type="submit" className="w-full">
