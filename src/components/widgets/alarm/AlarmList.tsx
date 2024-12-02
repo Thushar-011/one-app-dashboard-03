@@ -1,7 +1,7 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { Switch } from "@/components/ui/switch";
 import { Bell, Vibrate, Trash2 } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import {
   Accordion,
   AccordionContent,
@@ -30,6 +30,9 @@ export default function AlarmList({ alarms }: AlarmListProps) {
       alarm.id === alarmId ? { ...alarm, enabled } : alarm
     );
     updateWidget(widgetId, { data: { alarms: updatedAlarms } });
+    toast.success(enabled ? "Alarm enabled" : "Alarm disabled", {
+      duration: 1000,
+    });
   };
 
   const updateAlarmFeature = (alarmId: string, updates: Partial<AlarmListProps["alarms"][0]>) => {
@@ -42,9 +45,8 @@ export default function AlarmList({ alarms }: AlarmListProps) {
   const deleteAlarm = (alarmId: string) => {
     const updatedAlarms = alarms.filter((alarm) => alarm.id !== alarmId);
     updateWidget(widgetId, { data: { alarms: updatedAlarms } });
-    toast({
-      title: "Alarm deleted",
-      description: "The alarm has been removed successfully.",
+    toast.success("Alarm deleted", {
+      duration: 1000,
     });
   };
 
@@ -88,7 +90,6 @@ export default function AlarmList({ alarms }: AlarmListProps) {
 
             <AccordionContent className="px-3 pb-3">
               <div className="space-y-4">
-                {/* Label Input with improved visibility */}
                 <div className="space-y-1.5">
                   <input
                     type="text"
@@ -97,11 +98,10 @@ export default function AlarmList({ alarms }: AlarmListProps) {
                     onChange={(e) =>
                       updateAlarmFeature(alarm.id, { label: e.target.value })
                     }
-                    className="w-full px-3 py-2 bg-gray-50 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent text-sm transition-all duration-200"
+                    className="w-full px-3 py-2 bg-gray-50/50 border-2 border-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent text-sm transition-all duration-200"
                   />
                 </div>
 
-                {/* Sound - More compact layout */}
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() =>
@@ -115,7 +115,6 @@ export default function AlarmList({ alarms }: AlarmListProps) {
                     <span>{alarm.sound || "Default"}</span>
                   </button>
 
-                  {/* Vibration */}
                   <button
                     onClick={() =>
                       updateAlarmFeature(alarm.id, { vibrate: !alarm.vibrate })
@@ -127,9 +126,8 @@ export default function AlarmList({ alarms }: AlarmListProps) {
                   </button>
                 </div>
 
-                {/* Repeat - Compact grid layout */}
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground mb-2 pointer-events-none">
+                  <div className="text-sm font-medium text-muted-foreground mb-2 pointer-events-none select-none">
                     Repeat
                   </div>
                   <div className="grid grid-cols-4 gap-1.5">
@@ -155,7 +153,6 @@ export default function AlarmList({ alarms }: AlarmListProps) {
                   </div>
                 </div>
 
-                {/* Delete - Compact styling */}
                 <button
                   onClick={() => deleteAlarm(alarm.id)}
                   className="flex items-center gap-2 w-full px-3 py-1.5 text-destructive hover:bg-destructive/10 rounded-lg transition-colors text-sm"

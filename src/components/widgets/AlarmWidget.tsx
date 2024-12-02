@@ -3,11 +3,11 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { toast } from "../ui/use-toast";
 import { Clock, Keyboard } from "lucide-react";
 import TimeSelector from "./alarm/TimeSelector";
 import AlarmList from "./alarm/AlarmList";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 interface AlarmWidgetProps {
   id: string;
@@ -29,19 +29,15 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
     const minuteNum = parseInt(minute);
     
     if (isNaN(hourNum) || hourNum < 0 || hourNum > 23) {
-      toast({
-        title: "Invalid hour",
-        description: "Please enter a number between 0 and 23",
-        variant: "destructive",
+      toast.error("Please enter a valid hour (0-23)", {
+        duration: 1000,
       });
       return false;
     }
     
     if (isNaN(minuteNum) || minuteNum < 0 || minuteNum > 59) {
-      toast({
-        title: "Invalid minute",
-        description: "Please enter a number between 0 and 59",
-        variant: "destructive",
+      toast.error("Please enter a valid minute (0-59)", {
+        duration: 1000,
       });
       return false;
     }
@@ -63,6 +59,11 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
         alarms: [...alarms, newAlarm],
       },
     });
+    
+    toast.success("Alarm set successfully", {
+      duration: 1000,
+    });
+    
     setShowDialog(false);
     setHour("");
     setMinute("");
