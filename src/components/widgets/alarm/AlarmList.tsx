@@ -1,14 +1,14 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { Switch } from "@/components/ui/switch";
+import { Bell, Vibrate, Trash2 } from "lucide-react";
+import { toast } from "@/components/ui/toast";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { Calendar, Bell, Vibrate, Trash2, MoreVertical } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { cn } from "@/lib/utils";
 
 interface AlarmListProps {
   alarms: Array<{
@@ -23,8 +23,8 @@ interface AlarmListProps {
 }
 
 export default function AlarmList({ alarms }: AlarmListProps) {
-  const { updateWidget, removeWidget } = useWidgets();
-  const widgetId = "alarm-1"; // This should match your widget ID
+  const { updateWidget } = useWidgets();
+  const widgetId = "alarm-1";
 
   const toggleAlarm = (alarmId: string, enabled: boolean) => {
     const updatedAlarms = alarms.map((alarm) =>
@@ -49,138 +49,139 @@ export default function AlarmList({ alarms }: AlarmListProps) {
     });
   };
 
-  const addLabel = (alarmId: string) => {
-    const label = prompt("Enter a label for this alarm:");
-    if (label) {
-      updateAlarmFeature(alarmId, { label });
-      toast({
-        title: "Label added",
-        description: "The alarm label has been updated.",
-      });
-    }
-  };
-
-  const toggleRepeat = (alarmId: string, day: string) => {
-    const alarm = alarms.find((a) => a.id === alarmId);
-    const repeat = alarm?.repeat || [];
-    const updatedRepeat = repeat.includes(day)
-      ? repeat.filter((d) => d !== day)
-      : [...repeat, day];
-    updateAlarmFeature(alarmId, { repeat: updatedRepeat });
-  };
-
-  const toggleVibrate = (alarmId: string) => {
-    const alarm = alarms.find((a) => a.id === alarmId);
-    updateAlarmFeature(alarmId, { vibrate: !alarm?.vibrate });
-    toast({
-      title: alarm?.vibrate ? "Vibration disabled" : "Vibration enabled",
-      description: `Vibration has been ${alarm?.vibrate ? "disabled" : "enabled"} for this alarm.`,
-    });
-  };
-
-  const setAlarmSound = (alarmId: string) => {
-    const sounds = ["Default", "Gentle", "Nature", "Classic"];
-    const currentSound = alarms.find((a) => a.id === alarmId)?.sound || "Default";
-    const nextSound = sounds[(sounds.indexOf(currentSound) + 1) % sounds.length];
-    updateAlarmFeature(alarmId, { sound: nextSound });
-    toast({
-      title: "Sound changed",
-      description: `Alarm sound has been set to ${nextSound}.`,
-    });
-  };
-
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const days = [
+    { key: "Mon", label: "Monday" },
+    { key: "Tue", label: "Tuesday" },
+    { key: "Wed", label: "Wednesday" },
+    { key: "Thu", label: "Thursday" },
+    { key: "Fri", label: "Friday" },
+    { key: "Sat", label: "Saturday" },
+    { key: "Sun", label: "Sunday" },
+  ];
 
   return (
     <div className="space-y-4">
       {alarms.map((alarm) => (
-        <div
+        <Accordion
           key={alarm.id}
-          className="flex items-center justify-between p-4 rounded-lg bg-card border"
+          type="single"
+          collapsible
+          className="bg-white rounded-lg border shadow-sm"
         >
-          <div className="space-y-1">
-            <div className="text-2xl font-semibold">{alarm.time}</div>
-            {alarm.label && (
-              <div className="text-sm text-muted-foreground">{alarm.label}</div>
-            )}
-            {alarm.repeat && alarm.repeat.length > 0 && (
-              <div className="flex gap-1 text-xs">
-                {days.map((day) => (
-                  <span
-                    key={day}
-                    className={`w-6 h-6 flex items-center justify-center rounded-full ${
-                      alarm.repeat?.includes(day)
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground"
-                    }`}
-                  >
-                    {day[0]}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={alarm.enabled}
-              onCheckedChange={(checked) => toggleAlarm(alarm.id, checked)}
-            />
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger className="p-2 hover:bg-accent rounded-full">
-                <MoreVertical className="w-4 h-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => addLabel(alarm.id)}>
-                  <span className="mr-2">📝</span> Add label
-                </DropdownMenuItem>
-                
-                <DropdownMenuItem onClick={() => setAlarmSound(alarm.id)}>
-                  <Bell className="w-4 h-4 mr-2" />
-                  Sound: {alarm.sound || "Default"}
-                </DropdownMenuItem>
-                
-                <DropdownMenuItem onClick={() => toggleVibrate(alarm.id)}>
-                  <Vibrate className="w-4 h-4 mr-2" />
-                  Vibrate {alarm.vibrate ? "✓" : ""}
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator />
-                
-                <DropdownMenuItem>
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Repeat
-                </DropdownMenuItem>
-                <div className="px-2 py-1.5 flex gap-1">
-                  {days.map((day) => (
-                    <button
-                      key={day}
-                      onClick={() => toggleRepeat(alarm.id, day)}
-                      className={`w-6 h-6 text-xs rounded-full ${
-                        alarm.repeat?.includes(day)
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted hover:bg-muted/80"
-                      }`}
-                    >
-                      {day[0]}
-                    </button>
-                  ))}
+          <AccordionItem value="item-1" className="border-none">
+            <div className="flex items-center justify-between p-4">
+              <AccordionTrigger className="hover:no-underline flex-1">
+                <div className="flex items-center gap-4">
+                  <span className="text-2xl font-display">{alarm.time}</span>
+                  {alarm.label && (
+                    <span className="text-sm text-muted-foreground">
+                      {alarm.label}
+                    </span>
+                  )}
                 </div>
-                
-                <DropdownMenuSeparator />
-                
-                <DropdownMenuItem
-                  className="text-destructive focus:text-destructive"
+              </AccordionTrigger>
+              <Switch
+                checked={alarm.enabled}
+                onCheckedChange={(checked) => toggleAlarm(alarm.id, checked)}
+                className="ml-4"
+              />
+            </div>
+
+            <AccordionContent className="px-4 pb-4">
+              <div className="space-y-6">
+                {/* Label */}
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    placeholder="Add label"
+                    value={alarm.label || ""}
+                    onChange={(e) =>
+                      updateAlarmFeature(alarm.id, { label: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+
+                {/* Sound */}
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-muted-foreground">
+                    Sound
+                  </div>
+                  <button
+                    onClick={() =>
+                      updateAlarmFeature(alarm.id, {
+                        sound:
+                          alarm.sound === "Default"
+                            ? "Gentle"
+                            : alarm.sound === "Gentle"
+                            ? "Nature"
+                            : "Default",
+                      })
+                    }
+                    className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-50 rounded-lg transition-colors"
+                  >
+                    <Bell className="w-4 h-4 text-primary" />
+                    <span>{alarm.sound || "Default"}</span>
+                  </button>
+                </div>
+
+                {/* Vibration */}
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-muted-foreground">
+                    Vibration
+                  </div>
+                  <button
+                    onClick={() =>
+                      updateAlarmFeature(alarm.id, { vibrate: !alarm.vibrate })
+                    }
+                    className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-50 rounded-lg transition-colors"
+                  >
+                    <Vibrate className="w-4 h-4 text-primary" />
+                    <span>{alarm.vibrate ? "On" : "Off"}</span>
+                  </button>
+                </div>
+
+                {/* Repeat */}
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-muted-foreground pointer-events-none">
+                    Repeat
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {days.map((day) => (
+                      <button
+                        key={day.key}
+                        onClick={() => {
+                          const repeat = alarm.repeat || [];
+                          const updatedRepeat = repeat.includes(day.key)
+                            ? repeat.filter((d) => d !== day.key)
+                            : [...repeat, day.key];
+                          updateAlarmFeature(alarm.id, { repeat: updatedRepeat });
+                        }}
+                        className={cn(
+                          "px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
+                          alarm.repeat?.includes(day.key)
+                            ? "bg-primary/10 text-primary hover:bg-primary/20"
+                            : "text-muted-foreground hover:bg-gray-100"
+                        )}
+                      >
+                        {day.key}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Delete */}
+                <button
                   onClick={() => deleteAlarm(alarm.id)}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
+                  <Trash2 className="w-4 h-4" />
+                  <span>Delete alarm</span>
+                </button>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       ))}
     </div>
   );
