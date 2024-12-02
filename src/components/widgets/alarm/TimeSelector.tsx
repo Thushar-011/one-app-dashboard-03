@@ -35,11 +35,13 @@ export default function TimeSelector({ time, onChange }: TimeSelectorProps) {
       setSelectedHour(hour);
       const newTime = new Date(time);
       newTime.setHours(hour);
+      newTime.setMinutes(selectedMinute);
       onChange(newTime);
     } else {
       const minute = Math.round(angle / 6) % 60;
       setSelectedMinute(minute);
       const newTime = new Date(time);
+      newTime.setHours(selectedHour);
       newTime.setMinutes(minute);
       onChange(newTime);
     }
