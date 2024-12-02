@@ -18,12 +18,13 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { ExpenseCategory } from "@/types/widget";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface ExpenseFormProps {
   onAddExpense: (expense: {
@@ -36,10 +37,10 @@ interface ExpenseFormProps {
   categories?: ExpenseCategory[];
 }
 
-export default function ExpenseForm({ 
-  onAddExpense, 
-  onAddCategory, 
-  categories = [] 
+export default function ExpenseForm({
+  onAddExpense,
+  onAddCategory,
+  categories = [],
 }: ExpenseFormProps) {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -51,7 +52,7 @@ export default function ExpenseForm({
 
   const handleSubmit = () => {
     if (!description.trim() || !amount || !selectedDate || !selectedCategory) return;
-    
+
     onAddExpense({
       description: description.trim(),
       amount,
@@ -72,8 +73,8 @@ export default function ExpenseForm({
     setShowCategoryDialog(false);
   };
 
-  const selectedCategoryName = selectedCategory 
-    ? categories.find(category => category.id === selectedCategory)?.name 
+  const selectedCategoryName = selectedCategory
+    ? categories.find((category) => category.id === selectedCategory)?.name
     : null;
 
   return (
@@ -92,32 +93,29 @@ export default function ExpenseForm({
         placeholder="Amount"
       />
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-start text-left font-normal"
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Select expense date</p>
-        </TooltipContent>
-      </Tooltip>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className="w-full justify-start text-left font-normal"
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {selectedDate ? (
+              format(selectedDate, "PPP")
+            ) : (
+              <span>Pick a date</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={setSelectedDate}
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
 
       <div className="flex gap-2">
         <Popover open={open} onOpenChange={setOpen}>
@@ -135,8 +133,8 @@ export default function ExpenseForm({
             <Command>
               <CommandInput placeholder="Search category..." />
               <CommandEmpty>
-                {categories.length === 0 
-                  ? "Add a category first" 
+                {categories.length === 0
+                  ? "Add a category first"
                   : "No categories found"}
               </CommandEmpty>
               <CommandGroup>
@@ -152,7 +150,9 @@ export default function ExpenseForm({
                     <Check
                       className={cn(
                         "mr-2 h-4 w-4",
-                        selectedCategory === category.id ? "opacity-100" : "opacity-0"
+                        selectedCategory === category.id
+                          ? "opacity-100"
+                          : "opacity-0"
                       )}
                     />
                     {category.name}
@@ -186,7 +186,7 @@ export default function ExpenseForm({
         </Dialog>
       </div>
 
-      <Button 
+      <Button
         onClick={handleSubmit}
         disabled={!description.trim() || !amount || !selectedDate || !selectedCategory}
         className="w-full"
