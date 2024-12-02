@@ -21,6 +21,7 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
   const [hour, setHour] = useState("");
   const [minute, setMinute] = useState("");
   const [showKeyboard, setShowKeyboard] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const alarms = data?.alarms || [];
 
@@ -86,18 +87,29 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
   return (
     <div className="h-full flex flex-col relative">
       <AlarmList alarms={alarms} />
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 transform">
-        <Button
-          variant="outline"
-          onClick={() => {
-            setShowDialog(true);
-            setShowKeyboard(true);
-          }}
-          className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/90 to-primary hover:from-primary hover:to-primary/90 border-none shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-xl"
-        >
-          <span className="text-white text-3xl font-light select-none">+</span>
-        </Button>
-      </div>
+      <AnimatePresence>
+        {!isTransitioning && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 transform"
+            onAnimationStart={() => setIsTransitioning(true)}
+            onAnimationComplete={() => setIsTransitioning(false)}
+          >
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowDialog(true);
+                setShowKeyboard(true);
+              }}
+              className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/90 to-primary hover:from-primary hover:to-primary/90 border-none shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-xl"
+            >
+              <span className="text-white text-3xl font-light select-none">+</span>
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent className="bg-white border-none shadow-lg p-6 max-w-md rounded-2xl">
