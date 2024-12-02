@@ -42,6 +42,16 @@ export default function ExpenseAnalytics({ expenses, categories }: ExpenseAnalyt
   // Calculate total expenses
   const totalExpenses = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
 
+  // Chart configuration
+  const chartConfig = {
+    expenses: {
+      theme: {
+        light: "#10b981",
+        dark: "#34d399"
+      }
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="text-center">
@@ -50,7 +60,7 @@ export default function ExpenseAnalytics({ expenses, categories }: ExpenseAnalyt
       </div>
 
       <div className="h-[300px]">
-        <ChartContainer>
+        <ChartContainer config={chartConfig}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
