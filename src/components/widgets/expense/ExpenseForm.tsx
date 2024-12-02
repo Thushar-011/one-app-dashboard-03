@@ -40,29 +40,31 @@ interface ExpenseFormProps {
 export default function ExpenseForm({
   onAddExpense,
   onAddCategory,
-  categories = [],
+  categories = [], // Provide default empty array
 }: ExpenseFormProps) {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
-  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedCategory, setSelectedCategory] = useState<string>();
-  const [open, setOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [showCategoryDialog, setShowCategoryDialog] = useState(false);
 
   const handleSubmit = () => {
-    if (!description.trim() || !amount || !selectedDate || !selectedCategory) return;
+    if (!description.trim() || !amount || !selectedDate) return;
+
+    // Use first category as default if none selected
+    const categoryId = selectedCategory || (categories.length > 0 ? categories[0].id : "default");
 
     onAddExpense({
       description: description.trim(),
       amount,
       date: selectedDate,
-      categoryId: selectedCategory,
+      categoryId,
     });
 
     setDescription("");
     setAmount("");
-    setSelectedDate(undefined);
+    setSelectedDate(new Date());
     setSelectedCategory(undefined);
   };
 
@@ -73,12 +75,8 @@ export default function ExpenseForm({
     setShowCategoryDialog(false);
   };
 
-  const selectedCategoryName = selectedCategory
-    ? categories.find((category) => category.id === selectedCategory)?.name
-    : null;
-
   return (
-    <div className="space-y-4" onClick={(e) => e.stopPropagation()}>
+    <div className="space-y-4">
       <div className="flex gap-2">
         <Input
           type="number"
@@ -123,7 +121,10 @@ export default function ExpenseForm({
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="w-[240px] justify-start text-left font-normal"
+              className={cn(
+                "w-[240px] justify-start text-left font-normal",
+                !selectedDate && "text-muted-foreground"
+              )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
@@ -133,61 +134,38 @@ export default function ExpenseForm({
             <Calendar
               mode="single"
               selected={selectedDate}
-              onSelect={setSelectedDate}
+              onSelect={(date) => date && setSelectedDate(date)}
               initialFocus
             />
           </PopoverContent>
         </Popover>
 
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              role="combobox"
-              aria-expanded={open}
-              className="w-full justify-between"
-            >
-              {selectedCategoryName || "Select category"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0">
-            <Command>
-              <CommandInput placeholder="Search category..." />
-              <CommandEmpty>
-                {categories.length === 0
-                  ? "Add a category first"
-                  : "No categories found"}
-              </CommandEmpty>
-              <CommandGroup>
-                {categories.map((category) => (
-                  <CommandItem
-                    key={category.id}
-                    value={category.name}
-                    onSelect={() => {
-                      setSelectedCategory(category.id);
-                      setOpen(false);
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selectedCategory === category.id
-                          ? "opacity-100"
-                          : "opacity-0"
-                      )}
-                    />
-                    {category.name}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </Command>
-          </PopoverContent>
-        </Popover>
+        <Command className="w-[200px] border rounded-md">
+          <CommandInput placeholder="Search category..." />
+          <CommandEmpty>No categories found</CommandEmpty>
+          <CommandGroup>
+            {categories.map((category) => (
+              <CommandItem
+                key={category.id}
+                value={category.name}
+                onSelect={() => setSelectedCategory(category.id)}
+              >
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    selectedCategory === category.id ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                {category.name}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </Command>
       </div>
 
       <Button
         onClick={handleSubmit}
-        disabled={!description.trim() || !amount || !selectedDate || !selectedCategory}
+        disabled={!description.trim() || !amount || !selectedDate}
         className="w-full"
       >
         Add Expense
