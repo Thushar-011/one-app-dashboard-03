@@ -1,17 +1,17 @@
 import { useWidgets } from "@/hooks/useWidgets";
-import { AlarmData } from "@/types/widget";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { toast } from "../ui/use-toast";
-import { Clock } from "lucide-react";
+import { Clock, Keyboard } from "lucide-react";
 import TimeSelector from "./alarm/TimeSelector";
 import AlarmList from "./alarm/AlarmList";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface AlarmWidgetProps {
   id: string;
-  data?: AlarmData;
+  data?: any;
   isDetailView: boolean;
 }
 
@@ -103,43 +103,60 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
           <div className="space-y-6">
             <h2 className="text-lg font-medium text-center">Set alarm time</h2>
             
-            {showKeyboard ? (
-              <div className="flex items-center justify-center gap-2">
-                <div className="space-y-1">
-                  <Input
-                    type="text"
-                    value={hour}
-                    onChange={(e) => setHour(e.target.value)}
-                    placeholder="00"
-                    className="text-4xl text-center w-24 rounded-xl border-gray-200 focus:border-primary focus:ring-primary"
-                    maxLength={2}
+            <AnimatePresence mode="wait">
+              {showKeyboard ? (
+                <motion.div
+                  key="keyboard"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center justify-center gap-2"
+                >
+                  <div className="space-y-1">
+                    <Input
+                      type="text"
+                      value={hour}
+                      onChange={(e) => setHour(e.target.value)}
+                      placeholder="00"
+                      className="text-4xl text-center w-24 rounded-xl border-gray-200 focus:border-primary focus:ring-primary"
+                      maxLength={2}
+                    />
+                    <div className="text-sm text-center text-muted-foreground">Hour</div>
+                  </div>
+                  
+                  <div className="text-4xl">:</div>
+                  
+                  <div className="space-y-1">
+                    <Input
+                      type="text"
+                      value={minute}
+                      onChange={(e) => setMinute(e.target.value)}
+                      placeholder="00"
+                      className="text-4xl text-center w-24 rounded-xl border-gray-200 focus:border-primary focus:ring-primary"
+                      maxLength={2}
+                    />
+                    <div className="text-sm text-center text-muted-foreground">Minute</div>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="clock"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <TimeSelector
+                    time={new Date()}
+                    onChange={(date) => {
+                      setHour(date.getHours().toString().padStart(2, '0'));
+                      setMinute(date.getMinutes().toString().padStart(2, '0'));
+                    }}
                   />
-                  <div className="text-sm text-center text-muted-foreground">Hour</div>
-                </div>
-                
-                <div className="text-4xl">:</div>
-                
-                <div className="space-y-1">
-                  <Input
-                    type="text"
-                    value={minute}
-                    onChange={(e) => setMinute(e.target.value)}
-                    placeholder="00"
-                    className="text-4xl text-center w-24 rounded-xl border-gray-200 focus:border-primary focus:ring-primary"
-                    maxLength={2}
-                  />
-                  <div className="text-sm text-center text-muted-foreground">Minute</div>
-                </div>
-              </div>
-            ) : (
-              <TimeSelector
-                time={new Date()}
-                onChange={(date) => {
-                  setHour(date.getHours().toString().padStart(2, '0'));
-                  setMinute(date.getMinutes().toString().padStart(2, '0'));
-                }}
-              />
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <div className="flex justify-between items-center pt-4 relative">
               <Button
@@ -150,7 +167,7 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
                 {showKeyboard ? (
                   <Clock className="w-5 h-5 text-primary hover:text-primary/90" />
                 ) : (
-                  <Clock className="w-5 h-5 text-primary hover:text-primary/90" />
+                  <Keyboard className="w-5 h-5 text-primary hover:text-primary/90" />
                 )}
               </Button>
               
