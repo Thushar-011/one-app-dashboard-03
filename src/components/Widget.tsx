@@ -14,7 +14,6 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
   const { editMode, updateWidget, removeWidget } = useWidgets();
   const [isDragging, setIsDragging] = useState(false);
   const [isDetailView, setIsDetailView] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -111,7 +110,6 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         onClick={() => !editMode && setIsDetailView(!isDetailView)}
         whileHover={{ scale: editMode ? 1 : 1.02 }}
       >
-        {/* Widget content */}
         <div className="widget-content">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -127,23 +125,10 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
               </button>
             )}
           </div>
-          <AnimatePresence mode="wait">
-            {!isTransitioning && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onAnimationStart={() => setIsTransitioning(true)}
-                onAnimationComplete={() => setIsTransitioning(false)}
-              >
-                {renderWidgetContent()}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {renderWidgetContent()}
         </div>
       </motion.div>
 
-      {/* Detail View Modal */}
       <AnimatePresence>
         {isDetailView && (
           <motion.div 
