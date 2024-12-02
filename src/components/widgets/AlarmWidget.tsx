@@ -1,12 +1,14 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { AlarmData } from "@/types/widget";
-import { Plus, Keyboard, Clock } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { toast } from "../ui/use-toast";
-import AnalogClock from "./alarm/AnalogClock";
+import { Clock, Keyboard } from "lucide-react";
+import TimeSelector from "./alarm/TimeSelector";
+import AlarmList from "./alarm/AlarmList";
+import AddAlarmButton from "./alarm/AddAlarmButton";
 
 interface AlarmWidgetProps {
   id: string;
@@ -19,8 +21,7 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
   const [showDialog, setShowDialog] = useState(false);
   const [hour, setHour] = useState("");
   const [minute, setMinute] = useState("");
-  const [useClockInterface, setUseClockInterface] = useState(false);
-  const [clockMode, setClockMode] = useState<'hour' | 'minute'>('hour');
+  const [showKeyboard, setShowKeyboard] = useState(false);
 
   const alarms = data?.alarms || [];
 
@@ -55,10 +56,6 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
     const newAlarm = {
       id: Date.now().toString(),
       time: `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`,
-      repeat: [],
-      sound: "Waves",
-      snoozeEnabled: false,
-      snoozeInterval: 5,
       enabled: true,
     };
 
@@ -70,105 +67,35 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
     setShowDialog(false);
     setHour("");
     setMinute("");
-    setUseClockInterface(false);
-    setClockMode('hour');
-  };
-
-  const handleClockHourChange = (value: number) => {
-    setHour(value.toString());
-  };
-
-  const handleClockMinuteChange = (value: number) => {
-    setMinute(value.toString());
+    setShowKeyboard(false);
   };
 
   if (!isDetailView) {
     return (
-      <div className="text-sm text-muted-foreground flex flex-col items-center justify-between h-full relative">
-        <div className="flex items-center gap-2">
+      <div className="h-full flex flex-col relative pb-16">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <div className="w-2 h-2 rounded-full bg-primary/50" />
           {alarms.length === 0
             ? "No alarms set"
             : `${alarms.length} alarm${alarms.length === 1 ? "" : "s"} set`}
         </div>
         
-        <Button
-          size="icon"
-          className="rounded-full w-12 h-12 bg-primary hover:bg-primary/90 absolute bottom-0 left-1/2 -translate-x-1/2"
-          onClick={() => setShowDialog(true)}
-        >
-          <Plus className="w-6 h-6 text-white" />
-        </Button>
+        <AddAlarmButton onClick={() => setShowDialog(true)} />
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col relative pb-8">
-      {/* Alarms List */}
-      <div className="flex-1">
-        {alarms.length === 0 ? (
-          <div className="text-muted-foreground text-center mt-4">No Alarms</div>
-        ) : (
-          <div className="space-y-2">
-            {alarms.map((alarm) => (
-              <div 
-                key={alarm.id}
-                className="p-3 bg-background/50 backdrop-blur-sm rounded-lg border border-border/50"
-              >
-                <div className="text-2xl font-medium">{alarm.time}</div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+    <div className="h-full flex flex-col relative pb-16">
+      <AlarmList alarms={alarms} />
+      <AddAlarmButton onClick={() => setShowDialog(true)} />
 
-      {/* Add Alarm Button */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
-        <Button
-          size="icon"
-          className="rounded-full w-12 h-12 bg-primary hover:bg-primary/90"
-          onClick={() => setShowDialog(true)}
-        >
-          <Plus className="w-6 h-6 text-white" />
-        </Button>
-      </div>
-
-      {/* Time Selection Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="bg-gray-900/95 backdrop-blur-sm border-none shadow-lg p-6 max-w-md">
+        <DialogContent className="bg-white border-none shadow-lg p-6 max-w-md">
           <div className="space-y-6">
-            <h2 className="text-lg font-medium text-center text-gray-200">Set alarm time</h2>
+            <h2 className="text-lg font-medium text-center">Set alarm time</h2>
             
-            {useClockInterface ? (
-              <>
-                <div className="text-center text-3xl font-medium text-gray-200 mb-4">
-                  {hour.padStart(2, '0')}:{minute.padStart(2, '0')}
-                </div>
-                <AnalogClock
-                  mode={clockMode}
-                  value={clockMode === 'hour' ? parseInt(hour || '0') : parseInt(minute || '0')}
-                  onChange={clockMode === 'hour' ? handleClockHourChange : handleClockMinuteChange}
-                  onSwitchMode={() => setUseClockInterface(false)}
-                />
-                <div className="flex justify-center gap-4">
-                  <Button
-                    variant="outline"
-                    className={`px-6 ${clockMode === 'hour' ? 'bg-primary text-white' : 'text-gray-300'}`}
-                    onClick={() => setClockMode('hour')}
-                  >
-                    Hour
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className={`px-6 ${clockMode === 'minute' ? 'bg-primary text-white' : 'text-gray-300'}`}
-                    onClick={() => setClockMode('minute')}
-                  >
-                    Minute
-                  </Button>
-                </div>
-              </>
-            ) : (
+            {showKeyboard ? (
               <div className="flex items-center justify-center gap-2">
                 <div className="space-y-1">
                   <Input
@@ -176,13 +103,13 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
                     value={hour}
                     onChange={(e) => setHour(e.target.value)}
                     placeholder="00"
-                    className="text-4xl text-center w-24 bg-gray-800/50 border-gray-700 text-gray-200"
+                    className="text-4xl text-center w-24"
                     maxLength={2}
                   />
-                  <div className="text-sm text-center text-gray-400">Hour</div>
+                  <div className="text-sm text-center text-muted-foreground">Hour</div>
                 </div>
                 
-                <div className="text-4xl text-gray-200">:</div>
+                <div className="text-4xl">:</div>
                 
                 <div className="space-y-1">
                   <Input
@@ -190,35 +117,44 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
                     value={minute}
                     onChange={(e) => setMinute(e.target.value)}
                     placeholder="00"
-                    className="text-4xl text-center w-24 bg-gray-800/50 border-gray-700 text-gray-200"
+                    className="text-4xl text-center w-24"
                     maxLength={2}
                   />
-                  <div className="text-sm text-center text-gray-400">Minute</div>
+                  <div className="text-sm text-center text-muted-foreground">Minute</div>
                 </div>
               </div>
+            ) : (
+              <TimeSelector
+                time={new Date()}
+                onChange={(date) => {
+                  setHour(date.getHours().toString().padStart(2, '0'));
+                  setMinute(date.getMinutes().toString().padStart(2, '0'));
+                }}
+                showKeyboard={showKeyboard}
+                onToggleKeyboard={() => setShowKeyboard(!showKeyboard)}
+              />
             )}
 
             <div className="flex justify-between items-center pt-4">
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={() => {
                   setShowDialog(false);
                   setHour("");
                   setMinute("");
-                  setUseClockInterface(false);
-                  setClockMode('hour');
+                  setShowKeyboard(false);
                 }}
-                className="text-gray-300 hover:text-white hover:bg-gray-800/50"
+                className="hover:bg-gray-100"
               >
                 Cancel
               </Button>
-              {!useClockInterface && (
+              {!showKeyboard && (
                 <Button
                   variant="ghost"
-                  onClick={() => setUseClockInterface(true)}
-                  className="absolute bottom-6 left-6 text-gray-300 hover:text-white hover:bg-gray-800/50"
+                  onClick={() => setShowKeyboard(true)}
+                  className="absolute bottom-6 left-6 hover:bg-gray-100"
                 >
-                  <Clock className="w-5 h-5" />
+                  <Keyboard className="w-5 h-5" />
                 </Button>
               )}
               <Button
