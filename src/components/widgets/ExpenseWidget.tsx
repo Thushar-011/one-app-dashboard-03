@@ -3,6 +3,10 @@ import { ExpenseData } from "@/types/widget";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ExpenseForm from "./expense/ExpenseForm";
 import ExpenseList from "./expense/ExpenseList";
+import ExpenseAnalytics from "./expense/ExpenseAnalytics";
+import { Button } from "@/components/ui/button";
+import { BarChart2 } from "lucide-react";
+import { useState } from "react";
 
 interface ExpenseWidgetProps {
   id: string;
@@ -12,6 +16,7 @@ interface ExpenseWidgetProps {
 
 export default function ExpenseWidget({ id, data, isDetailView }: ExpenseWidgetProps) {
   const { updateWidget } = useWidgets();
+  const [showAnalytics, setShowAnalytics] = useState(false);
   
   const categories = data?.categories || [];
   const expenses = data?.expenses || [];
@@ -89,6 +94,22 @@ export default function ExpenseWidget({ id, data, isDetailView }: ExpenseWidgetP
           categories={categories}
           onRemoveExpense={removeExpense}
         />
+        <Button 
+          variant="outline" 
+          className="w-full" 
+          onClick={() => setShowAnalytics(true)}
+        >
+          <BarChart2 className="w-4 h-4 mr-2" />
+          View Analytics
+        </Button>
+        
+        {showAnalytics && (
+          <ExpenseAnalytics 
+            categories={categories}
+            expenses={expenses}
+            onClose={() => setShowAnalytics(false)}
+          />
+        )}
       </div>
     </TooltipProvider>
   );
