@@ -26,6 +26,10 @@ export interface Alarm {
   repeat?: string[];
   sound?: string;
   vibrate?: boolean;
+  snoozeEnabled?: boolean;
+  snoozeInterval?: number;
+  isAM?: boolean;
+  isPM?: boolean;
 }
 
 /**

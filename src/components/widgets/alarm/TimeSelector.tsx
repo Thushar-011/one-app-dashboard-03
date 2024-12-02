@@ -5,9 +5,11 @@ import { motion } from "framer-motion";
 interface TimeSelectorProps {
   time: Date;
   onChange: (time: Date) => void;
+  showKeyboard?: boolean;
+  onToggleKeyboard?: () => void;
 }
 
-export default function TimeSelector({ time, onChange }: TimeSelectorProps) {
+export default function TimeSelector({ time, onChange, showKeyboard, onToggleKeyboard }: TimeSelectorProps) {
   const [mode, setMode] = useState<'hours' | 'minutes'>('hours');
   const [selectedHour, setSelectedHour] = useState(time.getHours());
   const [selectedMinute, setSelectedMinute] = useState(time.getMinutes());
