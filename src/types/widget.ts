@@ -21,13 +21,11 @@ export interface Widget {
 export interface Alarm {
   id: string;
   time: string;
-  repeat: string[];
-  sound: string;
-  snoozeEnabled: boolean;
-  snoozeInterval: number;
-  isAM: boolean;
-  isPM: boolean;
   enabled: boolean;
+  label?: string;
+  repeat?: string[];
+  sound?: string;
+  vibrate?: boolean;
 }
 
 /**
