@@ -16,14 +16,25 @@ export interface Widget {
 }
 
 /**
+ * Individual alarm configuration
+ */
+export interface Alarm {
+  id: string;
+  time: string;
+  repeat: string[];
+  sound: string;
+  snoozeEnabled: boolean;
+  snoozeInterval: number;
+  isAM: boolean;
+  isPM: boolean;
+  enabled: boolean;
+}
+
+/**
  * Alarm widget data structure
  */
 export interface AlarmData {
-  alarms: Array<{
-    id: string;
-    time: string;
-    enabled: boolean;
-  }>;
+  alarms: Alarm[];
 }
 
 /**
