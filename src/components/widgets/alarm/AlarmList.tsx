@@ -1,7 +1,7 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { Switch } from "@/components/ui/switch";
 import { Bell, Vibrate, Trash2 } from "lucide-react";
-import { toast } from "@/components/ui/toast";
+import { toast } from "@/hooks/use-toast";
 import {
   Accordion,
   AccordionContent,
