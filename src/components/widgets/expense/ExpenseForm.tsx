@@ -120,7 +120,7 @@ export default function ExpenseForm({ onAddExpense, onAddCategory, categories = 
               aria-expanded={open}
               className="w-full justify-between"
             >
-              {selectedCategory
+              {selectedCategory && categories
                 ? categories.find((category) => category.id === selectedCategory)?.name
                 : "Select category"}
             </Button>
@@ -128,11 +128,9 @@ export default function ExpenseForm({ onAddExpense, onAddCategory, categories = 
           <PopoverContent className="w-[200px] p-0">
             <Command>
               <CommandInput placeholder="Search category..." />
-              <CommandEmpty>
-                <p className="p-2 text-sm text-muted-foreground">No categories found.</p>
-              </CommandEmpty>
+              <CommandEmpty>No categories found.</CommandEmpty>
               <CommandGroup>
-                {categories.map((category) => (
+                {(categories || []).map((category) => (
                   <CommandItem
                     key={category.id}
                     value={category.name}
