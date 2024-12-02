@@ -35,7 +35,7 @@ interface ExpenseFormProps {
   categories: ExpenseCategory[];
 }
 
-export default function ExpenseForm({ onAddExpense, onAddCategory, categories }: ExpenseFormProps) {
+export default function ExpenseForm({ onAddExpense, onAddCategory, categories = [] }: ExpenseFormProps) {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -135,7 +135,7 @@ export default function ExpenseForm({ onAddExpense, onAddCategory, categories }:
               </Button>
             </CommandEmpty>
             <CommandGroup>
-              {categories.map((category) => (
+              {(categories || []).map((category) => (
                 <CommandItem
                   key={category.id}
                   value={category.name}
