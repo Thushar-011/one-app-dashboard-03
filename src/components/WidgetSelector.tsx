@@ -15,6 +15,7 @@ const WIDGET_OPTIONS: Array<{ type: WidgetType; label: string }> = [
   { type: "todo", label: "To-Do List" },
   { type: "reminder", label: "Reminders" },
   { type: "note", label: "Notes" },
+  { type: "expense", label: "Expense Tracker" },
 ];
 
 export default function WidgetSelector() {

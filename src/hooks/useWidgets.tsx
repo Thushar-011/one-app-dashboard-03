@@ -27,7 +27,6 @@ const WidgetsContext = createContext<WidgetsContextType | null>(null);
  * Provides methods for widget CRUD operations
  */
 export function WidgetsProvider({ children }: { children: ReactNode }) {
-  // Initialize with default widgets
   const [widgets, setWidgets] = useState<Widget[]>([
     {
       id: "alarm-1",
@@ -42,6 +41,13 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
       position: { x: 0, y: 170 },
       size: { width: 150, height: 150 },
       data: { tasks: [] },
+    },
+    {
+      id: "expense-1",
+      type: "expense",
+      position: { x: 0, y: 340 },
+      size: { width: 150, height: 150 },
+      data: { categories: [], expenses: [] },
     },
   ]);
   const [trashedWidgets, setTrashedWidgets] = useState<Widget[]>([]);
@@ -59,6 +65,10 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
         ? { alarms: [] } 
         : type === "todo" 
         ? { tasks: [] }
+        : type === "reminder"
+        ? { reminders: [] }
+        : type === "note"
+        ? { notes: [] }
         : type === "expense"
         ? { categories: [], expenses: [] }
         : {},
