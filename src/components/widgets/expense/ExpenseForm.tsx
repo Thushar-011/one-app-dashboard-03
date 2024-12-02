@@ -40,7 +40,7 @@ interface ExpenseFormProps {
 export default function ExpenseForm({
   onAddExpense,
   onAddCategory,
-  categories = [],
+  categories = [], // Provide default empty array
 }: ExpenseFormProps) {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -138,7 +138,7 @@ export default function ExpenseForm({
                   : "No categories found"}
               </CommandEmpty>
               <CommandGroup>
-                {categories.map((category) => (
+                {(categories || []).map((category) => (
                   <CommandItem
                     key={category.id}
                     value={category.name}
