@@ -33,10 +33,14 @@ interface ExpenseFormProps {
     categoryId: string;
   }) => void;
   onAddCategory: (name: string) => void;
-  categories: ExpenseCategory[];
+  categories?: ExpenseCategory[];
 }
 
-export default function ExpenseForm({ onAddExpense, onAddCategory, categories = [] }: ExpenseFormProps) {
+export default function ExpenseForm({ 
+  onAddExpense, 
+  onAddCategory, 
+  categories = [] 
+}: ExpenseFormProps) {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -67,6 +71,10 @@ export default function ExpenseForm({ onAddExpense, onAddCategory, categories = 
     setNewCategoryName("");
     setShowCategoryDialog(false);
   };
+
+  const selectedCategoryName = selectedCategory 
+    ? categories.find(category => category.id === selectedCategory)?.name 
+    : null;
 
   return (
     <div className="space-y-4" onClick={(e) => e.stopPropagation()}>
@@ -120,17 +128,19 @@ export default function ExpenseForm({ onAddExpense, onAddCategory, categories = 
               aria-expanded={open}
               className="w-full justify-between"
             >
-              {selectedCategory && categories
-                ? categories.find((category) => category.id === selectedCategory)?.name
-                : "Select category"}
+              {selectedCategoryName || "Select category"}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[200px] p-0">
             <Command>
               <CommandInput placeholder="Search category..." />
-              <CommandEmpty>No categories found.</CommandEmpty>
+              <CommandEmpty>
+                {categories.length === 0 
+                  ? "Add a category first" 
+                  : "No categories found"}
+              </CommandEmpty>
               <CommandGroup>
-                {(categories || []).map((category) => (
+                {categories.map((category) => (
                   <CommandItem
                     key={category.id}
                     value={category.name}
