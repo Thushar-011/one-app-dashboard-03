@@ -9,6 +9,7 @@ import {
 import { useWidgets } from "@/hooks/useWidgets";
 import { Button } from "./ui/button";
 import { WidgetType } from "@/types/widget";
+import { toast } from "sonner";
 
 const WIDGET_OPTIONS: Array<{ type: WidgetType; label: string }> = [
   { type: "alarm", label: "Alarm" },
@@ -19,7 +20,52 @@ const WIDGET_OPTIONS: Array<{ type: WidgetType; label: string }> = [
 ];
 
 export default function WidgetSelector() {
-  const { addWidget } = useWidgets();
+  const { widgets, addWidget } = useWidgets();
+
+  const handleAddWidget = (type: WidgetType) => {
+    if (widgets.some(widget => widget.type === type)) {
+      toast.error(`${type.charAt(0).toUpperCase() + type.slice(1)} widget already exists`, {
+        duration: 1000,
+      });
+      return;
+    }
+
+    // Find optimal position for new widget
+    const existingPositions = widgets.map(w => w.position.y);
+    let newY = 0;
+    
+    if (existingPositions.length > 0) {
+      // Sort positions to find gaps
+      const sortedPositions = existingPositions.sort((a, b) => a - b);
+      
+      // Look for a gap between widgets
+      for (let i = 0; i < sortedPositions.length; i++) {
+        const currentPos = sortedPositions[i];
+        const nextPos = sortedPositions[i + 1];
+        
+        if (nextPos && nextPos - currentPos >= 170) { // 170 is widget height + margin
+          newY = currentPos + 170;
+          break;
+        }
+      }
+      
+      // If no gap found, place at the end
+      if (newY === 0) {
+        newY = sortedPositions[sortedPositions.length - 1] + 170;
+      }
+    }
+
+    addWidget(type, { x: 0, y: newY });
+    
+    const dialogClose = document.querySelector(
+      "[data-dialog-close]"
+    ) as HTMLButtonElement;
+    dialogClose?.click();
+    
+    toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} widget added`, {
+      duration: 1000,
+    });
+  };
 
   return (
     <Dialog>
@@ -41,14 +87,13 @@ export default function WidgetSelector() {
             <Button
               key={option.type}
               variant="outline"
-              className="h-20 flex flex-col gap-2"
-              onClick={() => {
-                addWidget(option.type);
-                const dialogClose = document.querySelector(
-                  "[data-dialog-close]"
-                ) as HTMLButtonElement;
-                dialogClose?.click();
-              }}
+              className={`h-20 flex flex-col gap-2 transition-all duration-300 ${
+                widgets.some(w => w.type === option.type)
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:scale-105"
+              }`}
+              onClick={() => handleAddWidget(option.type)}
+              disabled={widgets.some(w => w.type === option.type)}
             >
               {option.label}
             </Button>

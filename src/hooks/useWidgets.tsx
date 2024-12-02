@@ -1,65 +1,32 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { Widget, WidgetType } from "@/types/widget";
 
-/**
- * Context interface defining the shape of our widget management system
- */
 interface WidgetsContextType {
-  widgets: Widget[];              // Active widgets
-  trashedWidgets: Widget[];       // Deleted widgets stored in trash
-  editMode: boolean;              // Whether edit mode is active
-  toggleEditMode: () => void;     // Toggle edit mode on/off
-  addWidget: (type: WidgetType) => void;  // Add new widget
-  removeWidget: (id: string) => void;      // Move widget to trash
-  updateWidget: (id: string, updates: Partial<Widget>) => void;  // Update widget properties
-  restoreWidget: (id: string) => void;     // Restore widget from trash
-  clearTrash: () => void;                  // Empty trash
+  widgets: Widget[];
+  trashedWidgets: Widget[];
+  editMode: boolean;
+  toggleEditMode: () => void;
+  addWidget: (type: WidgetType, position?: { x: number; y: number }) => void;
+  removeWidget: (id: string) => void;
+  updateWidget: (id: string, updates: Partial<Widget>) => void;
+  restoreWidget: (id: string) => void;
+  clearTrash: () => void;
 }
 
 const WidgetsContext = createContext<WidgetsContextType | null>(null);
 
-/**
- * Provider component that wraps app to provide widget management functionality
- * Manages state for:
- * - Active widgets
- * - Trashed widgets
- * - Edit mode
- * Provides methods for widget CRUD operations
- */
 export function WidgetsProvider({ children }: { children: ReactNode }) {
-  const [widgets, setWidgets] = useState<Widget[]>([
-    {
-      id: "alarm-1",
-      type: "alarm",
-      position: { x: 0, y: 0 },
-      size: { width: 150, height: 150 },
-      data: { alarms: [] },
-    },
-    {
-      id: "todo-1",
-      type: "todo",
-      position: { x: 0, y: 170 },
-      size: { width: 150, height: 150 },
-      data: { tasks: [] },
-    },
-    {
-      id: "expense-1",
-      type: "expense",
-      position: { x: 0, y: 340 },
-      size: { width: 150, height: 150 },
-      data: { categories: [], expenses: [] },
-    },
-  ]);
+  const [widgets, setWidgets] = useState<Widget[]>([]);
   const [trashedWidgets, setTrashedWidgets] = useState<Widget[]>([]);
   const [editMode, setEditMode] = useState(false);
 
   const toggleEditMode = () => setEditMode(!editMode);
 
-  const addWidget = (type: WidgetType) => {
+  const addWidget = (type: WidgetType, position?: { x: number; y: number }) => {
     const newWidget: Widget = {
       id: `${type}-${Date.now()}`,
       type,
-      position: { x: 0, y: widgets.length * 170 },
+      position: position || { x: 0, y: widgets.length * 170 },
       size: { width: 150, height: 150 },
       data: type === "alarm" 
         ? { alarms: [] } 
@@ -88,7 +55,29 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
     const widgetToRestore = trashedWidgets.find(w => w.id === id);
     if (widgetToRestore) {
       setTrashedWidgets(trashedWidgets.filter(w => w.id !== id));
-      setWidgets([...widgets, widgetToRestore]);
+      
+      // Find optimal position for restored widget
+      const existingPositions = widgets.map(w => w.position.y);
+      let newY = 0;
+      
+      if (existingPositions.length > 0) {
+        const sortedPositions = existingPositions.sort((a, b) => a - b);
+        for (let i = 0; i < sortedPositions.length; i++) {
+          const currentPos = sortedPositions[i];
+          const nextPos = sortedPositions[i + 1];
+          
+          if (nextPos && nextPos - currentPos >= 170) {
+            newY = currentPos + 170;
+            break;
+          }
+        }
+        
+        if (newY === 0) {
+          newY = sortedPositions[sortedPositions.length - 1] + 170;
+        }
+      }
+      
+      setWidgets([...widgets, { ...widgetToRestore, position: { x: 0, y: newY } }]);
     }
   };
 
@@ -121,10 +110,6 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/**
- * Custom hook to access widget context
- * Throws error if used outside WidgetsProvider
- */
 export function useWidgets() {
   const context = useContext(WidgetsContext);
   if (!context) {

@@ -77,11 +77,23 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
           width: size.width,
           height: size.height,
         }}
-        initial={position}
+        initial={{ 
+          x: position.x,
+          y: position.y,
+          scale: 0.8,
+          opacity: 0 
+        }}
         animate={{
           x: position.x,
           y: position.y,
           scale: isDragging ? 1.05 : 1,
+          opacity: 1
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 500,
+          damping: 30,
+          opacity: { duration: 0.2 }
         }}
         drag={editMode}
         dragMomentum={false}
@@ -97,7 +109,6 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         }}
         onClick={() => !editMode && setIsDetailView(!isDetailView)}
         whileHover={{ scale: editMode ? 1 : 1.02 }}
-        transition={{ duration: 0.2 }}
       >
         {/* Widget content */}
         <div className="widget-content">
