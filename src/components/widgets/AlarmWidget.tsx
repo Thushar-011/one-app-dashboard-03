@@ -8,7 +8,6 @@ import { toast } from "../ui/use-toast";
 import { Clock, Keyboard } from "lucide-react";
 import TimeSelector from "./alarm/TimeSelector";
 import AlarmList from "./alarm/AlarmList";
-import AddAlarmButton from "./alarm/AddAlarmButton";
 
 interface AlarmWidgetProps {
   id: string;
@@ -21,7 +20,7 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
   const [showDialog, setShowDialog] = useState(false);
   const [hour, setHour] = useState("");
   const [minute, setMinute] = useState("");
-  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [showKeyboard, setShowKeyboard] = useState(true);
 
   const alarms = data?.alarms || [];
 
@@ -67,28 +66,38 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
     setShowDialog(false);
     setHour("");
     setMinute("");
-    setShowKeyboard(false);
+    setShowKeyboard(true);
   };
 
   if (!isDetailView) {
     return (
-      <div className="h-full flex flex-col relative pb-16">
+      <div className="h-full flex flex-col relative">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <div className="w-2 h-2 rounded-full bg-primary/50" />
           {alarms.length === 0
             ? "No alarms set"
             : `${alarms.length} alarm${alarms.length === 1 ? "" : "s"} set`}
         </div>
-        
-        <AddAlarmButton onClick={() => setShowDialog(true)} />
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col relative pb-16">
+    <div className="h-full flex flex-col relative">
       <AlarmList alarms={alarms} />
-      <AddAlarmButton onClick={() => setShowDialog(true)} />
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+        <Button
+          variant="outline"
+          size="icon"
+          className="rounded-full bg-primary hover:bg-primary/90"
+          onClick={() => {
+            setShowDialog(true);
+            setShowKeyboard(true);
+          }}
+        >
+          <span className="text-white text-xl">+</span>
+        </Button>
+      </div>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent className="bg-white border-none shadow-lg p-6 max-w-md">
@@ -142,19 +151,19 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
                   setShowDialog(false);
                   setHour("");
                   setMinute("");
-                  setShowKeyboard(false);
+                  setShowKeyboard(true);
                 }}
                 className="hover:bg-gray-100"
               >
                 Cancel
               </Button>
-              {!showKeyboard && (
+              {showKeyboard && (
                 <Button
                   variant="ghost"
-                  onClick={() => setShowKeyboard(true)}
-                  className="absolute bottom-6 left-6 hover:bg-gray-100"
+                  onClick={() => setShowKeyboard(false)}
+                  className="absolute bottom-6 left-1/2 -translate-x-1/2 hover:bg-gray-100"
                 >
-                  <Keyboard className="w-5 h-5" />
+                  <Clock className="w-5 h-5" />
                 </Button>
               )}
               <Button
