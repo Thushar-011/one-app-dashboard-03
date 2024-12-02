@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { toast } from "../ui/use-toast";
-import { Keyboard } from "lucide-react";
+import { Clock } from "lucide-react";
 import TimeSelector from "./alarm/TimeSelector";
 import AlarmList from "./alarm/AlarmList";
 
@@ -138,18 +138,20 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
                   setHour(date.getHours().toString().padStart(2, '0'));
                   setMinute(date.getMinutes().toString().padStart(2, '0'));
                 }}
-                showKeyboard={showKeyboard}
-                onToggleKeyboard={() => setShowKeyboard(!showKeyboard)}
               />
             )}
 
             <div className="flex justify-between items-center pt-4 relative">
               <Button
                 variant="ghost"
-                onClick={() => setShowKeyboard(true)}
+                onClick={() => setShowKeyboard(!showKeyboard)}
                 className="absolute bottom-0 left-0 p-2 hover:bg-transparent"
               >
-                <Keyboard className="w-5 h-5 text-primary hover:text-primary/90" />
+                {showKeyboard ? (
+                  <Clock className="w-5 h-5 text-primary hover:text-primary/90" />
+                ) : (
+                  <Clock className="w-5 h-5 text-primary hover:text-primary/90" />
+                )}
               </Button>
               
               <div className="flex gap-4 ml-auto">

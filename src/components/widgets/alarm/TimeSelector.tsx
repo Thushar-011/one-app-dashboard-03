@@ -1,20 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
 interface TimeSelectorProps {
   time: Date;
   onChange: (time: Date) => void;
-  showKeyboard: boolean;
-  onToggleKeyboard: () => void;
 }
 
-export default function TimeSelector({ time, onChange, onToggleKeyboard }: TimeSelectorProps) {
+export default function TimeSelector({ time, onChange }: TimeSelectorProps) {
   const [mode, setMode] = useState<'hours' | 'minutes'>('hours');
   const [selectedHour, setSelectedHour] = useState(time.getHours());
   const [selectedMinute, setSelectedMinute] = useState(time.getMinutes());
 
-  // Update the clock hands based on selected time
   const getHandRotation = () => {
     if (mode === 'hours') {
       return selectedHour * 15; // 360 / 24 = 15 degrees per hour
@@ -22,7 +19,6 @@ export default function TimeSelector({ time, onChange, onToggleKeyboard }: TimeS
     return selectedMinute * 6; // 360 / 60 = 6 degrees per minute
   };
 
-  // Handle clock face clicks
   const handleClockClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const centerX = rect.width / 2;
@@ -31,7 +27,6 @@ export default function TimeSelector({ time, onChange, onToggleKeyboard }: TimeS
     const x = e.clientX - rect.left - centerX;
     const y = e.clientY - rect.top - centerY;
     
-    // Calculate angle from center
     let angle = Math.atan2(y, x) * 180 / Math.PI + 90;
     if (angle < 0) angle += 360;
 
@@ -50,14 +45,6 @@ export default function TimeSelector({ time, onChange, onToggleKeyboard }: TimeS
     }
   };
 
-  // Switch between hours and minutes
-  useEffect(() => {
-    if (mode === 'hours') {
-      const timeout = setTimeout(() => setMode('minutes'), 2000);
-      return () => clearTimeout(timeout);
-    }
-  }, [selectedHour, mode]);
-
   return (
     <div className="relative w-full max-w-sm mx-auto">
       <div className="text-center mb-4 text-2xl font-light">
@@ -68,9 +55,7 @@ export default function TimeSelector({ time, onChange, onToggleKeyboard }: TimeS
         className="relative w-64 h-64 mx-auto bg-background rounded-full border-2 border-primary/20 cursor-pointer"
         onClick={handleClockClick}
       >
-        {/* Clock numbers */}
         {mode === 'hours' ? (
-          // 24-hour numbers
           Array.from({ length: 24 }, (_, i) => (
             <div
               key={i}
@@ -87,7 +72,6 @@ export default function TimeSelector({ time, onChange, onToggleKeyboard }: TimeS
             </div>
           ))
         ) : (
-          // Minute numbers (by 5s)
           Array.from({ length: 12 }, (_, i) => (
             <div
               key={i}
@@ -105,7 +89,6 @@ export default function TimeSelector({ time, onChange, onToggleKeyboard }: TimeS
           ))
         )}
 
-        {/* Clock hand */}
         <motion.div
           animate={{ rotate: getHandRotation() }}
           transition={{ type: "spring", stiffness: 100, damping: 15 }}
@@ -118,7 +101,6 @@ export default function TimeSelector({ time, onChange, onToggleKeyboard }: TimeS
           }}
         />
 
-        {/* Center dot */}
         <div className="absolute w-3 h-3 bg-primary rounded-full left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2" />
       </div>
 
@@ -130,7 +112,7 @@ export default function TimeSelector({ time, onChange, onToggleKeyboard }: TimeS
           variant="outline"
           size="sm"
           onClick={() => setMode(mode === 'hours' ? 'minutes' : 'hours')}
-          className="text-primary hover:text-primary border-primary hover:border-primary hover:bg-primary/10 rounded-xl"
+          className="text-primary hover:text-primary border-primary hover:border-primary hover:bg-primary/10 rounded-xl z-10"
         >
           {mode === 'hours' ? 'MIN' : 'HR'}
         </Button>
