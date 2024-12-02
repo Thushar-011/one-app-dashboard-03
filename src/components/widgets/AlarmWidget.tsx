@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { toast } from "../ui/use-toast";
-import { Clock, Keyboard } from "lucide-react";
+import { Clock } from "lucide-react";
 import TimeSelector from "./alarm/TimeSelector";
 import AlarmList from "./alarm/AlarmList";
 
@@ -100,7 +100,7 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
       </div>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="bg-white border-none shadow-lg p-6 max-w-md">
+        <DialogContent className="bg-white border-none shadow-lg p-6 max-w-md rounded-2xl">
           <div className="space-y-6">
             <h2 className="text-lg font-medium text-center">Set alarm time</h2>
             
@@ -112,7 +112,7 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
                     value={hour}
                     onChange={(e) => setHour(e.target.value)}
                     placeholder="00"
-                    className="text-4xl text-center w-24"
+                    className="text-4xl text-center w-24 rounded-xl border-gray-200 focus:border-primary focus:ring-primary"
                     maxLength={2}
                   />
                   <div className="text-sm text-center text-muted-foreground">Hour</div>
@@ -126,7 +126,7 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
                     value={minute}
                     onChange={(e) => setMinute(e.target.value)}
                     placeholder="00"
-                    className="text-4xl text-center w-24"
+                    className="text-4xl text-center w-24 rounded-xl border-gray-200 focus:border-primary focus:ring-primary"
                     maxLength={2}
                   />
                   <div className="text-sm text-center text-muted-foreground">Minute</div>
@@ -144,34 +144,35 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
               />
             )}
 
-            <div className="flex justify-between items-center pt-4">
+            <div className="flex justify-between items-center pt-4 relative">
               <Button
-                variant="outline"
-                onClick={() => {
-                  setShowDialog(false);
-                  setHour("");
-                  setMinute("");
-                  setShowKeyboard(true);
-                }}
-                className="hover:bg-gray-100"
+                variant="ghost"
+                onClick={() => setShowKeyboard(false)}
+                className="absolute bottom-0 left-0 hover:bg-gray-100 p-2"
               >
-                Cancel
+                <Clock className="w-5 h-5 text-primary" />
               </Button>
-              {showKeyboard && (
+              
+              <div className="flex gap-4 ml-auto">
                 <Button
-                  variant="ghost"
-                  onClick={() => setShowKeyboard(false)}
-                  className="absolute bottom-6 left-1/2 -translate-x-1/2 hover:bg-gray-100"
+                  variant="outline"
+                  onClick={() => {
+                    setShowDialog(false);
+                    setHour("");
+                    setMinute("");
+                    setShowKeyboard(true);
+                  }}
+                  className="hover:bg-gray-100 rounded-xl"
                 >
-                  <Clock className="w-5 h-5" />
+                  Cancel
                 </Button>
-              )}
-              <Button
-                onClick={handleSave}
-                className="bg-primary hover:bg-primary/90 text-white"
-              >
-                OK
-              </Button>
+                <Button
+                  onClick={handleSave}
+                  className="bg-primary hover:bg-primary/90 text-white rounded-xl"
+                >
+                  OK
+                </Button>
+              </div>
             </div>
           </div>
         </DialogContent>
