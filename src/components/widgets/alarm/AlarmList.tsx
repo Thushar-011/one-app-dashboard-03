@@ -8,7 +8,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { cn } from "@/lib/utils";
 
 interface AlarmListProps {
   alarms: Array<{
@@ -60,7 +59,7 @@ export default function AlarmList({ alarms }: AlarmListProps) {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {alarms.map((alarm) => (
         <Accordion
           key={alarm.id}
@@ -69,8 +68,8 @@ export default function AlarmList({ alarms }: AlarmListProps) {
           className="bg-white rounded-lg border shadow-sm"
         >
           <AccordionItem value="item-1" className="border-none">
-            <div className="flex items-center justify-between p-4">
-              <AccordionTrigger className="hover:no-underline flex-1">
+            <div className="flex items-center justify-between p-3">
+              <AccordionTrigger className="hover:no-underline flex-1 py-0">
                 <div className="flex items-center gap-4">
                   <span className="text-2xl font-display">{alarm.time}</span>
                   {alarm.label && (
@@ -87,10 +86,10 @@ export default function AlarmList({ alarms }: AlarmListProps) {
               />
             </div>
 
-            <AccordionContent className="px-4 pb-4">
-              <div className="space-y-6">
-                {/* Label */}
-                <div className="space-y-2">
+            <AccordionContent className="px-3 pb-3">
+              <div className="space-y-4">
+                {/* Label Input with improved visibility */}
+                <div className="space-y-1.5">
                   <input
                     type="text"
                     placeholder="Add label"
@@ -98,55 +97,42 @@ export default function AlarmList({ alarms }: AlarmListProps) {
                     onChange={(e) =>
                       updateAlarmFeature(alarm.id, { label: e.target.value })
                     }
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="w-full px-3 py-2 bg-gray-50 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent text-sm transition-all duration-200"
                   />
                 </div>
 
-                {/* Sound */}
-                <div className="space-y-2">
-                  <div className="text-sm font-medium text-muted-foreground">
-                    Sound
-                  </div>
+                {/* Sound - More compact layout */}
+                <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() =>
                       updateAlarmFeature(alarm.id, {
-                        sound:
-                          alarm.sound === "Default"
-                            ? "Gentle"
-                            : alarm.sound === "Gentle"
-                            ? "Nature"
-                            : "Default",
+                        sound: alarm.sound === "Default" ? "Gentle" : "Default",
                       })
                     }
-                    className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-50 rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-50 rounded-lg transition-colors text-sm"
                   >
                     <Bell className="w-4 h-4 text-primary" />
                     <span>{alarm.sound || "Default"}</span>
                   </button>
-                </div>
 
-                {/* Vibration */}
-                <div className="space-y-2">
-                  <div className="text-sm font-medium text-muted-foreground">
-                    Vibration
-                  </div>
+                  {/* Vibration */}
                   <button
                     onClick={() =>
                       updateAlarmFeature(alarm.id, { vibrate: !alarm.vibrate })
                     }
-                    className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-50 rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-50 rounded-lg transition-colors text-sm"
                   >
                     <Vibrate className="w-4 h-4 text-primary" />
                     <span>{alarm.vibrate ? "On" : "Off"}</span>
                   </button>
                 </div>
 
-                {/* Repeat */}
-                <div className="space-y-2">
-                  <div className="text-sm font-medium text-muted-foreground pointer-events-none">
+                {/* Repeat - Compact grid layout */}
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground mb-2 pointer-events-none">
                     Repeat
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid grid-cols-4 gap-1.5">
                     {days.map((day) => (
                       <button
                         key={day.key}
@@ -157,12 +143,11 @@ export default function AlarmList({ alarms }: AlarmListProps) {
                             : [...repeat, day.key];
                           updateAlarmFeature(alarm.id, { repeat: updatedRepeat });
                         }}
-                        className={cn(
-                          "px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
+                        className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${
                           alarm.repeat?.includes(day.key)
                             ? "bg-primary/10 text-primary hover:bg-primary/20"
-                            : "text-muted-foreground hover:bg-gray-100"
-                        )}
+                            : "text-gray-500 hover:bg-gray-100"
+                        }`}
                       >
                         {day.key}
                       </button>
@@ -170,10 +155,10 @@ export default function AlarmList({ alarms }: AlarmListProps) {
                   </div>
                 </div>
 
-                {/* Delete */}
+                {/* Delete - Compact styling */}
                 <button
                   onClick={() => deleteAlarm(alarm.id)}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+                  className="flex items-center gap-2 w-full px-3 py-1.5 text-destructive hover:bg-destructive/10 rounded-lg transition-colors text-sm"
                 >
                   <Trash2 className="w-4 h-4" />
                   <span>Delete alarm</span>
