@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Clock } from "lucide-react";
 
 interface TimeSelectorProps {
   time: Date;
@@ -124,22 +123,14 @@ export default function TimeSelector({ time, onChange, onToggleKeyboard }: TimeS
       </div>
 
       <div className="mt-4 flex justify-between items-center">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onToggleKeyboard}
-          className="text-primary hover:text-primary/90"
-        >
-          <Clock className="w-4 h-4" />
-        </Button>
         <div className="text-sm text-muted-foreground">
           {mode === 'hours' ? 'Select hour' : 'Select minute'}
         </div>
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
           onClick={() => setMode(mode === 'hours' ? 'minutes' : 'hours')}
-          className="text-primary hover:text-primary/90"
+          className="text-primary hover:text-primary border-primary hover:border-primary hover:bg-primary/10 rounded-xl"
         >
           {mode === 'hours' ? 'MIN' : 'HR'}
         </Button>
