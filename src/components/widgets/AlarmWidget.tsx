@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { Input } from "../ui/input";
+import { toast } from "../ui/use-toast";
 
 interface AlarmWidgetProps {
   id: string;
@@ -15,23 +16,42 @@ interface AlarmWidgetProps {
 export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps) {
   const { updateWidget } = useWidgets();
   const [showTimeDialog, setShowTimeDialog] = useState(false);
-  const [hour, setHour] = useState("00");
-  const [minute, setMinute] = useState("00");
+  const [hour, setHour] = useState("");
+  const [minute, setMinute] = useState("");
 
   const alarms = data?.alarms || [];
 
-  const handleSave = () => {
-    // Basic validation
+  const validateTime = (hour: string, minute: string) => {
     const hourNum = parseInt(hour);
     const minuteNum = parseInt(minute);
     
-    if (hourNum < 0 || hourNum > 23 || minuteNum < 0 || minuteNum > 59) {
-      return;
+    if (isNaN(hourNum) || hourNum < 0 || hourNum > 23) {
+      toast({
+        title: "Invalid hour",
+        description: "Please enter a number between 0 and 23",
+        variant: "destructive",
+      });
+      return false;
     }
+    
+    if (isNaN(minuteNum) || minuteNum < 0 || minuteNum > 59) {
+      toast({
+        title: "Invalid minute",
+        description: "Please enter a number between 0 and 59",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    return true;
+  };
+
+  const handleSave = () => {
+    if (!validateTime(hour, minute)) return;
 
     const newAlarm = {
       id: Date.now().toString(),
-      time: new Date().toISOString(), // This will be replaced with actual selected time
+      time: `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`,
       repeat: [],
       sound: "Waves",
       snoozeEnabled: false,
@@ -47,6 +67,8 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
       },
     });
     setShowTimeDialog(false);
+    setHour("");
+    setMinute("");
   };
 
   if (!isDetailView) {
@@ -61,25 +83,33 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
   }
 
   return (
-    <div className="h-full flex flex-col items-center justify-center relative">
-      {alarms.length === 0 ? (
-        <div className="flex flex-col items-center gap-4">
-          <div className="text-muted-foreground">No Alarms</div>
-        </div>
-      ) : (
-        <div className="w-full space-y-2">
-          {/* We'll implement the alarm list view later */}
-        </div>
-      )}
+    <div className="h-full flex flex-col relative pb-8">
+      {/* Alarms List */}
+      <div className="flex-1">
+        {alarms.length === 0 ? (
+          <div className="text-muted-foreground text-center mt-4">No Alarms</div>
+        ) : (
+          <div className="space-y-2">
+            {alarms.map((alarm) => (
+              <div 
+                key={alarm.id}
+                className="p-3 bg-background/50 backdrop-blur-sm rounded-lg border border-border/50"
+              >
+                <div className="text-2xl font-medium">{alarm.time}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Add Alarm Button */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
         <Button
-          size="lg"
-          className="rounded-full w-14 h-14 bg-primary hover:bg-primary/90"
+          size="icon"
+          className="rounded-full w-12 h-12 bg-primary hover:bg-primary/90 shadow-lg"
           onClick={() => setShowTimeDialog(true)}
         >
-          <Plus className="w-6 h-6" />
+          <Plus className="w-6 h-6 text-white" />
         </Button>
       </div>
 
@@ -87,15 +117,16 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
       <Dialog open={showTimeDialog} onOpenChange={setShowTimeDialog}>
         <DialogContent className="bg-background/95 backdrop-blur-sm border-none shadow-lg p-6 w-[300px]">
           <div className="space-y-6">
-            <h2 className="text-lg font-medium text-center">Select time</h2>
+            <h2 className="text-lg font-medium text-center">Set alarm time</h2>
             
             <div className="flex items-center justify-center gap-2">
               <div className="space-y-1">
                 <Input
                   type="text"
                   value={hour}
-                  onChange={(e) => setHour(e.target.value.padStart(2, '0'))}
-                  className="text-4xl text-center w-24 bg-gray-800/50"
+                  onChange={(e) => setHour(e.target.value)}
+                  placeholder="00"
+                  className="text-4xl text-center w-24 bg-background/50"
                   maxLength={2}
                 />
                 <div className="text-sm text-center text-muted-foreground">Hour</div>
@@ -107,8 +138,9 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
                 <Input
                   type="text"
                   value={minute}
-                  onChange={(e) => setMinute(e.target.value.padStart(2, '0'))}
-                  className="text-4xl text-center w-24 bg-gray-800/50"
+                  onChange={(e) => setMinute(e.target.value)}
+                  placeholder="00"
+                  className="text-4xl text-center w-24 bg-background/50"
                   maxLength={2}
                 />
                 <div className="text-sm text-center text-muted-foreground">Minute</div>
@@ -118,14 +150,18 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
             <div className="flex justify-between items-center pt-4">
               <Button
                 variant="ghost"
-                onClick={() => setShowTimeDialog(false)}
-                className="text-primary hover:text-primary/90"
+                onClick={() => {
+                  setShowTimeDialog(false);
+                  setHour("");
+                  setMinute("");
+                }}
+                className="hover:bg-background/80"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleSave}
-                className="text-primary hover:text-primary/90"
+                className="bg-primary hover:bg-primary/90"
               >
                 OK
               </Button>
