@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { useWidgets } from "@/hooks/useWidgets";
-import { format } from "date-fns";
-import { Pencil, Save, Trash2 } from "lucide-react";
+import { Pencil, Save } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ExpenseTableHeader } from "./ExpenseTableHeader";
+import { ExpenseTableRow } from "./ExpenseTableRow";
 
 interface ExpenseListProps {
   id: string;
@@ -108,51 +109,18 @@ export default function ExpenseList({ id, expenses, categories, isCompact = fals
 
       <div className="border rounded-lg overflow-hidden">
         <table className="w-full">
-          <thead className="bg-muted">
-            <tr>
-              <th className="px-4 py-2 text-left">Category</th>
-              <th className="px-4 py-2 text-left">Amount</th>
-              <th className="px-4 py-2 text-left">Date</th>
-              {editMode && <th className="px-4 py-2"></th>}
-            </tr>
-          </thead>
+          <ExpenseTableHeader editMode={editMode} />
           <tbody>
             {expenses.map((expense) => (
-              <tr key={expense.id} className="border-t">
-                <td className="px-4 py-2">{getCategoryName(expense.categoryId)}</td>
-                <td className="px-4 py-2">
-                  {editMode ? (
-                    <input
-                      type="number"
-                      className="w-24 p-1 border rounded"
-                      value={editingAmount[expense.id]}
-                      onChange={(e) =>
-                        setEditingAmount({
-                          ...editingAmount,
-                          [expense.id]: e.target.value,
-                        })
-                      }
-                    />
-                  ) : (
-                    `₹${expense.amount}`
-                  )}
-                </td>
-                <td className="px-4 py-2">
-                  {format(new Date(expense.date), "MMM d, yyyy")}
-                </td>
-                {editMode && (
-                  <td className="px-4 py-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-red-500 hover:text-red-600"
-                      onClick={() => handleDelete(expense.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </td>
-                )}
-              </tr>
+              <ExpenseTableRow
+                key={expense.id}
+                expense={expense}
+                editMode={editMode}
+                editingAmount={editingAmount}
+                getCategoryName={getCategoryName}
+                setEditingAmount={setEditingAmount}
+                handleDelete={handleDelete}
+              />
             ))}
           </tbody>
         </table>

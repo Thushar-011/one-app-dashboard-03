@@ -75,4 +75,16 @@
   .rdp {
     @apply bg-white rounded-lg shadow-lg border border-gray-200;
   }
+
+  .rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+    @apply bg-gray-100;
+  }
+
+  .rdp-day_selected {
+    @apply bg-primary text-white;
+  }
+
+  .rdp-day_today {
+    @apply bg-accent text-white;
+  }
 }
