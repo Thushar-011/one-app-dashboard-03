@@ -63,11 +63,6 @@ export default function WidgetSelector() {
       }
     }
 
-    // Check for overlapping widgets at the calculated position
-    while (widgets.some(w => Math.abs(w.position.y - newY) < 150)) {
-      newY += 170; // Move down if position is occupied
-    }
-
     addWidget(type, { x: 0, y: newY });
     
     const dialogClose = document.querySelector(

@@ -76,7 +76,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         style={{
           width: size.width,
           height: size.height,
-          marginTop: type === "alarm" ? "60px" : "0", // Add margin for alarm widget
+          marginTop: type === "alarm" ? "20px" : "0", // Reduced margin for alarm widget
         }}
         initial={{ 
           x: position.x,
@@ -86,7 +86,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         }}
         animate={{
           x: position.x,
-          y: position.y,
+          y: position.y + (type !== "alarm" ? 170 : 0), // Add vertical spacing between widgets
           scale: isDragging ? 1.05 : 1,
           opacity: 1
         }}
