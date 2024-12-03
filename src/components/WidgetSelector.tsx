@@ -63,6 +63,11 @@ export default function WidgetSelector() {
       }
     }
 
+    // Ensure minimum spacing between widgets
+    while (widgets.some(w => Math.abs(w.position.y - newY) < 150)) {
+      newY += 170;
+    }
+
     addWidget(type, { x: 0, y: newY });
     
     const dialogClose = document.querySelector(

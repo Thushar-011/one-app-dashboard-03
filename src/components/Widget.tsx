@@ -69,6 +69,8 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
     }
   };
 
+  const basePosition = position.y + (type === "alarm" ? 0 : (position.y === 0 ? 120 : 170));
+
   return (
     <>
       <motion.div
@@ -76,7 +78,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         style={{
           width: size.width,
           height: size.height,
-          marginTop: type === "alarm" ? "20px" : "0", // Reduced margin for alarm widget
+          marginTop: type === "alarm" ? "10px" : "0", // Minimal margin for alarm widget
         }}
         initial={{ 
           x: position.x,
@@ -86,7 +88,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         }}
         animate={{
           x: position.x,
-          y: position.y + (type !== "alarm" ? 170 : 0), // Add vertical spacing between widgets
+          y: basePosition, // Use calculated base position
           scale: isDragging ? 1.05 : 1,
           opacity: 1
         }}
