@@ -1,7 +1,7 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, AlarmClock, ListTodo, Calendar, FileText, IndianRupee, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Widget as WidgetType } from "@/types/widget";
 import AlarmWidget from "./widgets/AlarmWidget";
 import TodoWidget from "./widgets/TodoWidget";
@@ -9,48 +9,12 @@ import NoteWidget from "./widgets/NoteWidget";
 import ReminderWidget from "./widgets/ReminderWidget";
 import ExpenseWidget from "./widgets/ExpenseWidget";
 import { Button } from "./ui/button";
+import WidgetHeader from "./widgets/WidgetHeader";
 
 export default function Widget({ id, type, position, size, data }: WidgetType) {
   const { editMode, updateWidget, removeWidget } = useWidgets();
   const [isDragging, setIsDragging] = useState(false);
   const [isDetailView, setIsDetailView] = useState(false);
-
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    removeWidget(id);
-  };
-
-  const getWidgetIcon = () => {
-    switch (type) {
-      case "alarm":
-        return <AlarmClock className="w-5 h-5" />;
-      case "todo":
-        return <ListTodo className="w-5 h-5" />;
-      case "reminder":
-        return <Calendar className="w-5 h-5" />;
-      case "note":
-        return <FileText className="w-5 h-5" />;
-      case "expense":
-        return <IndianRupee className="w-5 h-5" />;
-    }
-  };
-
-  const getWidgetTitle = () => {
-    switch (type) {
-      case "alarm":
-        return "Alarm";
-      case "todo":
-        return "To-Do List";
-      case "reminder":
-        return "Reminders";
-      case "note":
-        return "Notes";
-      case "expense":
-        return "Expense Tracker";
-      default:
-        return type;
-    }
-  };
 
   const renderWidgetContent = () => {
     switch (type) {
@@ -111,20 +75,14 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         whileHover={{ scale: editMode ? 1 : 1.02 }}
       >
         <div className="widget-content">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              {getWidgetIcon()}
-              <h3 className="font-semibold">{getWidgetTitle()}</h3>
-            </div>
-            {editMode && (
-              <button
-                onClick={handleDelete}
-                className="p-1.5 hover:bg-red-100 rounded-full transition-colors"
-              >
-                <Trash2 className="w-4 h-4 text-red-500" />
-              </button>
-            )}
-          </div>
+          <WidgetHeader
+            type={type}
+            editMode={editMode}
+            onDelete={(e) => {
+              e.stopPropagation();
+              removeWidget(id);
+            }}
+          />
           {renderWidgetContent()}
         </div>
       </motion.div>
@@ -154,10 +112,14 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
                     >
                       <ArrowLeft className="w-5 h-5" />
                     </Button>
-                    <div className="flex items-center gap-2">
-                      {getWidgetIcon()}
-                      <h2 className="text-xl font-semibold">{getWidgetTitle()}</h2>
-                    </div>
+                    <WidgetHeader
+                      type={type}
+                      editMode={editMode}
+                      onDelete={(e) => {
+                        e.stopPropagation();
+                        removeWidget(id);
+                      }}
+                    />
                   </div>
                 </div>
               </div>

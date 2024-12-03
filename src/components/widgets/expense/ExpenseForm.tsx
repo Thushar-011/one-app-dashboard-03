@@ -5,10 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon, Plus } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import CategoryManager from "./CategoryManager";
+
+const CATEGORY_COLORS = [
+  "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEEAD",
+  "#D4A5A5", "#9B6B6B", "#E9967A", "#A8E6CF", "#FFB6B9"
+];
 
 interface ExpenseFormProps {
   id: string;
@@ -24,18 +29,12 @@ interface ExpenseFormProps {
   };
 }
 
-const CATEGORY_COLORS = [
-  "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEEAD",
-  "#D4A5A5", "#9B6B6B", "#E9967A", "#A8E6CF", "#FFB6B9"
-];
-
 export default function ExpenseForm({ id, data }: ExpenseFormProps) {
   const { updateWidget } = useWidgets();
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState<Date>();
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [newCategoryName, setNewCategoryName] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,15 +65,10 @@ export default function ExpenseForm({ id, data }: ExpenseFormProps) {
     toast.success("Expense added successfully");
   };
 
-  const handleAddCategory = () => {
-    if (!newCategoryName.trim()) {
-      toast.error("Please enter a category name");
-      return;
-    }
-
+  const handleAddCategory = (name: string) => {
     const newCategory = {
       id: Date.now().toString(),
-      name: newCategoryName.trim(),
+      name,
       color: CATEGORY_COLORS[data.categories.length % CATEGORY_COLORS.length],
     };
 
@@ -85,8 +79,25 @@ export default function ExpenseForm({ id, data }: ExpenseFormProps) {
       },
     });
 
-    setNewCategoryName("");
     toast.success("Category added successfully");
+  };
+
+  const handleDeleteCategory = (categoryId: string) => {
+    // Check if category is in use
+    const isInUse = data.expenses.some(expense => expense.categoryId === categoryId);
+    if (isInUse) {
+      toast.error("Cannot delete category that is in use");
+      return;
+    }
+
+    updateWidget(id, {
+      data: {
+        ...data,
+        categories: data.categories.filter(cat => cat.id !== categoryId),
+      },
+    });
+
+    toast.success("Category deleted successfully");
   };
 
   return (
@@ -133,46 +144,13 @@ export default function ExpenseForm({ id, data }: ExpenseFormProps) {
         </Popover>
       </div>
 
-      <div className="space-y-2">
-        <div className="flex gap-2">
-          <select
-            className="flex-1 w-full p-2 border rounded-md"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            <option value="">Select Category</option>
-            {data.categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Plus className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Category</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <Input
-                    placeholder="Category Name"
-                    value={newCategoryName}
-                    onChange={(e) => setNewCategoryName(e.target.value)}
-                  />
-                </div>
-                <Button onClick={handleAddCategory} className="w-full">
-                  Add Category
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
+      <CategoryManager
+        categories={data.categories}
+        onAddCategory={handleAddCategory}
+        onDeleteCategory={handleDeleteCategory}
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+      />
 
       <Button type="submit" className="w-full">
         Add Expense
