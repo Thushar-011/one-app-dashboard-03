@@ -19,11 +19,11 @@ interface AlarmListProps {
     sound?: string;
     vibrate?: boolean;
   }>;
+  widgetId: string;
 }
 
-export default function AlarmList({ alarms }: AlarmListProps) {
+export default function AlarmList({ alarms, widgetId }: AlarmListProps) {
   const { updateWidget } = useWidgets();
-  const widgetId = "alarm-1";
 
   const toggleAlarm = (alarmId: string, enabled: boolean) => {
     const updatedAlarms = alarms.map((alarm) =>

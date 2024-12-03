@@ -1,12 +1,13 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent } from "../ui/dialog";
+import { Dialog, DialogContent, DialogDescription } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Clock, Keyboard } from "lucide-react";
 import TimeSelector from "./alarm/TimeSelector";
 import AlarmList from "./alarm/AlarmList";
-import { motion, AnimatePresence } from "framer-motion";
+import CompactAlarmView from "./alarm/CompactAlarmView";
+import AddAlarmButton from "./alarm/AddAlarmButton";
 import { toast } from "sonner";
 
 interface AlarmWidgetProps {
@@ -21,7 +22,6 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
   const [hour, setHour] = useState("");
   const [minute, setMinute] = useState("");
   const [showKeyboard, setShowKeyboard] = useState(true);
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const alarms = data?.alarms || [];
 
@@ -72,60 +72,26 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
   };
 
   if (!isDetailView) {
-    return (
-      <div className="h-full flex flex-col relative">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <div className="w-2 h-2 rounded-full bg-primary/50" />
-          {alarms.length === 0
-            ? "No alarms set"
-            : `${alarms.length} alarm${alarms.length === 1 ? "" : "s"} set`}
-        </div>
-      </div>
-    );
+    return <CompactAlarmView alarms={alarms} />;
   }
 
   return (
     <div className="h-full flex flex-col relative">
-      <AlarmList alarms={alarms} />
-      <AnimatePresence>
-        {!isTransitioning && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 transform"
-            onAnimationStart={() => setIsTransitioning(true)}
-            onAnimationComplete={() => setIsTransitioning(false)}
-          >
-            <Button
-              variant="outline"
-              onClick={() => {
-                setShowDialog(true);
-                setShowKeyboard(true);
-              }}
-              className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/90 to-primary hover:from-primary hover:to-primary/90 border-none shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-xl"
-            >
-              <span className="text-white text-3xl font-light select-none">+</span>
-            </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <AlarmList alarms={alarms} widgetId={id} />
+      
+      <AddAlarmButton onClick={() => {
+        setShowDialog(true);
+        setShowKeyboard(true);
+      }} />
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent className="bg-white border-none shadow-lg p-6 max-w-md rounded-2xl">
-          <div className="space-y-6">
-            <h2 className="text-lg font-medium text-center">Set alarm time</h2>
-            
-            <AnimatePresence mode="wait">
+          <DialogDescription>
+            <div className="space-y-6">
+              <h2 className="text-lg font-medium text-center">Set alarm time</h2>
+              
               {showKeyboard ? (
-                <motion.div
-                  key="keyboard"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex items-center justify-center gap-2"
-                >
+                <div className="flex items-center justify-center gap-2">
                   <div className="space-y-1">
                     <Input
                       type="text"
@@ -151,61 +117,53 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
                     />
                     <div className="text-sm text-center text-muted-foreground">Minute</div>
                   </div>
-                </motion.div>
+                </div>
               ) : (
-                <motion.div
-                  key="clock"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <TimeSelector
-                    time={new Date()}
-                    onChange={(date) => {
-                      setHour(date.getHours().toString().padStart(2, '0'));
-                      setMinute(date.getMinutes().toString().padStart(2, '0'));
-                    }}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <div className="flex justify-between items-center pt-4 relative">
-              <Button
-                variant="ghost"
-                onClick={() => setShowKeyboard(!showKeyboard)}
-                className="absolute bottom-0 left-0 p-2 hover:bg-transparent"
-              >
-                {showKeyboard ? (
-                  <Clock className="w-5 h-5 text-primary hover:text-primary/90" />
-                ) : (
-                  <Keyboard className="w-5 h-5 text-primary hover:text-primary/90" />
-                )}
-              </Button>
-              
-              <div className="flex gap-4 ml-auto">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setShowDialog(false);
-                    setHour("");
-                    setMinute("");
-                    setShowKeyboard(true);
+                <TimeSelector
+                  time={new Date()}
+                  onChange={(date) => {
+                    setHour(date.getHours().toString().padStart(2, '0'));
+                    setMinute(date.getMinutes().toString().padStart(2, '0'));
                   }}
-                  className="hover:bg-gray-100 rounded-xl"
-                >
-                  Cancel
-                </Button>
+                />
+              )}
+
+              <div className="flex justify-between items-center pt-4 relative">
                 <Button
-                  onClick={handleSave}
-                  className="bg-primary hover:bg-primary/90 text-white rounded-xl"
+                  variant="ghost"
+                  onClick={() => setShowKeyboard(!showKeyboard)}
+                  className="absolute bottom-0 left-0 p-2 hover:bg-transparent"
                 >
-                  OK
+                  {showKeyboard ? (
+                    <Clock className="w-5 h-5 text-primary hover:text-primary/90" />
+                  ) : (
+                    <Keyboard className="w-5 h-5 text-primary hover:text-primary/90" />
+                  )}
                 </Button>
+                
+                <div className="flex gap-4 ml-auto">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowDialog(false);
+                      setHour("");
+                      setMinute("");
+                      setShowKeyboard(true);
+                    }}
+                    className="hover:bg-gray-100 rounded-xl"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleSave}
+                    className="bg-primary hover:bg-primary/90 text-white rounded-xl"
+                  >
+                    OK
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
+          </DialogDescription>
         </DialogContent>
       </Dialog>
     </div>
