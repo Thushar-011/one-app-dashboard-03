@@ -46,7 +46,7 @@ export default function ExpenseList({ id, expenses, categories, isCompact = fals
 
     setEditMode(false);
     setEditingAmount({});
-    toast.success("Changes saved successfully");
+    toast("Changes saved successfully");
   };
 
   const handleDelete = (expenseId: string) => {
@@ -57,7 +57,7 @@ export default function ExpenseList({ id, expenses, categories, isCompact = fals
         expenses: updatedExpenses
       }
     });
-    toast.success("Expense deleted successfully");
+    toast("Expense deleted successfully");
   };
 
   if (isCompact) {
@@ -113,7 +113,7 @@ export default function ExpenseList({ id, expenses, categories, isCompact = fals
               <th className="px-4 py-2 text-left">Category</th>
               <th className="px-4 py-2 text-left">Amount</th>
               <th className="px-4 py-2 text-left">Date</th>
-              {editMode && <th className="px-4 py-2"></th>}
+              <th className="px-4 py-2"></th>
             </tr>
           </thead>
           <tbody>
@@ -140,18 +140,16 @@ export default function ExpenseList({ id, expenses, categories, isCompact = fals
                 <td className="px-4 py-2">
                   {format(new Date(expense.date), "MMM d, yyyy")}
                 </td>
-                {editMode && (
-                  <td className="px-4 py-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-red-500 hover:text-red-600"
-                      onClick={() => handleDelete(expense.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </td>
-                )}
+                <td className="px-4 py-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-red-500 hover:text-red-600"
+                    onClick={() => handleDelete(expense.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </td>
               </tr>
             ))}
           </tbody>

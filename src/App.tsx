@@ -23,7 +23,7 @@ const App = () => (
     <TooltipProvider>
       <WidgetsProvider>
         <Toaster />
-        <Sonner />
+        <Sonner duration={1000} />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
