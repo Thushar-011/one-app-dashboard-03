@@ -69,8 +69,8 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
     }
   };
 
-  // Adjust the basePosition calculation to reduce the gap
-  const basePosition = position.y + (type === "alarm" ? 0 : (position.y === 0 ? 40 : 60));
+  // Adjust the basePosition calculation to maintain consistent spacing
+  const basePosition = position.y + (type === "alarm" ? 0 : 60);
 
   return (
     <>
