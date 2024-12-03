@@ -70,7 +70,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
   };
 
   // Adjust the basePosition calculation to maintain consistent spacing
-  const basePosition = position.y + (type === "alarm" ? 0 : 60);
+  const basePosition = position.y + (type === "alarm" ? 20 : 60);
 
   return (
     <>
