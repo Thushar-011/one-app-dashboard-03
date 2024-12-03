@@ -74,6 +74,8 @@
   /* Calendar styles */
   .rdp {
     @apply bg-white rounded-lg shadow-lg border border-gray-200;
+    position: relative;
+    z-index: 50;
   }
 
   .rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
@@ -86,5 +88,11 @@
 
   .rdp-day_today {
     @apply bg-accent text-white;
+  }
+
+  /* PopoverContent styles for calendar */
+  [data-radix-popper-content-wrapper] {
+    background: white !important;
+    z-index: 50 !important;
   }
 }

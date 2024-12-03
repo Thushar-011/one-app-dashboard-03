@@ -26,7 +26,7 @@ export const ExpenseTableRow: React.FC<ExpenseTableRowProps> = ({
   setEditingAmount,
   handleDelete,
 }) => (
-  <tr key={expense.id} className="border-t">
+  <tr key={expense.id} className="border-t hover:bg-gray-50">
     <td className="px-4 py-2">{getCategoryName(expense.categoryId)}</td>
     <td className="px-4 py-2">
       {editMode ? (
@@ -49,11 +49,11 @@ export const ExpenseTableRow: React.FC<ExpenseTableRowProps> = ({
       {format(new Date(expense.date), "MMM d, yyyy")}
     </td>
     {editMode && (
-      <td className="px-4 py-2">
+      <td className="px-4 py-2 text-right">
         <Button
           variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-red-500 hover:text-red-600"
+          size="sm"
+          className="text-red-500 hover:text-red-600 hover:bg-red-50"
           onClick={() => handleDelete(expense.id)}
         >
           <Trash2 className="h-4 w-4" />

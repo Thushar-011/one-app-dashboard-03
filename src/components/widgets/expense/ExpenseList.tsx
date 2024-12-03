@@ -108,22 +108,24 @@ export default function ExpenseList({ id, expenses, categories, isCompact = fals
       </div>
 
       <div className="border rounded-lg overflow-hidden">
-        <table className="w-full">
-          <ExpenseTableHeader editMode={editMode} />
-          <tbody>
-            {expenses.map((expense) => (
-              <ExpenseTableRow
-                key={expense.id}
-                expense={expense}
-                editMode={editMode}
-                editingAmount={editingAmount}
-                getCategoryName={getCategoryName}
-                setEditingAmount={setEditingAmount}
-                handleDelete={handleDelete}
-              />
-            ))}
-          </tbody>
-        </table>
+        <div className="max-h-[400px] overflow-y-auto">
+          <table className="w-full">
+            <ExpenseTableHeader editMode={editMode} />
+            <tbody>
+              {expenses.map((expense) => (
+                <ExpenseTableRow
+                  key={expense.id}
+                  expense={expense}
+                  editMode={editMode}
+                  editingAmount={editingAmount}
+                  getCategoryName={getCategoryName}
+                  setEditingAmount={setEditingAmount}
+                  handleDelete={handleDelete}
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
