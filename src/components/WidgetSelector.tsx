@@ -19,6 +19,11 @@ const WIDGET_OPTIONS: Array<{ type: WidgetType; label: string }> = [
   { type: "expense", label: "Expense Tracker" },
 ];
 
+// Constants for widget positioning
+const INITIAL_Y_POSITION = 20; // Starting position below the ribbon
+const WIDGET_VERTICAL_GAP = 20; // Consistent gap between widgets
+const WIDGET_HEIGHT = 150; // Standard widget height
+
 export default function WidgetSelector() {
   const { widgets, trashedWidgets, addWidget } = useWidgets();
 
@@ -38,35 +43,10 @@ export default function WidgetSelector() {
       return;
     }
 
-    // Find optimal position for new widget
-    const existingPositions = widgets.map(w => w.position.y);
-    let newY = 0;
-    
-    if (existingPositions.length > 0) {
-      // Sort positions to find gaps
-      const sortedPositions = existingPositions.sort((a, b) => a - b);
-      
-      // Look for a gap between widgets
-      for (let i = 0; i < sortedPositions.length; i++) {
-        const currentPos = sortedPositions[i];
-        const nextPos = sortedPositions[i + 1];
-        
-        if (nextPos && nextPos - currentPos >= 170) { // 170 is widget height + margin
-          newY = currentPos + 170;
-          break;
-        }
-      }
-      
-      // If no gap found, place at the end
-      if (newY === 0) {
-        newY = Math.max(...existingPositions) + 170;
-      }
-    }
-
-    // Ensure minimum spacing between widgets
-    while (widgets.some(w => Math.abs(w.position.y - newY) < 150)) {
-      newY += 170;
-    }
+    // Calculate new widget position
+    const newY = widgets.length === 0 
+      ? INITIAL_Y_POSITION 
+      : Math.max(...widgets.map(w => w.position.y)) + WIDGET_HEIGHT + WIDGET_VERTICAL_GAP;
 
     addWidget(type, { x: 0, y: newY });
     

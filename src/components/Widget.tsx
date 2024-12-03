@@ -69,9 +69,6 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
     }
   };
 
-  // Adjust the basePosition calculation to maintain consistent spacing
-  const basePosition = position.y + (type === "alarm" ? 10 : 60);
-
   return (
     <>
       <motion.div
@@ -79,7 +76,6 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         style={{
           width: size.width,
           height: size.height,
-          marginTop: type === "alarm" ? "10px" : "0",
         }}
         initial={{ 
           x: position.x,
@@ -89,7 +85,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         }}
         animate={{
           x: position.x,
-          y: basePosition,
+          y: position.y,
           scale: isDragging ? 1.05 : 1,
           opacity: 1
         }}
