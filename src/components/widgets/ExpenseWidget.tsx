@@ -17,7 +17,12 @@ export default function ExpenseWidget({ id, data, isDetailView }: ExpenseWidgetP
   if (!isDetailView) {
     const total = data.expenses.reduce((sum, expense) => sum + expense.amount, 0);
     return (
-      <div className="text-sm">₹{total.toLocaleString()}</div>
+      <div className="text-sm text-muted-foreground flex items-center gap-2">
+        <div className="w-2 h-2 rounded-full bg-primary/50" />
+        {data.expenses.length === 0 
+          ? "No expenses"
+          : `Total Expense: ₹${total.toLocaleString()}`}
+      </div>
     );
   }
 

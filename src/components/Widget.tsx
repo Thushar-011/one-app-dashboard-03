@@ -76,6 +76,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
         style={{
           width: size.width,
           height: size.height,
+          marginTop: type === "alarm" ? "60px" : "0", // Add margin for alarm widget
         }}
         initial={{ 
           x: position.x,
