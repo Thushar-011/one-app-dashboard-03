@@ -24,6 +24,7 @@ export default function VoiceControl() {
 
       mediaRecorder.current.onstop = async () => {
         const audioBlob = new Blob(audioChunks.current, { type: "audio/wav" });
+        const audioUrl = URL.createObjectURL(audioBlob);
         
         try {
           const transcriber = await pipeline(
@@ -31,7 +32,7 @@ export default function VoiceControl() {
             "openai/whisper-tiny.en"
           );
 
-          const result = await transcriber(audioBlob as unknown as ArrayBuffer, {
+          const result = await transcriber(audioUrl, {
             chunk_length_s: 30,
             stride_length_s: 5,
           });
@@ -44,6 +45,8 @@ export default function VoiceControl() {
         } catch (error) {
           console.error("Error processing audio:", error);
           toast.error("Failed to process voice command");
+        } finally {
+          URL.revokeObjectURL(audioUrl);
         }
       };
 
