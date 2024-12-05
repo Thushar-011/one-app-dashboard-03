@@ -71,8 +71,14 @@ export default function TimeSelector({
       const hour = i + 1;
       const currentHour = time.getHours() % 12 || 12;
       return (
-        <div
+        <motion.div
           key={hour}
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ 
+            opacity: currentHour === hour ? 1 : 0.5,
+            scale: currentHour === hour ? 1.2 : 1,
+          }}
+          transition={{ duration: 0.2 }}
           className={`absolute text-sm font-medium ${
             currentHour === hour ? 'text-primary' : 'text-muted-foreground'
           }`}
@@ -83,7 +89,7 @@ export default function TimeSelector({
           }}
         >
           {hour}
-        </div>
+        </motion.div>
       );
     });
   };
@@ -92,8 +98,14 @@ export default function TimeSelector({
     return Array.from({ length: 12 }, (_, i) => {
       const minute = i * 5;
       return (
-        <div
+        <motion.div
           key={i}
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ 
+            opacity: time.getMinutes() === minute ? 1 : 0.5,
+            scale: time.getMinutes() === minute ? 1.2 : 1,
+          }}
+          transition={{ duration: 0.2 }}
           className={`absolute text-sm font-medium ${
             time.getMinutes() === minute ? 'text-primary' : 'text-muted-foreground'
           }`}
@@ -104,7 +116,7 @@ export default function TimeSelector({
           }}
         >
           {minute.toString().padStart(2, '0')}
-        </div>
+        </motion.div>
       );
     });
   };
@@ -130,9 +142,11 @@ export default function TimeSelector({
         </div>
       )}
 
-      <div 
+      <motion.div 
         className="relative w-64 h-64 mx-auto bg-background rounded-full border-2 border-primary/20 cursor-pointer"
         onClick={handleClockClick}
+        whileHover={{ scale: 1.02 }}
+        transition={{ duration: 0.2 }}
       >
         {mode === 'hours' ? renderHourNumbers() : renderMinuteNumbers()}
 
@@ -148,8 +162,12 @@ export default function TimeSelector({
           }}
         />
 
-        <div className="absolute w-3 h-3 bg-primary rounded-full left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2" />
-      </div>
+        <motion.div 
+          className="absolute w-3 h-3 bg-primary rounded-full left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
+          whileHover={{ scale: 1.2 }}
+          transition={{ duration: 0.2 }}
+        />
+      </motion.div>
 
       <div className="mt-4 flex justify-between items-center">
         <div className="text-sm text-muted-foreground">
