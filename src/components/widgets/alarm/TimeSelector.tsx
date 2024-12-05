@@ -1,16 +1,27 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { Clock, Keyboard } from "lucide-react";
 
-interface TimeSelectorProps {
+export interface TimeSelectorProps {
   time: Date;
   onChange: (time: Date) => void;
   is12Hour?: boolean;
   isPM?: boolean;
   onPMChange?: (isPM: boolean) => void;
+  showKeyboard?: boolean;
+  onToggleKeyboard?: () => void;
 }
 
-export default function TimeSelector({ time, onChange, is12Hour = false, isPM = false, onPMChange }: TimeSelectorProps) {
+export default function TimeSelector({ 
+  time, 
+  onChange, 
+  is12Hour = false, 
+  isPM = false, 
+  onPMChange,
+  showKeyboard = false,
+  onToggleKeyboard
+}: TimeSelectorProps) {
   const [mode, setMode] = useState<'hours' | 'minutes'>('hours');
 
   const getHandRotation = () => {
@@ -58,11 +69,12 @@ export default function TimeSelector({ time, onChange, is12Hour = false, isPM = 
   const renderHourNumbers = () => {
     return Array.from({ length: 12 }, (_, i) => {
       const hour = i + 1;
+      const currentHour = time.getHours() % 12 || 12;
       return (
         <div
           key={hour}
           className={`absolute text-sm font-medium ${
-            (time.getHours() % 12 || 12) === hour ? 'text-primary' : 'text-muted-foreground'
+            currentHour === hour ? 'text-primary' : 'text-muted-foreground'
           }`}
           style={{
             left: `${50 + 40 * Math.cos(((hour * 30) - 90) * Math.PI / 180)}%`,
@@ -99,18 +111,18 @@ export default function TimeSelector({ time, onChange, is12Hour = false, isPM = 
 
   return (
     <div className="relative w-full max-w-sm mx-auto space-y-4">
-      {is12Hour && (
+      {is12Hour && onPMChange && (
         <div className="flex justify-center gap-2">
           <Button
             variant={!isPM ? "default" : "outline"}
-            onClick={() => onPMChange?.(false)}
+            onClick={() => onPMChange(false)}
             className="w-16"
           >
             AM
           </Button>
           <Button
             variant={isPM ? "default" : "outline"}
-            onClick={() => onPMChange?.(true)}
+            onClick={() => onPMChange(true)}
             className="w-16"
           >
             PM
@@ -143,14 +155,26 @@ export default function TimeSelector({ time, onChange, is12Hour = false, isPM = 
         <div className="text-sm text-muted-foreground">
           {mode === 'hours' ? 'Select hour' : 'Select minute'}
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setMode(mode === 'hours' ? 'minutes' : 'hours')}
-          className="text-primary hover:text-primary border-primary hover:border-primary hover:bg-primary/10 rounded-xl z-10"
-        >
-          {mode === 'hours' ? 'MIN' : 'HR'}
-        </Button>
+        <div className="flex items-center gap-4">
+          {onToggleKeyboard && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleKeyboard}
+              className="text-primary hover:text-primary/90"
+            >
+              {showKeyboard ? <Clock className="w-5 h-5" /> : <Keyboard className="w-5 h-5" />}
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setMode(mode === 'hours' ? 'minutes' : 'hours')}
+            className="text-primary hover:text-primary border-primary hover:border-primary hover:bg-primary/10 rounded-xl z-10"
+          >
+            {mode === 'hours' ? 'MIN' : 'HR'}
+          </Button>
+        </div>
       </div>
     </div>
   );
