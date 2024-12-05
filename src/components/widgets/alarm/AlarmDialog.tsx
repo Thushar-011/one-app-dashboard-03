@@ -17,6 +17,7 @@ export default function AlarmDialog({ showDialog, setShowDialog, onSave }: Alarm
   const [minute, setMinute] = useState("");
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [isPM, setIsPM] = useState(false);
+  const [time, setTime] = useState(new Date());
 
   const handleTimeChange = (date: Date) => {
     let hours = date.getHours();
@@ -26,6 +27,7 @@ export default function AlarmDialog({ showDialog, setShowDialog, onSave }: Alarm
     setHour(hours.toString());
     setMinute(date.getMinutes().toString().padStart(2, '0'));
     setIsPM(isPM);
+    setTime(date);
   };
 
   const resetAndClose = () => {
@@ -34,6 +36,7 @@ export default function AlarmDialog({ showDialog, setShowDialog, onSave }: Alarm
     setMinute("");
     setShowKeyboard(false);
     setIsPM(false);
+    setTime(new Date());
   };
 
   return (
@@ -105,23 +108,21 @@ export default function AlarmDialog({ showDialog, setShowDialog, onSave }: Alarm
               transition={{ duration: 0.2 }}
             >
               <TimeSelector
-                time={new Date()}
+                time={time}
                 onChange={handleTimeChange}
                 is12Hour={true}
                 isPM={isPM}
                 onPMChange={setIsPM}
-                showKeyboard={showKeyboard}
-                onToggleKeyboard={() => setShowKeyboard(!showKeyboard)}
               />
             </motion.div>
           )}
         </AnimatePresence>
 
-        <div className="flex justify-between items-center pt-4 relative">
+        <div className="flex justify-between items-center pt-4">
           <Button
             variant="ghost"
             onClick={() => setShowKeyboard(!showKeyboard)}
-            className="absolute bottom-0 left-0 p-2 hover:bg-transparent"
+            className="p-2 hover:bg-transparent"
           >
             {showKeyboard ? (
               <Clock className="w-5 h-5 text-primary hover:text-primary/90" />
@@ -130,7 +131,7 @@ export default function AlarmDialog({ showDialog, setShowDialog, onSave }: Alarm
             )}
           </Button>
           
-          <div className="flex gap-4 ml-auto">
+          <div className="flex gap-4">
             <Button
               variant="outline"
               onClick={resetAndClose}

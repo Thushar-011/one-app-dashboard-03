@@ -22,6 +22,13 @@ interface AlarmListProps {
   widgetId: string;
 }
 
+const formatTime = (time24: string) => {
+  const [hours, minutes] = time24.split(':').map(Number);
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const hours12 = hours % 12 || 12;
+  return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
+};
+
 export default function AlarmList({ alarms, widgetId }: AlarmListProps) {
   const { updateWidget } = useWidgets();
 
@@ -73,7 +80,7 @@ export default function AlarmList({ alarms, widgetId }: AlarmListProps) {
             <div className="flex items-center justify-between p-3">
               <AccordionTrigger className="hover:no-underline flex-1 py-0">
                 <div className="flex items-center gap-4">
-                  <span className="text-2xl font-display">{alarm.time}</span>
+                  <span className="text-2xl font-display">{formatTime(alarm.time)}</span>
                   {alarm.label && (
                     <span className="text-sm text-muted-foreground">
                       {alarm.label}

@@ -16,7 +16,7 @@ export interface TimeSelectorProps {
 export default function TimeSelector({ 
   time, 
   onChange, 
-  is12Hour = false, 
+  is12Hour = true, 
   isPM = false, 
   onPMChange,
   showKeyboard = false,
@@ -173,17 +173,7 @@ export default function TimeSelector({
         <div className="text-sm text-muted-foreground">
           {mode === 'hours' ? 'Select hour' : 'Select minute'}
         </div>
-        <div className="flex items-center gap-4">
-          {onToggleKeyboard && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onToggleKeyboard}
-              className="text-primary hover:text-primary/90"
-            >
-              {showKeyboard ? <Clock className="w-5 h-5" /> : <Keyboard className="w-5 h-5" />}
-            </Button>
-          )}
+        <div className="flex gap-4">
           <Button
             variant="outline"
             size="sm"
