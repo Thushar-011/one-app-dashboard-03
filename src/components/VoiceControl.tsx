@@ -29,7 +29,7 @@ export default function VoiceControl() {
         try {
           const transcriber = await pipeline(
             "automatic-speech-recognition",
-            "openai/whisper-tiny.en"
+            "onnx-community/whisper-tiny.en"
           );
 
           const result = await transcriber(audioUrl, {
