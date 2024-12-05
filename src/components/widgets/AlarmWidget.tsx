@@ -21,7 +21,8 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
   const [showDialog, setShowDialog] = useState(false);
   const [hour, setHour] = useState("");
   const [minute, setMinute] = useState("");
-  const [showKeyboard, setShowKeyboard] = useState(true);
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [isPM, setIsPM] = useState(false);
 
   const alarms = data?.alarms || [];
 
@@ -29,8 +30,8 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
     const hourNum = parseInt(hour);
     const minuteNum = parseInt(minute);
     
-    if (isNaN(hourNum) || hourNum < 0 || hourNum > 23) {
-      toast.error("Please enter a valid hour (0-23)", {
+    if (isNaN(hourNum) || hourNum < 1 || hourNum > 12) {
+      toast.error("Please enter a valid hour (1-12)", {
         duration: 1000,
       });
       return false;
@@ -49,9 +50,14 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
   const handleSave = () => {
     if (!validateTime(hour, minute)) return;
 
+    // Convert 12-hour format to 24-hour format
+    let hour24 = parseInt(hour);
+    if (isPM && hour24 !== 12) hour24 += 12;
+    if (!isPM && hour24 === 12) hour24 = 0;
+
     const newAlarm = {
       id: Date.now().toString(),
-      time: `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`,
+      time: `${hour24.toString().padStart(2, '0')}:${minute.padStart(2, '0')}`,
       enabled: true,
     };
 
@@ -68,7 +74,8 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
     setShowDialog(false);
     setHour("");
     setMinute("");
-    setShowKeyboard(true);
+    setShowKeyboard(false);
+    setIsPM(false);
   };
 
   if (!isDetailView) {
@@ -81,7 +88,7 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
       
       <AddAlarmButton onClick={() => {
         setShowDialog(true);
-        setShowKeyboard(true);
+        setShowKeyboard(false);
       }} />
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
@@ -91,40 +98,67 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
               <h2 className="text-lg font-medium text-center">Set alarm time</h2>
               
               {showKeyboard ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="space-y-1">
-                    <Input
-                      type="text"
-                      value={hour}
-                      onChange={(e) => setHour(e.target.value)}
-                      placeholder="00"
-                      className="text-4xl text-center w-24 rounded-xl border-gray-200 focus:border-primary focus:ring-primary"
-                      maxLength={2}
-                    />
-                    <div className="text-sm text-center text-muted-foreground">Hour</div>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="space-y-1">
+                      <Input
+                        type="text"
+                        value={hour}
+                        onChange={(e) => setHour(e.target.value)}
+                        placeholder="12"
+                        className="text-4xl text-center w-24 rounded-xl border-gray-200 focus:border-primary focus:ring-primary"
+                        maxLength={2}
+                      />
+                      <div className="text-sm text-center text-muted-foreground">Hour</div>
+                    </div>
+                    
+                    <div className="text-4xl">:</div>
+                    
+                    <div className="space-y-1">
+                      <Input
+                        type="text"
+                        value={minute}
+                        onChange={(e) => setMinute(e.target.value)}
+                        placeholder="00"
+                        className="text-4xl text-center w-24 rounded-xl border-gray-200 focus:border-primary focus:ring-primary"
+                        maxLength={2}
+                      />
+                      <div className="text-sm text-center text-muted-foreground">Minute</div>
+                    </div>
                   </div>
-                  
-                  <div className="text-4xl">:</div>
-                  
-                  <div className="space-y-1">
-                    <Input
-                      type="text"
-                      value={minute}
-                      onChange={(e) => setMinute(e.target.value)}
-                      placeholder="00"
-                      className="text-4xl text-center w-24 rounded-xl border-gray-200 focus:border-primary focus:ring-primary"
-                      maxLength={2}
-                    />
-                    <div className="text-sm text-center text-muted-foreground">Minute</div>
+
+                  <div className="flex justify-center gap-2">
+                    <Button
+                      variant={!isPM ? "default" : "outline"}
+                      onClick={() => setIsPM(false)}
+                      className="w-16"
+                    >
+                      AM
+                    </Button>
+                    <Button
+                      variant={isPM ? "default" : "outline"}
+                      onClick={() => setIsPM(true)}
+                      className="w-16"
+                    >
+                      PM
+                    </Button>
                   </div>
                 </div>
               ) : (
                 <TimeSelector
                   time={new Date()}
                   onChange={(date) => {
-                    setHour(date.getHours().toString().padStart(2, '0'));
+                    let hours = date.getHours();
+                    const isPM = hours >= 12;
+                    if (hours > 12) hours -= 12;
+                    if (hours === 0) hours = 12;
+                    setHour(hours.toString());
                     setMinute(date.getMinutes().toString().padStart(2, '0'));
+                    setIsPM(isPM);
                   }}
+                  is12Hour={true}
+                  isPM={isPM}
+                  onPMChange={setIsPM}
                 />
               )}
 
@@ -148,7 +182,8 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
                       setShowDialog(false);
                       setHour("");
                       setMinute("");
-                      setShowKeyboard(true);
+                      setShowKeyboard(false);
+                      setIsPM(false);
                     }}
                     className="hover:bg-gray-100 rounded-xl"
                   >

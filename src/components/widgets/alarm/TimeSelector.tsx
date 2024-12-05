@@ -5,20 +5,23 @@ import { motion } from "framer-motion";
 interface TimeSelectorProps {
   time: Date;
   onChange: (time: Date) => void;
-  showKeyboard?: boolean;
-  onToggleKeyboard?: () => void;
+  is12Hour?: boolean;
+  isPM?: boolean;
+  onPMChange?: (isPM: boolean) => void;
 }
 
-export default function TimeSelector({ time, onChange, showKeyboard, onToggleKeyboard }: TimeSelectorProps) {
+export default function TimeSelector({ time, onChange, is12Hour = false, isPM = false, onPMChange }: TimeSelectorProps) {
   const [mode, setMode] = useState<'hours' | 'minutes'>('hours');
-  const [selectedHour, setSelectedHour] = useState(time.getHours());
-  const [selectedMinute, setSelectedMinute] = useState(time.getMinutes());
 
   const getHandRotation = () => {
     if (mode === 'hours') {
-      return selectedHour * 15; // 360 / 24 = 15 degrees per hour
+      let hours = time.getHours();
+      if (is12Hour) {
+        hours = hours % 12 || 12;
+      }
+      return (hours * 30) % 360; // 360 / 12 = 30 degrees per hour
     }
-    return selectedMinute * 6; // 360 / 60 = 6 degrees per minute
+    return time.getMinutes() * 6; // 360 / 60 = 6 degrees per minute
   };
 
   const handleClockClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -32,66 +35,94 @@ export default function TimeSelector({ time, onChange, showKeyboard, onToggleKey
     let angle = Math.atan2(y, x) * 180 / Math.PI + 90;
     if (angle < 0) angle += 360;
 
+    const newTime = new Date(time);
+    
     if (mode === 'hours') {
-      const hour = Math.round(angle / 15) % 24;
-      setSelectedHour(hour);
-      const newTime = new Date(time);
-      newTime.setHours(hour);
-      newTime.setMinutes(selectedMinute);
-      onChange(newTime);
+      let hour = Math.round(angle / 30) % 12;
+      if (hour === 0) hour = 12;
+      
+      if (is12Hour) {
+        const hour24 = isPM ? (hour === 12 ? 12 : hour + 12) : (hour === 12 ? 0 : hour);
+        newTime.setHours(hour24);
+      } else {
+        newTime.setHours(hour);
+      }
     } else {
       const minute = Math.round(angle / 6) % 60;
-      setSelectedMinute(minute);
-      const newTime = new Date(time);
-      newTime.setHours(selectedHour);
       newTime.setMinutes(minute);
-      onChange(newTime);
     }
+    
+    onChange(newTime);
+  };
+
+  const renderHourNumbers = () => {
+    return Array.from({ length: 12 }, (_, i) => {
+      const hour = i + 1;
+      return (
+        <div
+          key={hour}
+          className={`absolute text-sm font-medium ${
+            (time.getHours() % 12 || 12) === hour ? 'text-primary' : 'text-muted-foreground'
+          }`}
+          style={{
+            left: `${50 + 40 * Math.cos(((hour * 30) - 90) * Math.PI / 180)}%`,
+            top: `${50 + 40 * Math.sin(((hour * 30) - 90) * Math.PI / 180)}%`,
+            transform: 'translate(-50%, -50%)'
+          }}
+        >
+          {hour}
+        </div>
+      );
+    });
+  };
+
+  const renderMinuteNumbers = () => {
+    return Array.from({ length: 12 }, (_, i) => {
+      const minute = i * 5;
+      return (
+        <div
+          key={i}
+          className={`absolute text-sm font-medium ${
+            time.getMinutes() === minute ? 'text-primary' : 'text-muted-foreground'
+          }`}
+          style={{
+            left: `${50 + 40 * Math.cos(((i * 30) - 90) * Math.PI / 180)}%`,
+            top: `${50 + 40 * Math.sin(((i * 30) - 90) * Math.PI / 180)}%`,
+            transform: 'translate(-50%, -50%)'
+          }}
+        >
+          {minute.toString().padStart(2, '0')}
+        </div>
+      );
+    });
   };
 
   return (
-    <div className="relative w-full max-w-sm mx-auto">
-      <div className="text-center mb-4 text-2xl font-light">
-        {String(selectedHour).padStart(2, '0')}:{String(selectedMinute).padStart(2, '0')}
-      </div>
+    <div className="relative w-full max-w-sm mx-auto space-y-4">
+      {is12Hour && (
+        <div className="flex justify-center gap-2">
+          <Button
+            variant={!isPM ? "default" : "outline"}
+            onClick={() => onPMChange?.(false)}
+            className="w-16"
+          >
+            AM
+          </Button>
+          <Button
+            variant={isPM ? "default" : "outline"}
+            onClick={() => onPMChange?.(true)}
+            className="w-16"
+          >
+            PM
+          </Button>
+        </div>
+      )}
 
       <div 
         className="relative w-64 h-64 mx-auto bg-background rounded-full border-2 border-primary/20 cursor-pointer"
         onClick={handleClockClick}
       >
-        {mode === 'hours' ? (
-          Array.from({ length: 24 }, (_, i) => (
-            <div
-              key={i}
-              className={`absolute text-sm font-medium ${
-                selectedHour === i ? 'text-primary' : 'text-muted-foreground'
-              }`}
-              style={{
-                left: `${50 + 40 * Math.cos(((i * 15) - 90) * Math.PI / 180)}%`,
-                top: `${50 + 40 * Math.sin(((i * 15) - 90) * Math.PI / 180)}%`,
-                transform: 'translate(-50%, -50%)'
-              }}
-            >
-              {String(i).padStart(2, '0')}
-            </div>
-          ))
-        ) : (
-          Array.from({ length: 12 }, (_, i) => (
-            <div
-              key={i}
-              className={`absolute text-sm font-medium ${
-                selectedMinute === i * 5 ? 'text-primary' : 'text-muted-foreground'
-              }`}
-              style={{
-                left: `${50 + 40 * Math.cos(((i * 30) - 90) * Math.PI / 180)}%`,
-                top: `${50 + 40 * Math.sin(((i * 30) - 90) * Math.PI / 180)}%`,
-                transform: 'translate(-50%, -50%)'
-              }}
-            >
-              {String(i * 5).padStart(2, '0')}
-            </div>
-          ))
-        )}
+        {mode === 'hours' ? renderHourNumbers() : renderMinuteNumbers()}
 
         <motion.div
           animate={{ rotate: getHandRotation() }}
