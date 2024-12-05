@@ -2,8 +2,21 @@ import { Mic, MicOff } from "lucide-react";
 import { useState, useRef } from "react";
 import { Button } from "./ui/button";
 import { useWidgets } from "@/hooks/useWidgets";
-import { pipeline } from "@huggingface/transformers";
+import { pipeline, AutomaticSpeechRecognitionOutput } from "@huggingface/transformers";
 import { toast } from "sonner";
+
+interface WidgetData {
+  alarms?: Array<{ id: string; time: string; enabled: boolean }>;
+  tasks?: Array<{ id: string; text: string; completed: boolean }>;
+  reminders?: Array<{ id: string; text: string; date: string; completed: boolean }>;
+  notes?: Array<{ id: string; text: string; createdAt: string }>;
+  categories?: Array<{ id: string; name: string; color: string }>;
+  expenses?: Array<{ id: string; amount: number; description: string; categoryId: string; date: string }>;
+}
+
+interface WidgetUpdate {
+  data: WidgetData;
+}
 
 export default function VoiceControl() {
   const [isRecording, setIsRecording] = useState(false);
@@ -29,7 +42,6 @@ export default function VoiceControl() {
 
         const time = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
         
-        // Find existing alarm widget or create new one
         let alarmWidget = widgets.find(w => w.type === "alarm");
         if (!alarmWidget) {
           addWidget("alarm");
@@ -45,7 +57,7 @@ export default function VoiceControl() {
         const updatedAlarms = [...(alarmWidget?.data?.alarms || []), newAlarm];
         addWidget("alarm", {
           data: { alarms: updatedAlarms }
-        });
+        } as WidgetUpdate);
 
         toast.success(`Alarm set for ${time}`);
       }
@@ -70,7 +82,7 @@ export default function VoiceControl() {
         const updatedTasks = [...(todoWidget?.data?.tasks || []), newTask];
         addWidget("todo", {
           data: { tasks: updatedTasks }
-        });
+        } as WidgetUpdate);
 
         toast.success("Task added successfully");
       }
@@ -96,7 +108,7 @@ export default function VoiceControl() {
         const updatedReminders = [...(reminderWidget?.data?.reminders || []), newReminder];
         addWidget("reminder", {
           data: { reminders: updatedReminders }
-        });
+        } as WidgetUpdate);
 
         toast.success("Reminder added successfully");
       }
@@ -121,7 +133,7 @@ export default function VoiceControl() {
         const updatedNotes = [...(noteWidget?.data?.notes || []), newNote];
         addWidget("note", {
           data: { notes: updatedNotes }
-        });
+        } as WidgetUpdate);
 
         toast.success("Note added successfully");
       }
@@ -140,7 +152,6 @@ export default function VoiceControl() {
           expenseWidget = widgets[widgets.length - 1];
         }
 
-        // Create category if it doesn't exist
         let categoryId = expenseWidget?.data?.categories?.find(
           (c: any) => c.name.toLowerCase() === category.toLowerCase()
         )?.id;
@@ -169,7 +180,7 @@ export default function VoiceControl() {
             categories: expenseWidget.data.categories,
             expenses: updatedExpenses,
           }
-        });
+        } as WidgetUpdate);
 
         toast.success(`Expense of ${amount} added under ${category}`);
       }
@@ -190,18 +201,20 @@ export default function VoiceControl() {
         const audioBlob = new Blob(audioChunks.current, { type: "audio/wav" });
         
         try {
-          // Initialize Whisper model for speech recognition
           const transcriber = await pipeline(
             "automatic-speech-recognition",
             "openai/whisper-tiny.en"
           );
 
-          // Convert audio to text
-          const result = await transcriber(audioBlob);
-          console.log("Transcription result:", result);
+          const result = await transcriber(audioBlob, {
+            chunk_length_s: 30,
+            stride_length_s: 5,
+          });
 
-          if (result.text) {
-            await processCommand(result.text);
+          if (typeof result === 'object' && 'text' in result) {
+            await processCommand(result.text as string);
+          } else if (Array.isArray(result) && result.length > 0 && 'text' in result[0]) {
+            await processCommand(result[0].text as string);
           }
         } catch (error) {
           console.error("Error processing audio:", error);
@@ -222,7 +235,6 @@ export default function VoiceControl() {
       mediaRecorder.current.stop();
       setIsRecording(false);
       
-      // Stop all tracks in the stream
       mediaRecorder.current.stream.getTracks().forEach(track => track.stop());
     }
   };
