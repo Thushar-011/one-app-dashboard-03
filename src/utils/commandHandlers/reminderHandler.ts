@@ -8,7 +8,7 @@ export const handleReminderCommand = (
   addWidget: (type: string, position?: { x: number; y: number }) => void
 ) => {
   // Extract the reminder text and date using regex
-  const reminderPattern = /(?:add (?:a )?reminder\s+)(.*?)(?:\s+on\s+)(.*)/i;
+  const reminderPattern = /add (?:a )?reminder\s+(.*?)\s+on\s+(.*)/i;
   const match = text.match(reminderPattern);
   
   if (!match) {

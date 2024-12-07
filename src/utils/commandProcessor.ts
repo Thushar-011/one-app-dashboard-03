@@ -21,6 +21,15 @@ export const processCommand = async (
   const lowerText = text.toLowerCase().trim();
   console.log("Processing command:", lowerText);
 
+  // Reminder commands - check this first since it's more specific
+  if (lowerText.includes("reminder")) {
+    const success = await handleReminderCommand(text, widgets, updateWidget, addWidget);
+    if (success) {
+      toast.success("Reminder added successfully");
+      return;
+    }
+  }
+
   // Alarm commands
   if (lowerText.includes("alarm") || lowerText.includes("wake") || lowerText.includes("remind me at")) {
     const timeMatch = lowerText.match(/(\d{1,2})(?::(\d{1,2}))?\s*(am|pm)?/i);
