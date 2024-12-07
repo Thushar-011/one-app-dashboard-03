@@ -30,7 +30,7 @@ export default function VoiceControl() {
           console.log("Initializing speech recognition pipeline...");
           const transcriber = await pipeline(
             "automatic-speech-recognition",
-            "openai/whisper-tiny.en"
+            "onnx-community/whisper-tiny.en"
           );
 
           console.log("Processing audio...");
