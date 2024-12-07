@@ -12,15 +12,15 @@ export const handleReminderCommand = async (
     console.log("Processing reminder command:", text);
     
     // Extract the reminder text and date using regex
-    // This pattern now handles variations like "to", "for", "on" and allows more flexible date formats
-    const reminderPattern = /add (?:a )?reminder(?:\s+to)?\s+(.*?)\s+(?:for|on)\s+(.*)/i;
+    // This pattern now handles both "set" and "add" commands with various formats
+    const reminderPattern = /(?:set|add) (?:a )?reminder(?:\s+to)?\s*,?\s*(.*?)\s+(?:for|on)\s+(.*)/i;
     const match = text.match(reminderPattern);
     
     console.log("Regex match result:", match);
     
     if (!match) {
       console.log("Could not match reminder pattern");
-      throw new Error("Could not understand the reminder format. Please say: Add a reminder [task] on [date]");
+      throw new Error("Could not understand the reminder format. Please say: Set reminder [task] on [date]");
     }
 
     const [, reminderText, dateText] = match;
