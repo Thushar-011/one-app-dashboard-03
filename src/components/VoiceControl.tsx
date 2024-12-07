@@ -56,11 +56,7 @@ export default function VoiceControl() {
             "onnx-community/whisper-tiny.en",
             {
               quantized: true,
-              revision: "main",
-              config: {
-                language: "en",
-                task: "transcribe"
-              }
+              revision: "main"
             }
           );
 
