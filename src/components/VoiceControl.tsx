@@ -139,17 +139,21 @@ export default function VoiceControl() {
         <Button
           size="lg"
           disabled={isProcessing}
-          className={`rounded-full w-14 h-14 ${
-            isRecording ? "bg-red-500 hover:bg-red-600" : "bg-primary hover:bg-primary/90"
-          } transition-all duration-200 shadow-lg hover:shadow-xl`}
+          className={`rounded-full w-14 h-14 transition-all duration-300 shadow-lg hover:shadow-xl 
+            ${isRecording 
+              ? "bg-red-500 hover:bg-red-600 animate-pulse ring-4 ring-red-300" 
+              : "bg-primary hover:bg-primary/90"
+            }
+            ${isProcessing ? "animate-spin" : ""}
+          `}
           onClick={isRecording ? stopRecording : startRecording}
         >
           {isProcessing ? (
             <span className="animate-spin">⏳</span>
           ) : isRecording ? (
-            <MicOff className="w-6 h-6 animate-pulse" />
+            <MicOff className="w-6 h-6 text-white animate-bounce" />
           ) : (
-            <Mic className="w-6 h-6" />
+            <Mic className="w-6 h-6 text-white transition-transform hover:scale-110" />
           )}
         </Button>
       </div>
