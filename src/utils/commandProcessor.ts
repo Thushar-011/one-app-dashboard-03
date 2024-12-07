@@ -1,5 +1,6 @@
 import { Widget } from "@/types/widget";
 import { toast } from "sonner";
+import { parse } from "date-fns";
 
 export interface WidgetData {
   alarms?: Array<{ id: string; time: string; enabled: boolean }>;
@@ -84,29 +85,63 @@ export const processCommand = async (
 
   // Reminder commands
   else if (lowerText.includes("reminder") || lowerText.includes("remind me")) {
-    const reminderText = text.replace(/set (a )?reminder|remind me( to)?/gi, "").trim();
-    if (reminderText) {
-      let reminderWidget = widgets.find(w => w.type === "reminder");
-      if (!reminderWidget) {
-        addWidget("reminder", { x: 0, y: 0 });
-        reminderWidget = widgets[widgets.length - 1];
+    // Extract date using regex
+    const datePattern = /on\s+(\w+\s+\d{1,2}(?:st|nd|rd|th)?(?:\s*,?\s*\d{4})?)/i;
+    const match = text.match(datePattern);
+    
+    if (match) {
+      const dateText = match[1];
+      console.log("Extracted date text:", dateText);
+      
+      // Remove the date and command words from the text to get the reminder content
+      const reminderText = text
+        .replace(/set (a )?reminder|remind me( to)?/gi, "")
+        .replace(/on\s+\w+\s+\d{1,2}(?:st|nd|rd|th)?(?:\s*,?\s*\d{4})?/i, "")
+        .trim();
+
+      if (reminderText) {
+        let reminderWidget = widgets.find(w => w.type === "reminder");
+        if (!reminderWidget) {
+          addWidget("reminder", { x: 0, y: 0 });
+          reminderWidget = widgets[widgets.length - 1];
+        }
+
+        try {
+          // Parse the date, assuming current year if not specified
+          let parsedDate;
+          try {
+            parsedDate = parse(dateText, "MMMM d yyyy", new Date());
+          } catch {
+            parsedDate = parse(dateText, "MMMM d", new Date());
+          }
+
+          if (isNaN(parsedDate.getTime())) {
+            throw new Error("Invalid date format");
+          }
+
+          const newReminder = {
+            id: Date.now().toString(),
+            text: reminderText,
+            date: parsedDate.toISOString(),
+            completed: false,
+          };
+
+          const updatedReminders = [...(reminderWidget?.data?.reminders || []), newReminder];
+          updateWidget(reminderWidget.id, {
+            data: { reminders: updatedReminders }
+          });
+
+          toast.success("Reminder added successfully");
+          console.log("Added reminder:", newReminder);
+        } catch (error) {
+          console.error("Error parsing date:", error);
+          throw new Error("Could not understand the date format. Please try again with a different format (e.g., 'December 25')");
+        }
+      } else {
+        throw new Error("Could not understand the reminder description");
       }
-
-      const newReminder = {
-        id: Date.now().toString(),
-        text: reminderText,
-        date: new Date().toISOString(),
-        completed: false,
-      };
-
-      const updatedReminders = [...(reminderWidget?.data?.reminders || []), newReminder];
-      updateWidget(reminderWidget.id, {
-        data: { reminders: updatedReminders }
-      });
-
-      toast.success("Reminder added successfully");
     } else {
-      throw new Error("Could not understand the reminder description");
+      throw new Error("Could not understand the date. Please specify a date (e.g., 'on December 25')");
     }
   }
 
