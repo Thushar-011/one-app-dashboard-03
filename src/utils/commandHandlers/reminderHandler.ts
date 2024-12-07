@@ -1,5 +1,6 @@
 import { Widget } from "@/types/widget";
 import { parseDate } from "../dateParser";
+import { toast } from "sonner";
 
 export const handleReminderCommand = async (
   text: string,
@@ -9,7 +10,7 @@ export const handleReminderCommand = async (
 ) => {
   try {
     // Extract the reminder text and date using regex
-    const reminderPattern = /add (?:a )?reminder\s+(.*?)\s+on\s+(.*)/i;
+    const reminderPattern = /add (?:a )?reminder\s+(.*?)\s+(?:for|on)\s+(.*)/i;
     const match = text.match(reminderPattern);
     
     console.log("Processing reminder command:", text);
@@ -21,10 +22,16 @@ export const handleReminderCommand = async (
     }
 
     const [, reminderText, dateText] = match;
-    console.log("Extracted reminder text:", reminderText);
-    console.log("Extracted date text:", dateText);
     
-    if (!reminderText || !dateText) {
+    // Clean up the reminder text
+    const cleanedReminderText = reminderText
+      .replace(/^to\s+/i, '')  // Remove leading "to" if present
+      .trim();
+      
+    console.log("Cleaned reminder text:", cleanedReminderText);
+    console.log("Date text:", dateText);
+    
+    if (!cleanedReminderText || !dateText) {
       console.log("Missing reminder text or date");
       throw new Error("Could not understand the reminder text or date");
     }
@@ -41,7 +48,7 @@ export const handleReminderCommand = async (
 
     const newReminder = {
       id: Date.now().toString(),
-      text: reminderText.trim(),
+      text: cleanedReminderText,
       date: parsedDate.toISOString(),
       completed: false,
     };
@@ -53,6 +60,7 @@ export const handleReminderCommand = async (
       data: { reminders: updatedReminders }
     });
 
+    toast.success(`Reminder "${cleanedReminderText}" set for ${parsedDate.toLocaleDateString()}`);
     return true;
   } catch (error) {
     console.error("Error in handleReminderCommand:", error);

@@ -1,7 +1,7 @@
 import { parse } from "date-fns";
 
 export const cleanDateString = (dateText: string): string => {
-  // Remove ordinal suffixes (st, nd, rd, th) and clean up the string
+  // Remove ordinal suffixes and clean up the string
   return dateText
     .toLowerCase()
     .replace(/(\d+)(st|nd|rd|th)/, "$1")
@@ -11,7 +11,7 @@ export const cleanDateString = (dateText: string): string => {
 
 export const parseDate = (dateText: string): Date => {
   const cleanedDate = cleanDateString(dateText);
-  console.log("Cleaned date string:", cleanedDate);
+  console.log("Attempting to parse date:", cleanedDate);
   
   const formats = [
     "MMMM d yyyy",
@@ -20,8 +20,12 @@ export const parseDate = (dateText: string): Date => {
     "MMM d",
     "yyyy-MM-dd",
     "MM/dd/yyyy",
-    "MM-dd-yyyy"
+    "MM-dd-yyyy",
+    "MMMM d, yyyy",
+    "MMM d, yyyy"
   ];
+
+  let lastError = null;
 
   for (const format of formats) {
     try {
@@ -31,12 +35,15 @@ export const parseDate = (dateText: string): Date => {
         if (!dateText.includes(new Date().getFullYear().toString())) {
           parsedDate.setFullYear(new Date().getFullYear());
         }
+        console.log("Successfully parsed date:", parsedDate);
         return parsedDate;
       }
     } catch (error) {
+      lastError = error;
       console.log(`Failed to parse with format ${format}:`, error);
     }
   }
   
-  throw new Error("Invalid date format");
+  console.error("Final parsing error:", lastError);
+  throw new Error(`Could not parse date: ${dateText}. Please use a format like "December 25" or "Dec 25"`);
 };
