@@ -5,9 +5,20 @@ import { useWidgets } from "@/hooks/useWidgets";
 import { pipeline } from "@huggingface/transformers";
 import { toast } from "sonner";
 import { processCommand } from "@/utils/commandProcessor";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function VoiceControl() {
   const [isRecording, setIsRecording] = useState(false);
+  const [transcription, setTranscription] = useState<string | null>(null);
   const { addWidget, widgets, updateWidget } = useWidgets();
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
@@ -38,9 +49,9 @@ export default function VoiceControl() {
           });
 
           if (typeof result === 'object' && 'text' in result) {
-            await processCommand(result.text, widgets, updateWidget, addWidget);
+            setTranscription(result.text);
           } else if (Array.isArray(result) && result.length > 0 && 'text' in result[0]) {
-            await processCommand(result[0].text, widgets, updateWidget, addWidget);
+            setTranscription(result[0].text);
           }
         } catch (error) {
           console.error("Error processing audio:", error);
@@ -67,21 +78,55 @@ export default function VoiceControl() {
     }
   };
 
+  const handleConfirm = async () => {
+    if (transcription) {
+      try {
+        await processCommand(transcription, widgets, updateWidget, addWidget);
+        toast.success("Task completed successfully");
+      } catch (error) {
+        console.error("Error executing command:", error);
+        toast.error("Error: Task could not be completed");
+      }
+      setTranscription(null);
+    }
+  };
+
+  const handleCancel = () => {
+    setTranscription(null);
+  };
+
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
-      <Button
-        size="lg"
-        className={`rounded-full w-14 h-14 ${
-          isRecording ? "bg-red-500 hover:bg-red-600" : "bg-primary hover:bg-primary/90"
-        } transition-all duration-200 shadow-lg hover:shadow-xl`}
-        onClick={isRecording ? stopRecording : startRecording}
-      >
-        {isRecording ? (
-          <MicOff className="w-6 h-6 animate-pulse" />
-        ) : (
-          <Mic className="w-6 h-6" />
-        )}
-      </Button>
-    </div>
+    <>
+      <AlertDialog open={transcription !== null}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Voice Command</AlertDialogTitle>
+            <AlertDialogDescription>
+              Did you mean: &quot;{transcription}&quot;?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirm}>OK</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
+        <Button
+          size="lg"
+          className={`rounded-full w-14 h-14 ${
+            isRecording ? "bg-red-500 hover:bg-red-600" : "bg-primary hover:bg-primary/90"
+          } transition-all duration-200 shadow-lg hover:shadow-xl`}
+          onClick={isRecording ? stopRecording : startRecording}
+        >
+          {isRecording ? (
+            <MicOff className="w-6 h-6 animate-pulse" />
+          ) : (
+            <Mic className="w-6 h-6" />
+          )}
+        </Button>
+      </div>
+    </>
   );
 }
