@@ -14,19 +14,36 @@ export const processCommand = async (
   const lowerText = text.toLowerCase();
   console.log("Processing command:", lowerText);
 
-  if (lowerText.includes("alarm")) {
+  // Enhanced command detection patterns
+  const patterns = {
+    alarm: /(set|create|add|make)?\s*(an?\s*)?alarm\s*(for|at)?/i,
+    todo: /(add|create|make)?\s*(an?\s*)?(task|todo)/i,
+    reminder: /(set|create|add|make)?\s*(an?\s*)?reminder/i,
+    note: /(take|create|add|make)?\s*(an?\s*)?note/i,
+    expense: /(add|log|record)?\s*(an?\s*)?expense/i
+  };
+
+  if (patterns.alarm.test(lowerText)) {
+    console.log("Detected alarm command");
     handleAlarmCommand(text, widgets, updateWidget, addWidget);
   }
-  else if (lowerText.includes("task") || lowerText.includes("todo")) {
+  else if (patterns.todo.test(lowerText)) {
+    console.log("Detected todo command");
     handleTodoCommand(text, widgets, updateWidget, addWidget);
   }
-  else if (lowerText.includes("reminder")) {
+  else if (patterns.reminder.test(lowerText)) {
+    console.log("Detected reminder command");
     handleReminderCommand(text, widgets, updateWidget, addWidget);
   }
-  else if (lowerText.includes("note")) {
+  else if (patterns.note.test(lowerText)) {
+    console.log("Detected note command");
     handleNoteCommand(text, widgets, updateWidget, addWidget);
   }
-  else if (lowerText.includes("expense")) {
+  else if (patterns.expense.test(lowerText)) {
+    console.log("Detected expense command");
     handleExpenseCommand(text, widgets, updateWidget, addWidget);
+  } else {
+    console.log("No matching command pattern found");
+    toast.error("I couldn't understand that command. Please try again.");
   }
 };
