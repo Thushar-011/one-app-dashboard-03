@@ -58,7 +58,6 @@ export default function VoiceControl() {
               quantized: true,
               revision: "main",
               config: {
-                max_new_tokens: 128,
                 language: "en",
                 task: "transcribe"
               }
