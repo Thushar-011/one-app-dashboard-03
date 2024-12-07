@@ -1,9 +1,10 @@
 import { parse } from "date-fns";
 
 export const cleanDateString = (dateText: string): string => {
-  // Remove ordinal suffixes and clean up the string
+  // Remove trailing punctuation, ordinal suffixes and clean up the string
   return dateText
     .toLowerCase()
+    .replace(/[.,!?]+$/, '') // Remove trailing punctuation
     .replace(/(\d+)(st|nd|rd|th)/, "$1")
     .replace(/\s+/g, " ")
     .trim();
