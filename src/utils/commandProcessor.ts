@@ -21,8 +21,11 @@ export const processCommand = async (
 
   // Alarm commands
   if (lowerText.includes("alarm")) {
+    console.log("Detected alarm command");
     const timeMatch = lowerText.match(/(\d{1,2})(?::(\d{1,2}))?\s*(am|pm)?/i);
+    
     if (timeMatch) {
+      console.log("Time match found:", timeMatch);
       let hours = parseInt(timeMatch[1]);
       const minutes = timeMatch[2] ? parseInt(timeMatch[2]) : 0;
       const period = timeMatch[3]?.toLowerCase();
@@ -31,25 +34,39 @@ export const processCommand = async (
       if (period === "am" && hours === 12) hours = 0;
 
       const time = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+      console.log("Formatted time:", time);
       
       let alarmWidget = widgets.find(w => w.type === "alarm");
+      
       if (!alarmWidget) {
+        console.log("Creating new alarm widget");
         addWidget("alarm", { x: 0, y: 0 });
-        alarmWidget = widgets[widgets.length - 1];
+        // Wait for the next tick to ensure widget is created
+        await new Promise(resolve => setTimeout(resolve, 0));
+        alarmWidget = widgets.find(w => w.type === "alarm");
       }
 
-      const newAlarm = {
-        id: Date.now().toString(),
-        time,
-        enabled: true,
-      };
+      if (alarmWidget) {
+        console.log("Updating alarm widget:", alarmWidget.id);
+        const newAlarm = {
+          id: Date.now().toString(),
+          time,
+          enabled: true,
+        };
 
-      const updatedAlarms = [...(alarmWidget?.data?.alarms || []), newAlarm];
-      updateWidget(alarmWidget.id, {
-        data: { alarms: updatedAlarms }
-      });
+        const updatedAlarms = [...(alarmWidget?.data?.alarms || []), newAlarm];
+        updateWidget(alarmWidget.id, {
+          data: { alarms: updatedAlarms }
+        });
 
-      toast.success(`Alarm set for ${time}`);
+        toast.success(`Alarm set for ${time}`);
+      } else {
+        console.error("Failed to create or find alarm widget");
+        toast.error("Failed to create alarm widget");
+      }
+    } else {
+      console.log("No valid time found in command");
+      toast.error("Please specify a valid time for the alarm");
     }
   }
 
@@ -60,21 +77,24 @@ export const processCommand = async (
       let todoWidget = widgets.find(w => w.type === "todo");
       if (!todoWidget) {
         addWidget("todo", { x: 0, y: 0 });
-        todoWidget = widgets[widgets.length - 1];
+        await new Promise(resolve => setTimeout(resolve, 0));
+        todoWidget = widgets.find(w => w.type === "todo");
       }
 
-      const newTask = {
-        id: Date.now().toString(),
-        text: taskText,
-        completed: false,
-      };
+      if (todoWidget) {
+        const newTask = {
+          id: Date.now().toString(),
+          text: taskText,
+          completed: false,
+        };
 
-      const updatedTasks = [...(todoWidget?.data?.tasks || []), newTask];
-      updateWidget(todoWidget.id, {
-        data: { tasks: updatedTasks }
-      });
+        const updatedTasks = [...(todoWidget?.data?.tasks || []), newTask];
+        updateWidget(todoWidget.id, {
+          data: { tasks: updatedTasks }
+        });
 
-      toast.success("Task added successfully");
+        toast.success("Task added successfully");
+      }
     }
   }
 
@@ -85,22 +105,25 @@ export const processCommand = async (
       let reminderWidget = widgets.find(w => w.type === "reminder");
       if (!reminderWidget) {
         addWidget("reminder", { x: 0, y: 0 });
-        reminderWidget = widgets[widgets.length - 1];
+        await new Promise(resolve => setTimeout(resolve, 0));
+        reminderWidget = widgets.find(w => w.type === "reminder");
       }
 
-      const newReminder = {
-        id: Date.now().toString(),
-        text: reminderText,
-        date: new Date().toISOString(),
-        completed: false,
-      };
+      if (reminderWidget) {
+        const newReminder = {
+          id: Date.now().toString(),
+          text: reminderText,
+          date: new Date().toISOString(),
+          completed: false,
+        };
 
-      const updatedReminders = [...(reminderWidget?.data?.reminders || []), newReminder];
-      updateWidget(reminderWidget.id, {
-        data: { reminders: updatedReminders }
-      });
+        const updatedReminders = [...(reminderWidget?.data?.reminders || []), newReminder];
+        updateWidget(reminderWidget.id, {
+          data: { reminders: updatedReminders }
+        });
 
-      toast.success("Reminder added successfully");
+        toast.success("Reminder added successfully");
+      }
     }
   }
 
@@ -111,21 +134,24 @@ export const processCommand = async (
       let noteWidget = widgets.find(w => w.type === "note");
       if (!noteWidget) {
         addWidget("note", { x: 0, y: 0 });
-        noteWidget = widgets[widgets.length - 1];
+        await new Promise(resolve => setTimeout(resolve, 0));
+        noteWidget = widgets.find(w => w.type === "note");
       }
 
-      const newNote = {
-        id: Date.now().toString(),
-        text: noteText,
-        createdAt: new Date().toISOString(),
-      };
+      if (noteWidget) {
+        const newNote = {
+          id: Date.now().toString(),
+          text: noteText,
+          createdAt: new Date().toISOString(),
+        };
 
-      const updatedNotes = [...(noteWidget?.data?.notes || []), newNote];
-      updateWidget(noteWidget.id, {
-        data: { notes: updatedNotes }
-      });
+        const updatedNotes = [...(noteWidget?.data?.notes || []), newNote];
+        updateWidget(noteWidget.id, {
+          data: { notes: updatedNotes }
+        });
 
-      toast.success("Note added successfully");
+        toast.success("Note added successfully");
+      }
     }
   }
 
@@ -139,40 +165,46 @@ export const processCommand = async (
       let expenseWidget = widgets.find(w => w.type === "expense");
       if (!expenseWidget) {
         addWidget("expense", { x: 0, y: 0 });
-        expenseWidget = widgets[widgets.length - 1];
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expenseWidget = widgets.find(w => w.type === "expense");
       }
 
-      let categoryId = expenseWidget?.data?.categories?.find(
-        (c: any) => c.name.toLowerCase() === category.toLowerCase()
-      )?.id;
+      if (expenseWidget) {
+        let categoryId = expenseWidget?.data?.categories?.find(
+          (c: any) => c.name.toLowerCase() === category.toLowerCase()
+        )?.id;
 
-      if (!categoryId) {
-        categoryId = Date.now().toString();
-        const newCategory = {
-          id: categoryId,
-          name: category,
-          color: "#" + Math.floor(Math.random()*16777215).toString(16),
-        };
-        expenseWidget.data.categories = [...(expenseWidget?.data?.categories || []), newCategory];
-      }
-
-      const newExpense = {
-        id: Date.now().toString(),
-        amount,
-        description: `Voice command: ${amount} under ${category}`,
-        categoryId,
-        date: new Date().toISOString(),
-      };
-
-      const updatedExpenses = [...(expenseWidget?.data?.expenses || []), newExpense];
-      updateWidget(expenseWidget.id, {
-        data: {
-          categories: expenseWidget.data.categories,
-          expenses: updatedExpenses,
+        if (!categoryId) {
+          categoryId = Date.now().toString();
+          const newCategory = {
+            id: categoryId,
+            name: category,
+            color: "#" + Math.floor(Math.random()*16777215).toString(16),
+          };
+          expenseWidget.data.categories = [...(expenseWidget?.data?.categories || []), newCategory];
         }
-      });
 
-      toast.success(`Expense of ${amount} added under ${category}`);
+        const newExpense = {
+          id: Date.now().toString(),
+          amount,
+          description: `Voice command: ${amount} under ${category}`,
+          categoryId,
+          date: new Date().toISOString(),
+        };
+
+        const updatedExpenses = [...(expenseWidget?.data?.expenses || []), newExpense];
+        updateWidget(expenseWidget.id, {
+          data: {
+            categories: expenseWidget.data.categories,
+            expenses: updatedExpenses,
+          }
+        });
+
+        toast.success(`Expense of ${amount} added under ${category}`);
+      }
     }
+  } else {
+    console.log("No matching command found");
+    toast.error("Command not recognized");
   }
 };

@@ -27,20 +27,28 @@ export default function VoiceControl() {
         const audioUrl = URL.createObjectURL(audioBlob);
         
         try {
+          console.log("Initializing speech recognition pipeline...");
           const transcriber = await pipeline(
             "automatic-speech-recognition",
-            "onnx-community/whisper-tiny.en"
+            "openai/whisper-tiny.en",
+            { quantized: true }
           );
 
+          console.log("Processing audio...");
           const result = await transcriber(audioUrl, {
             chunk_length_s: 30,
             stride_length_s: 5,
           });
 
-          if (typeof result === 'object' && 'text' in result) {
-            await processCommand(result.text, widgets, updateWidget, addWidget);
-          } else if (Array.isArray(result) && result.length > 0 && 'text' in result[0]) {
-            await processCommand(result[0].text, widgets, updateWidget, addWidget);
+          console.log("Transcription result:", result);
+
+          if (result && typeof result === 'object' && 'text' in result) {
+            const text = result.text.trim();
+            console.log("Processing command:", text);
+            await processCommand(text, widgets, updateWidget, addWidget);
+          } else {
+            console.error("Invalid transcription result:", result);
+            toast.error("Could not understand audio");
           }
         } catch (error) {
           console.error("Error processing audio:", error);
@@ -52,6 +60,7 @@ export default function VoiceControl() {
 
       mediaRecorder.current.start();
       setIsRecording(true);
+      toast.success("Started recording");
     } catch (error) {
       console.error("Error accessing microphone:", error);
       toast.error("Failed to access microphone");
@@ -62,6 +71,7 @@ export default function VoiceControl() {
     if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
       mediaRecorder.current.stop();
       setIsRecording(false);
+      toast.success("Stopped recording");
       
       mediaRecorder.current.stream.getTracks().forEach(track => track.stop());
     }
