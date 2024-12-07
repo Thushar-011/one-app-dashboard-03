@@ -7,37 +7,35 @@ export const handleReminderCommand = (
   updateWidget: (id: string, updates: Partial<Widget>) => void,
   addWidget: (type: string, position?: { x: number; y: number }) => void
 ) => {
-  const datePattern = /on\s+(\w+\s+\d{1,2}(?:st|nd|rd|th)?(?:\s*,?\s*\d{4})?)/i;
-  const match = text.match(datePattern);
+  // Extract the reminder text and date using regex
+  const reminderPattern = /(?:add (?:a )?reminder\s+)(.*?)(?:\s+on\s+)(.*)/i;
+  const match = text.match(reminderPattern);
   
   if (!match) {
-    throw new Error("Could not understand the date. Please specify a date (e.g., 'on December 25')");
+    throw new Error("Could not understand the reminder format. Please use the format: Add a reminder [task] on [date]");
   }
 
-  const dateText = match[1];
+  const [, reminderText, dateText] = match;
+  console.log("Extracted reminder text:", reminderText);
   console.log("Extracted date text:", dateText);
   
-  const reminderText = text
-    .replace(/set (a )?reminder|remind me( to)?/gi, "")
-    .replace(/on\s+\w+\s+\d{1,2}(?:st|nd|rd|th)?(?:\s*,?\s*\d{4})?/i, "")
-    .trim();
-
-  if (!reminderText) {
-    throw new Error("Could not understand the reminder description");
-  }
-
-  let reminderWidget = widgets.find(w => w.type === "reminder");
-  if (!reminderWidget) {
-    addWidget("reminder", { x: 0, y: 0 });
-    reminderWidget = widgets[widgets.length - 1];
+  if (!reminderText || !dateText) {
+    throw new Error("Could not understand the reminder text or date");
   }
 
   try {
     const parsedDate = parseDate(dateText);
+    console.log("Parsed date:", parsedDate);
+
+    let reminderWidget = widgets.find(w => w.type === "reminder");
+    if (!reminderWidget) {
+      addWidget("reminder", { x: 0, y: 0 });
+      reminderWidget = widgets[widgets.length - 1];
+    }
 
     const newReminder = {
       id: Date.now().toString(),
-      text: reminderText,
+      text: reminderText.trim(),
       date: parsedDate.toISOString(),
       completed: false,
     };
@@ -47,7 +45,6 @@ export const handleReminderCommand = (
       data: { reminders: updatedReminders }
     });
 
-    console.log("Added reminder:", newReminder);
     return true;
   } catch (error) {
     console.error("Error parsing date:", error);
