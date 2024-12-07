@@ -55,10 +55,13 @@ export default function VoiceControl() {
             "automatic-speech-recognition",
             "onnx-community/whisper-tiny.en",
             {
-              chunk_length_s: 30,
-              stride_length_s: 5,
-              language: "en",
-              task: "transcribe"
+              quantized: true,
+              revision: "main",
+              config: {
+                max_new_tokens: 128,
+                language: "en",
+                task: "transcribe"
+              }
             }
           );
 
