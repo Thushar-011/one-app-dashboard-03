@@ -4,6 +4,7 @@ import { handleTodoCommand } from "./commands/todoCommands";
 import { handleReminderCommand } from "./commands/reminderCommands";
 import { handleNoteCommand } from "./commands/noteCommands";
 import { handleExpenseCommand } from "./commands/expenseCommands";
+import { toast } from "sonner";
 
 export const processCommand = async (
   text: string,
