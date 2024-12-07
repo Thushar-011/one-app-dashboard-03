@@ -27,33 +27,50 @@ export const processCommand = async (
       const minutes = timeMatch[2] ? parseInt(timeMatch[2]) : 0;
       const period = timeMatch[3]?.toLowerCase();
 
+      // Convert to 24-hour format
       if (period === "pm" && hours < 12) hours += 12;
       if (period === "am" && hours === 12) hours = 0;
 
       const time = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
       
+      // Find existing alarm widget or create new one
       let alarmWidget = widgets.find(w => w.type === "alarm");
+      
+      // If no alarm widget exists, create one
       if (!alarmWidget) {
-        addWidget("alarm", { x: 0, y: 0 });
+        addWidget("alarm");
+        // Get the newly created widget
         alarmWidget = widgets[widgets.length - 1];
       }
 
-      const newAlarm = {
-        id: Date.now().toString(),
-        time,
-        enabled: true,
-      };
+      // Ensure the widget and its data structure exists
+      if (alarmWidget) {
+        const currentAlarms = alarmWidget.data?.alarms || [];
+        const newAlarm = {
+          id: Date.now().toString(),
+          time,
+          enabled: true,
+        };
 
-      const updatedAlarms = [...(alarmWidget?.data?.alarms || []), newAlarm];
-      updateWidget(alarmWidget.id, {
-        data: { alarms: updatedAlarms }
-      });
+        // Update the widget with the new alarm
+        updateWidget(alarmWidget.id, {
+          data: { 
+            alarms: [...currentAlarms, newAlarm]
+          }
+        });
 
-      toast.success(`Alarm set for ${time}`);
+        console.log("Alarm set for:", time);
+        toast.success(`Alarm set for ${time}`);
+      } else {
+        console.error("Failed to create or find alarm widget");
+        toast.error("Failed to set alarm");
+      }
+    } else {
+      toast.error("Could not understand the time format");
     }
+    return;
   }
 
-  // Todo commands
   else if (lowerText.includes("task") || lowerText.includes("todo")) {
     const taskText = text.replace(/add (a )?task|todo/i, "").trim();
     if (taskText) {
