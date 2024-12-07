@@ -33,18 +33,33 @@ export const processCommand = async (
 
       const time = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
       
-      // Find existing alarm widget or create new one
+      // Find existing alarm widget
       let alarmWidget = widgets.find(w => w.type === "alarm");
       
-      // If no alarm widget exists, create one
       if (!alarmWidget) {
-        addWidget("alarm");
-        // Get the newly created widget
-        alarmWidget = widgets[widgets.length - 1];
-      }
+        // Create new alarm widget with initial data
+        const widgetId = `alarm-${Date.now()}`;
+        addWidget("alarm", { x: 0, y: 0 });
+        
+        // Create the alarm data
+        const newAlarm = {
+          id: Date.now().toString(),
+          time,
+          enabled: true,
+        };
 
-      // Ensure the widget and its data structure exists
-      if (alarmWidget) {
+        // Update the widget with initial data
+        setTimeout(() => {
+          updateWidget(widgetId, {
+            data: { 
+              alarms: [newAlarm]
+            }
+          });
+        }, 0);
+
+        console.log("Created new alarm widget with ID:", widgetId);
+      } else {
+        // Update existing widget
         const currentAlarms = alarmWidget.data?.alarms || [];
         const newAlarm = {
           id: Date.now().toString(),
@@ -52,19 +67,17 @@ export const processCommand = async (
           enabled: true,
         };
 
-        // Update the widget with the new alarm
         updateWidget(alarmWidget.id, {
           data: { 
             alarms: [...currentAlarms, newAlarm]
           }
         });
 
-        console.log("Alarm set for:", time);
-        toast.success(`Alarm set for ${time}`);
-      } else {
-        console.error("Failed to create or find alarm widget");
-        toast.error("Failed to set alarm");
+        console.log("Updated existing alarm widget:", alarmWidget.id);
       }
+
+      console.log("Alarm set for:", time);
+      toast.success(`Alarm set for ${time}`);
     } else {
       toast.error("Could not understand the time format");
     }
