@@ -1,6 +1,5 @@
 import { Widget } from "@/types/widget";
 import { toast } from "sonner";
-import { parse } from "date-fns";
 import { handleReminderCommand } from "./commandHandlers/reminderHandler";
 
 export interface WidgetData {
@@ -21,16 +20,17 @@ export const processCommand = async (
   const lowerText = text.toLowerCase().trim();
   console.log("Processing command:", lowerText);
 
-  // Reminder commands - check this first since it's more specific
-  if (lowerText.includes("reminder")) {
-    const success = await handleReminderCommand(text, widgets, updateWidget, addWidget);
-    if (success) {
-      toast.success("Reminder added successfully");
-      return;
+  try {
+    // Reminder commands - check this first since it's more specific
+    if (lowerText.includes("reminder")) {
+      console.log("Handling reminder command");
+      const success = await handleReminderCommand(text, widgets, updateWidget, addWidget);
+      if (success) {
+        toast.success("Reminder set successfully");
+        return;
+      }
     }
-  }
 
-  // Alarm commands
   if (lowerText.includes("alarm") || lowerText.includes("wake") || lowerText.includes("remind me at")) {
     const timeMatch = lowerText.match(/(\d{1,2})(?::(\d{1,2}))?\s*(am|pm)?/i);
     if (timeMatch) {
@@ -176,5 +176,11 @@ export const processCommand = async (
     }
   } else {
     throw new Error("Command not recognized. Please try again with a different phrase.");
+  }
+
+  } catch (error) {
+    console.error("Error processing command:", error);
+    toast.error(error instanceof Error ? error.message : "Failed to process command");
+    throw error;
   }
 };

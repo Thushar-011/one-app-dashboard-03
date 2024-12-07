@@ -13,7 +13,7 @@ export const handleReminderCommand = async (
     
     // Extract the reminder text and date using regex
     // This pattern now handles both "set" and "add" commands with various formats
-    const reminderPattern = /(?:set|add) (?:a )?reminder(?:\s+to)?\s*,?\s*(.*?)\s+(?:for|on)\s+(.*)/i;
+    const reminderPattern = /(?:set|add)(?:\s+a)?\s+reminder(?:\s+to)?\s*(?:,)?\s*(.+?)\s+(?:for|on)\s+(.+)/i;
     const match = text.match(reminderPattern);
     
     console.log("Regex match result:", match);
@@ -59,7 +59,6 @@ export const handleReminderCommand = async (
       data: { reminders: updatedReminders }
     });
 
-    toast.success(`Reminder "${cleanedReminderText}" set for ${parsedDate.toLocaleDateString()}`);
     return true;
   } catch (error) {
     console.error("Error in handleReminderCommand:", error);
