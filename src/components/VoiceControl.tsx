@@ -55,7 +55,6 @@ export default function VoiceControl() {
             "automatic-speech-recognition",
             "onnx-community/whisper-tiny.en",
             {
-              quantized: true,
               revision: "main"
             }
           );
@@ -156,4 +155,3 @@ export default function VoiceControl() {
       </div>
     </>
   );
-}
