@@ -16,11 +16,11 @@ export const processCommand = async (
   updateWidget: (id: string, updates: Partial<Widget>) => void,
   addWidget: (type: string, position?: { x: number; y: number }) => void
 ) => {
-  const lowerText = text.toLowerCase();
+  const lowerText = text.toLowerCase().trim();
   console.log("Processing command:", lowerText);
 
   // Alarm commands
-  if (lowerText.includes("alarm")) {
+  if (lowerText.includes("alarm") || lowerText.includes("wake") || lowerText.includes("remind me at")) {
     const timeMatch = lowerText.match(/(\d{1,2})(?::(\d{1,2}))?\s*(am|pm)?/i);
     if (timeMatch) {
       let hours = parseInt(timeMatch[1]);
@@ -50,12 +50,14 @@ export const processCommand = async (
       });
 
       toast.success(`Alarm set for ${time}`);
+    } else {
+      throw new Error("Could not understand the time for the alarm");
     }
   }
 
   // Todo commands
-  else if (lowerText.includes("task") || lowerText.includes("todo")) {
-    const taskText = text.replace(/add (a )?task|todo/i, "").trim();
+  else if (lowerText.includes("task") || lowerText.includes("todo") || lowerText.includes("add to list")) {
+    const taskText = text.replace(/add (a )?task|todo|to( the)? list/gi, "").trim();
     if (taskText) {
       let todoWidget = widgets.find(w => w.type === "todo");
       if (!todoWidget) {
@@ -75,12 +77,14 @@ export const processCommand = async (
       });
 
       toast.success("Task added successfully");
+    } else {
+      throw new Error("Could not understand the task description");
     }
   }
 
   // Reminder commands
-  else if (lowerText.includes("reminder")) {
-    const reminderText = text.replace(/set (a )?reminder/i, "").trim();
+  else if (lowerText.includes("reminder") || lowerText.includes("remind me")) {
+    const reminderText = text.replace(/set (a )?reminder|remind me( to)?/gi, "").trim();
     if (reminderText) {
       let reminderWidget = widgets.find(w => w.type === "reminder");
       if (!reminderWidget) {
@@ -101,12 +105,14 @@ export const processCommand = async (
       });
 
       toast.success("Reminder added successfully");
+    } else {
+      throw new Error("Could not understand the reminder description");
     }
   }
 
   // Note commands
-  else if (lowerText.includes("note")) {
-    const noteText = text.replace(/start taking notes|add (a )?note/i, "").trim();
+  else if (lowerText.includes("note") || lowerText.includes("write down")) {
+    const noteText = text.replace(/start taking notes|add (a )?note|write down/gi, "").trim();
     if (noteText) {
       let noteWidget = widgets.find(w => w.type === "note");
       if (!noteWidget) {
@@ -126,12 +132,16 @@ export const processCommand = async (
       });
 
       toast.success("Note added successfully");
+    } else {
+      throw new Error("Could not understand the note content");
     }
   }
 
   // Expense commands
-  else if (lowerText.includes("expense")) {
-    const match = lowerText.match(/expense of (\d+) under (.+)/i);
+  else if (lowerText.includes("expense") || lowerText.includes("spent") || lowerText.includes("cost")) {
+    const match = lowerText.match(/(\d+)(?:\s*dollars?)?\s+(?:for|on|under)\s+(.+)/i) ||
+                 lowerText.match(/spent\s+(\d+)(?:\s*dollars?)?\s+(?:for|on|under)\s+(.+)/i);
+    
     if (match) {
       const amount = parseInt(match[1]);
       const category = match[2].trim();
@@ -159,7 +169,7 @@ export const processCommand = async (
       const newExpense = {
         id: Date.now().toString(),
         amount,
-        description: `Voice command: ${amount} under ${category}`,
+        description: `Voice command: ${amount} for ${category}`,
         categoryId,
         date: new Date().toISOString(),
       };
@@ -172,7 +182,11 @@ export const processCommand = async (
         }
       });
 
-      toast.success(`Expense of ${amount} added under ${category}`);
+      toast.success(`Expense of $${amount} added under ${category}`);
+    } else {
+      throw new Error("Could not understand the expense amount and category");
     }
+  } else {
+    throw new Error("Command not recognized. Please try again with a different phrase.");
   }
 };

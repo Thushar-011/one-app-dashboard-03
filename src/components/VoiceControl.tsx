@@ -19,14 +19,25 @@ import {
 export default function VoiceControl() {
   const [isRecording, setIsRecording] = useState(false);
   const [transcription, setTranscription] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const { addWidget, widgets, updateWidget } = useWidgets();
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder.current = new MediaRecorder(stream);
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 16000
+        } 
+      });
+      
+      mediaRecorder.current = new MediaRecorder(stream, {
+        mimeType: 'audio/webm'
+      });
       audioChunks.current = [];
 
       mediaRecorder.current.ondataavailable = (event) => {
@@ -34,38 +45,51 @@ export default function VoiceControl() {
       };
 
       mediaRecorder.current.onstop = async () => {
-        const audioBlob = new Blob(audioChunks.current, { type: "audio/wav" });
+        setIsProcessing(true);
+        const audioBlob = new Blob(audioChunks.current, { type: "audio/webm" });
         const audioUrl = URL.createObjectURL(audioBlob);
         
         try {
+          console.log("Initializing transcriber...");
           const transcriber = await pipeline(
             "automatic-speech-recognition",
-            "onnx-community/whisper-tiny.en"
+            "onnx-community/whisper-tiny.en",
+            {
+              chunk_length_s: 30,
+              stride_length_s: 5,
+              language: "en",
+              task: "transcribe"
+            }
           );
 
-          const result = await transcriber(audioUrl, {
-            chunk_length_s: 30,
-            stride_length_s: 5,
-          });
+          console.log("Starting transcription...");
+          const result = await transcriber(audioUrl);
+          console.log("Transcription result:", result);
 
           if (typeof result === 'object' && 'text' in result) {
-            setTranscription(result.text);
+            const cleanedText = result.text.trim().toLowerCase();
+            console.log("Cleaned transcription:", cleanedText);
+            setTranscription(cleanedText);
           } else if (Array.isArray(result) && result.length > 0 && 'text' in result[0]) {
-            setTranscription(result[0].text);
+            const cleanedText = result[0].text.trim().toLowerCase();
+            console.log("Cleaned transcription:", cleanedText);
+            setTranscription(cleanedText);
           }
         } catch (error) {
           console.error("Error processing audio:", error);
-          toast.error("Failed to process voice command");
+          toast.error("Failed to process voice command. Please try again.");
         } finally {
           URL.revokeObjectURL(audioUrl);
+          setIsProcessing(false);
         }
       };
 
       mediaRecorder.current.start();
       setIsRecording(true);
+      toast.success("Recording started");
     } catch (error) {
       console.error("Error accessing microphone:", error);
-      toast.error("Failed to access microphone");
+      toast.error("Failed to access microphone. Please check your permissions.");
     }
   };
 
@@ -73,6 +97,7 @@ export default function VoiceControl() {
     if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
       mediaRecorder.current.stop();
       setIsRecording(false);
+      toast.success("Processing your command...");
       
       mediaRecorder.current.stream.getTracks().forEach(track => track.stop());
     }
@@ -81,6 +106,7 @@ export default function VoiceControl() {
   const handleConfirm = async () => {
     if (transcription) {
       try {
+        console.log("Executing command:", transcription);
         await processCommand(transcription, widgets, updateWidget, addWidget);
         toast.success("Task completed successfully");
       } catch (error) {
@@ -115,12 +141,15 @@ export default function VoiceControl() {
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
         <Button
           size="lg"
+          disabled={isProcessing}
           className={`rounded-full w-14 h-14 ${
             isRecording ? "bg-red-500 hover:bg-red-600" : "bg-primary hover:bg-primary/90"
           } transition-all duration-200 shadow-lg hover:shadow-xl`}
           onClick={isRecording ? stopRecording : startRecording}
         >
-          {isRecording ? (
+          {isProcessing ? (
+            <span className="animate-spin">⏳</span>
+          ) : isRecording ? (
             <MicOff className="w-6 h-6 animate-pulse" />
           ) : (
             <Mic className="w-6 h-6" />
