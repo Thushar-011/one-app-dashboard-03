@@ -3,6 +3,7 @@ import { Trash2, Pencil } from "lucide-react";
 import { useWidgets } from "@/hooks/useWidgets";
 import Widget from "@/components/Widget";
 import TrashList from "@/components/TrashList";
+import SlidePanel from "@/components/SlidePanel";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
@@ -43,6 +44,7 @@ export default function Index() {
         </div>
 
         <TrashList isOpen={isTrashOpen} onClose={() => setIsTrashOpen(false)} />
+        <SlidePanel />
       </div>
     </Layout>
   );
