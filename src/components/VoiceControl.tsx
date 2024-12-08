@@ -4,6 +4,7 @@ import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { toast } from "sonner";
 import RecordButton from "./voice/RecordButton";
 import ConfirmationDialog from "./voice/ConfirmationDialog";
+import { useLocation } from "react-router-dom";
 
 export default function VoiceControl() {
   const { addWidget, widgets, updateWidget } = useWidgets();
@@ -15,6 +16,9 @@ export default function VoiceControl() {
     stopRecording,
     setTranscription
   } = useVoiceRecorder();
+
+  // Check if any widget is in detail view by looking for the backdrop
+  const isWidgetDetailOpen = document.querySelector('.backdrop-blur-sm') !== null;
 
   const handleConfirm = async () => {
     if (transcription) {
@@ -32,6 +36,11 @@ export default function VoiceControl() {
   const handleCancel = () => {
     setTranscription(null);
   };
+
+  // Don't render the voice control if a widget is in detail view
+  if (isWidgetDetailOpen) {
+    return null;
+  }
 
   return (
     <>
