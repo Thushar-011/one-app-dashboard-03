@@ -1,6 +1,7 @@
 import { useWidgets } from "@/hooks/useWidgets";
 import { processCommand } from "@/utils/commandProcessor";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
+import { toast } from "@/hooks/use-toast"; // Add this import
 import RecordButton from "./voice/RecordButton";
 import ConfirmationDialog from "./voice/ConfirmationDialog";
 
@@ -19,10 +20,15 @@ export default function VoiceControl() {
     if (transcription) {
       try {
         await processCommand(transcription, widgets, updateWidget, addWidget);
-        toast.success("Task completed successfully");
+        toast({
+          description: "Task completed successfully"
+        });
       } catch (error) {
         console.error("Error executing command:", error);
-        toast.error("Error: Task could not be completed");
+        toast({
+          variant: "destructive",
+          description: "Error: Task could not be completed"
+        });
       }
       setTranscription(null);
     }
