@@ -20,6 +20,7 @@ export default function RecordButton({ isRecording, isProcessing, onClick }: Rec
         ${isProcessing ? "animate-spin" : ""}
       `}
       onClick={onClick}
+      aria-label={isRecording ? "Stop Recording" : "Start Recording"}
     >
       {isProcessing ? (
         <span className="animate-spin">⏳</span>
