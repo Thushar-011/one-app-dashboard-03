@@ -20,9 +20,10 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
 
   const getHandRotation = () => {
     if (mode === 'hour') {
-      return (value * 30) - 90; // 360° / 12 = 30° per hour, -90° to start at 12 o'clock
+      // For hours, we multiply by exactly 30 degrees (360/12)
+      return value * 30 - 90;
     } else {
-      return (value * 6) - 90; // 360° / 60 = 6° per minute, -90° to start at 12 o'clock
+      return (value * 6) - 90; // 360° / 60 = 6° per minute
     }
   };
 
@@ -34,11 +35,14 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     const x = e.clientX - rect.left - centerX;
     const y = e.clientY - rect.top - centerY;
     
+    // Calculate angle from center
     let angle = Math.atan2(y, x) * 180 / Math.PI + 90;
     if (angle < 0) angle += 360;
 
     if (mode === 'hour') {
-      let hour = Math.round(angle / 30); // 360° / 12 = 30° per hour
+      // For hours, we divide by exactly 30 degrees (360/12)
+      let hour = Math.round(angle / 30);
+      // Ensure hour is between 1 and 12
       if (hour === 0 || hour > 12) hour = 12;
       onChange(hour);
     } else {
@@ -55,8 +59,9 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
         className="absolute inset-0 rounded-full bg-white border-4 border-primary/20 cursor-pointer shadow-inner"
         onClick={handleClockClick}
       >
-        {/* Clock face with numbers */}
+        {/* Clock numbers */}
         {getNumbers().map((num) => {
+          // Calculate exact positions for numbers using precise trigonometry
           const angle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
           const radius = 44; // Adjusted for perfect boundary alignment
           const x = 50 + radius * Math.cos(angle);
@@ -86,7 +91,7 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
         {/* Clock center dot */}
         <div className="absolute left-1/2 top-1/2 w-3 h-3 bg-primary rounded-full -translate-x-1/2 -translate-y-1/2 z-20" />
 
-        {/* Clock hands */}
+        {/* Clock hand */}
         <motion.div
           className="absolute left-1/2 top-1/2 origin-center z-10"
           style={{
@@ -106,8 +111,6 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
           const innerRadius = 44;
           const x1 = 50 + outerRadius * Math.cos(angle);
           const y1 = 50 + outerRadius * Math.sin(angle);
-          const x2 = 50 + innerRadius * Math.cos(angle);
-          const y2 = 50 + innerRadius * Math.sin(angle);
           
           return (
             <div
