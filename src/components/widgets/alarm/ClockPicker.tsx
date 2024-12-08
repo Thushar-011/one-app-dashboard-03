@@ -23,25 +23,27 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
     const x = e.clientX - rect.left - centerX;
     const y = e.clientY - rect.top - centerY;
     
-    let angle = Math.atan2(y, x) * (180 / Math.PI);
-    angle = ((angle + 360 + 90) % 360);
+    // Calculate angle from center, with 0 degrees at 12 o'clock
+    let angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
+    if (angle < 0) angle += 360;
     
     if (mode === 'hour') {
-      const hour = Math.round(angle / 30);
-      onChange({ ...value, hour: hour === 0 ? 12 : hour });
+      let hour = Math.round(angle / 30);
+      if (hour === 0) hour = 12;
+      onChange({ ...value, hour: hour });
     } else {
-      const minute = Math.round(angle / 6);
-      onChange({ ...value, minute: minute === 60 ? 0 : minute });
+      const minute = Math.round(angle / 6) % 60;
+      onChange({ ...value, minute: minute });
     }
   };
 
   const getHandRotation = () => {
     if (mode === 'hour') {
       const hour = value.hour % 12 || 12;
-      // Adjust rotation to start from 12 o'clock (90 degrees offset)
+      // Convert hour to angle, with 12 o'clock being 0 degrees
       return (hour * 30) - 90;
     }
-    // For minutes, also adjust to start from 12 o'clock
+    // Convert minutes to angle, with 12 o'clock being 0 degrees
     return (value.minute * 6) - 90;
   };
 
