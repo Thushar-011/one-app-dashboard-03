@@ -31,7 +31,7 @@ export const processCommand = async (
       }
     }
 
-    // Improved time pattern matching for both hour:minute format and spoken format
+    // Enhanced time pattern matching for both hour:minute format and spoken format
     if (lowerText.includes("alarm") || lowerText.includes("wake") || lowerText.includes("remind me at")) {
       // Match patterns like "5:56 pm", "5 56 pm", "five fifty six pm"
       const timePattern = /(\d{1,2})(?::|\s+)?(\d{2})?\s*(am|pm)?/i;
@@ -39,36 +39,43 @@ export const processCommand = async (
 
       if (timeMatch) {
         let hours = parseInt(timeMatch[1]);
-        const minutes = timeMatch[2] ? parseInt(timeMatch[2]) : 0;
+        let minutes = timeMatch[2] ? parseInt(timeMatch[2]) : 0;
         const period = timeMatch[3]?.toLowerCase();
+
+        console.log(`Parsed time: ${hours}:${minutes} ${period || ''}`);
 
         // Convert to 24-hour format
         if (period === "pm" && hours < 12) hours += 12;
         if (period === "am" && hours === 12) hours = 0;
 
-        const time = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
-        console.log("Setting alarm for:", time);
+        // Validate hours and minutes
+        if (hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60) {
+          const time = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+          console.log("Setting alarm for:", time);
 
-        let alarmWidget = widgets.find(w => w.type === "alarm");
-        if (!alarmWidget) {
-          addWidget("alarm", { x: 0, y: 0 });
-          alarmWidget = widgets[widgets.length - 1];
+          let alarmWidget = widgets.find(w => w.type === "alarm");
+          if (!alarmWidget) {
+            addWidget("alarm", { x: 0, y: 0 });
+            alarmWidget = widgets[widgets.length - 1];
+          }
+
+          const newAlarm = {
+            id: Date.now().toString(),
+            time,
+            enabled: true,
+          };
+
+          const updatedAlarms = [...(alarmWidget?.data?.alarms || []), newAlarm];
+          updateWidget(alarmWidget.id, {
+            data: { alarms: updatedAlarms }
+          });
+
+          toast.success(`Alarm set for ${time}`);
+          return;
         }
-
-        const newAlarm = {
-          id: Date.now().toString(),
-          time,
-          enabled: true,
-        };
-
-        const updatedAlarms = [...(alarmWidget?.data?.alarms || []), newAlarm];
-        updateWidget(alarmWidget.id, {
-          data: { alarms: updatedAlarms }
-        });
-
-        toast.success(`Alarm set for ${time}`);
-        return;
       }
+      
+      throw new Error("Could not understand the time format. Please try again.");
     }
 
   else if (lowerText.includes("task") || lowerText.includes("todo") || lowerText.includes("add to list")) {
@@ -181,6 +188,7 @@ export const processCommand = async (
   } else {
     throw new Error("Command not recognized. Please try again with a different phrase.");
   }
+    
   } catch (error) {
     console.error("Error processing command:", error);
     toast.error(error instanceof Error ? error.message : "Failed to process command");

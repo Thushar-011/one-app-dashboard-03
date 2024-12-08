@@ -12,7 +12,6 @@ interface AnalogClockProps {
 export default function AnalogClock({ mode, value, onChange, onSwitchMode }: AnalogClockProps) {
   const [angle, setAngle] = useState(0);
 
-  // Generate clock numbers based on mode
   const getNumbers = () => {
     if (mode === 'hour') {
       return Array.from({ length: 12 }, (_, i) => i + 1);
@@ -21,15 +20,14 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     }
   };
 
-  // Convert mouse position to clock value
   const getValueFromPosition = (x: number, y: number, rect: DOMRect) => {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
     
-    // Calculate angle in radians
+    // Calculate angle in radians, adjusted to start from 12 o'clock
     const angleRad = Math.atan2(y - centerY, x - centerX);
-    // Convert to degrees and normalize to 0-360 range
-    let angleDeg = ((angleRad * 180 / Math.PI) + 450) % 360;
+    // Convert to degrees and normalize to 0-360 range, with 0 at 12 o'clock
+    let angleDeg = ((angleRad * 180 / Math.PI) + 90 + 360) % 360;
     
     if (mode === 'hour') {
       // Convert angle to hour (1-12)
@@ -42,7 +40,6 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     }
   };
 
-  // Handle clock face click
   const handleClockClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -53,15 +50,20 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     
     // Calculate angle for hand position
     const angleRad = Math.atan2(y - rect.height / 2, x - rect.width / 2);
-    let newAngle = ((angleRad * 180 / Math.PI) + 450) % 360;
+    let newAngle = ((angleRad * 180 / Math.PI) + 90 + 360) % 360;
     setAngle(newAngle);
   };
 
-  // Update angle when value changes
   useEffect(() => {
-    const newAngle = mode === 'hour'
-      ? ((value % 12 || 12) - 3) * 30
-      : (value - 15) * 6;
+    // Update angle when value changes
+    let newAngle;
+    if (mode === 'hour') {
+      // For hours, each number represents 30 degrees (360/12)
+      newAngle = ((value % 12 || 12) - 3) * 30;
+    } else {
+      // For minutes, each mark represents 6 degrees (360/60)
+      newAngle = (value - 15) * 6;
+    }
     setAngle(newAngle);
   }, [value, mode]);
 
@@ -101,7 +103,6 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
           style={{
             left: '50%',
             bottom: '50%',
-            transform: `rotate(${angle}deg)`,
             transformOrigin: 'bottom center'
           }}
           animate={{ rotate: angle }}
