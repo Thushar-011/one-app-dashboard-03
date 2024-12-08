@@ -23,25 +23,22 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
     const x = e.clientX - rect.left - centerX;
     const y = e.clientY - rect.top - centerY;
     
-    // Calculate angle in radians, starting from 12 o'clock position
-    let angle = Math.atan2(x, -y);
-    if (angle < 0) angle += 2 * Math.PI;
+    // Calculate angle from 12 o'clock position
+    let angle = Math.atan2(x, -y) * (180 / Math.PI);
+    if (angle < 0) angle += 360;
     
-    // Convert to degrees
-    let degrees = angle * (180 / Math.PI);
-    
-    console.log('Raw angle in degrees:', degrees);
+    console.log('Raw angle:', angle);
     
     if (mode === 'hour') {
-      // Convert degrees to hour (30 degrees per hour)
-      let hour = Math.round(degrees / 30);
+      // Convert angle to hour (30 degrees per hour)
+      let hour = Math.round(angle / 30);
       if (hour === 0) hour = 12;
       
       console.log('Selected hour:', hour);
       onChange({ ...value, hour });
     } else {
-      // Convert degrees to minutes (6 degrees per minute)
-      let minute = Math.round(degrees / 6);
+      // Convert angle to minutes (6 degrees per minute)
+      let minute = Math.round(angle / 6);
       if (minute === 60) minute = 0;
       
       console.log('Selected minute:', minute);
@@ -51,11 +48,9 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
 
   const getHandRotation = () => {
     if (mode === 'hour') {
-      // For hours, each number represents 30 degrees
-      return ((value.hour % 12 || 12) - 3) * 30;
+      return value.hour * 30;
     }
-    // For minutes, each minute represents 6 degrees
-    return (value.minute - 15) * 6;
+    return value.minute * 6;
   };
 
   return (
