@@ -4,7 +4,6 @@ import SideMenu from "./SideMenu";
 import { Button } from "./ui/button";
 import WidgetSelector from "./WidgetSelector";
 import VoiceControl from "./VoiceControl";
-import QuickActions from "./QuickActions";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,7 +28,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <main className="pt-16 pb-4 px-4">{children}</main>
 
       <VoiceControl />
-      <QuickActions />
 
       <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
     </div>
