@@ -22,32 +22,13 @@ export default function LoadingScreen({ onLoadingComplete }: { onLoadingComplete
       className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center"
     >
       <div className="relative w-48 h-48">
-        {/* Outer circle */}
-        <motion.div
-          className="absolute inset-0 border-4 border-black rounded-full"
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+        {/* Logo image */}
+        <img 
+          src="/lovable-uploads/e12237ee-3f46-41e6-b992-94b99c1fbb9a.png" 
+          alt="OneApp Logo" 
+          className="w-full h-full"
         />
         
-        {/* Inner circle */}
-        <motion.div
-          className="absolute inset-2 border-2 border-black rounded-full"
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        />
-
-        {/* Letter A */}
-        <motion.div
-          className="absolute inset-0 flex items-center justify-center font-display text-4xl font-black"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-        >
-          A
-        </motion.div>
-
         {/* Rotating ball */}
         <motion.div
           className="absolute w-3 h-3 bg-black rounded-full"
@@ -81,6 +62,7 @@ export default function LoadingScreen({ onLoadingComplete }: { onLoadingComplete
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.8 }}
+        style={{ fontFamily: 'Satoshi, sans-serif' }}
       >
         Your all-in-one productivity app
       </motion.p>
