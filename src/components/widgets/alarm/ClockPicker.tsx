@@ -28,12 +28,15 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
     if (angle < 0) angle += 360;
     
     if (mode === 'hour') {
+      // Convert angle to hour (30 degrees per hour)
       let hour = Math.round(angle / 30);
+      // Adjust for 12 o'clock position
       if (hour === 0) hour = 12;
-      onChange({ ...value, hour: hour });
+      if (hour === 12) hour = 12;
+      onChange({ ...value, hour });
     } else {
       const minute = Math.round(angle / 6) % 60;
-      onChange({ ...value, minute: minute });
+      onChange({ ...value, minute });
     }
   };
 
