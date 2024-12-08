@@ -24,7 +24,7 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
     const y = e.clientY - rect.top - centerY;
     
     // Calculate angle from center, with 0 degrees at 12 o'clock
-    let angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
+    let angle = Math.atan2(y, x) * (180 / Math.PI) - 90;
     if (angle < 0) angle += 360;
     
     if (mode === 'hour') {
@@ -40,11 +40,9 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
   const getHandRotation = () => {
     if (mode === 'hour') {
       const hour = value.hour % 12 || 12;
-      // Convert hour to angle, with 12 o'clock being 0 degrees
-      return (hour * 30) - 90;
+      return hour * 30;
     }
-    // Convert minutes to angle, with 12 o'clock being 0 degrees
-    return (value.minute * 6) - 90;
+    return value.minute * 6;
   };
 
   return (
@@ -71,11 +69,11 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
       >
         {/* Minute markers */}
         {mode === 'minute' && minuteMarkers.map((marker) => {
-          const angle = (marker * 6 - 90) * (Math.PI / 180);
+          const angle = (marker * 6) * (Math.PI / 180);
           const isMainMarker = marker % 5 === 0;
           const radius = isMainMarker ? 48 : 46;
-          const x = 50 + radius * Math.cos(angle);
-          const y = 50 + radius * Math.sin(angle);
+          const x = 50 + radius * Math.cos(angle - Math.PI/2);
+          const y = 50 + radius * Math.sin(angle - Math.PI/2);
           
           return (
             <div
