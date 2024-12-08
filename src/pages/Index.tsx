@@ -1,5 +1,5 @@
 import Layout from "@/components/Layout";
-import { Trash2 } from "lucide-react";
+import { Trash2, Pencil } from "lucide-react";
 import { useWidgets } from "@/hooks/useWidgets";
 import Widget from "@/components/Widget";
 import TrashList from "@/components/TrashList";
@@ -16,12 +16,13 @@ export default function Index() {
           <Widget key={widget.id} {...widget} />
         ))}
 
-        <div className="fixed bottom-4 right-4 flex gap-2">
+        <div className="fixed bottom-4 right-4 flex flex-col gap-2">
           <button
             onClick={toggleEditMode}
-            className="bg-primary text-white px-4 py-2 rounded-full shadow-lg hover:bg-primary/90 transition-colors"
+            className="bg-primary text-white p-2 rounded-full shadow-lg hover:bg-primary/90 transition-colors"
+            aria-label={editMode ? "Done editing" : "Edit widgets"}
           >
-            {editMode ? "Done" : "Edit Widgets"}
+            <Pencil className="w-6 h-6" />
           </button>
           
           <button
