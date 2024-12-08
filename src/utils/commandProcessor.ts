@@ -22,11 +22,9 @@ export const processCommand = async (
   console.log("Processing command:", lowerText);
 
   try {
-    // Handle alarm commands
-    if (lowerText.includes("alarm") || lowerText.includes("wake") || lowerText.includes("remind me at")) {
-      const success = await handleAlarmCommand(text, widgets, updateWidget, addWidget);
-      if (success) return;
-    }
+    // Handle alarm commands first
+    const alarmSuccess = await handleAlarmCommand(text, widgets, updateWidget, addWidget);
+    if (alarmSuccess) return;
 
     // Handle reminder commands
     if (lowerText.includes("reminder")) {
@@ -34,7 +32,6 @@ export const processCommand = async (
       if (success) return;
     }
 
-    // Task commands
     else if (lowerText.includes("task") || lowerText.includes("todo") || lowerText.includes("add to list")) {
       const taskText = text.replace(/add (a )?task|todo|to( the)? list/gi, "").trim();
       if (taskText) {

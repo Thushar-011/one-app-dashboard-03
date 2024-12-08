@@ -2,8 +2,8 @@ import { Widget } from "@/types/widget";
 import { toast } from "sonner";
 
 const parseTimeFromCommand = (text: string): { hour: number, minute: number, isPM: boolean } | null => {
-  // Match patterns like "5:56 pm", "5 56 pm", "5.30 pm", "5:30", "5.30", "5 30"
-  const timePattern = /(\d{1,2})(?:[:.\s]+)(\d{2})?\s*(am|pm)?/i;
+  // Match patterns like "4:30 pm", "4 30 pm", "4.30 pm", "430 pm", "4:30", "4.30"
+  const timePattern = /(\d{1,2})[:.\s]*(\d{2})?\s*(am|pm)?/i;
   const match = text.toLowerCase().match(timePattern);
   
   if (!match) return null;
@@ -35,8 +35,16 @@ export const handleAlarmCommand = async (
 ): Promise<boolean> => {
   console.log("Processing alarm command:", text);
   
+  // Check if this is an alarm-related command
+  if (!text.toLowerCase().includes('alarm') && !text.toLowerCase().includes('wake') && !text.toLowerCase().includes('at')) {
+    return false;
+  }
+  
   const timeInfo = parseTimeFromCommand(text);
-  if (!timeInfo) return false;
+  if (!timeInfo) {
+    toast.error("Could not understand the time format. Please try again.");
+    return false;
+  }
   
   const { hour, minute, isPM } = timeInfo;
   
