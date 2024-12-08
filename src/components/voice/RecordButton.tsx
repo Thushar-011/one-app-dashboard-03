@@ -12,7 +12,7 @@ export default function RecordButton({ isRecording, isProcessing, onClick }: Rec
     <Button
       size="lg"
       disabled={isProcessing}
-      className={`rounded-full w-14 h-14 p-0 flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl
+      className={`rounded-full w-14 h-14 p-0 flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl z-40
         ${isRecording 
           ? "bg-red-500 hover:bg-red-600 animate-pulse ring-4 ring-red-300" 
           : "bg-primary hover:bg-primary/90 ring-4 ring-primary/30"

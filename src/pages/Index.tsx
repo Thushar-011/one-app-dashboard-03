@@ -22,7 +22,11 @@ export default function Index() {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={toggleEditMode}
-            className="bg-primary text-white p-2 rounded-full shadow-lg hover:bg-primary/90 transition-colors"
+            className={`text-white p-2 rounded-full shadow-lg transition-colors ${
+              editMode 
+                ? "bg-secondary hover:bg-secondary/90" 
+                : "bg-primary hover:bg-primary/90"
+            }`}
             aria-label={editMode ? "Done editing" : "Edit widgets"}
           >
             <Pencil className="w-6 h-6" />

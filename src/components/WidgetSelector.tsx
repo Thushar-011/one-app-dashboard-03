@@ -79,7 +79,7 @@ export default function WidgetSelector() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-flow-colors bg-clip-text text-transparent">
+          <DialogTitle className="text-foreground">
             Add Widget
           </DialogTitle>
         </DialogHeader>
