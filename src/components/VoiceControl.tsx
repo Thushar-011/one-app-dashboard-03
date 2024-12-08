@@ -4,7 +4,6 @@ import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { toast } from "sonner";
 import RecordButton from "./voice/RecordButton";
 import ConfirmationDialog from "./voice/ConfirmationDialog";
-import { useLocation } from "react-router-dom";
 
 export default function VoiceControl() {
   const { addWidget, widgets, updateWidget } = useWidgets();

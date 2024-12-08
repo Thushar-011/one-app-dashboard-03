@@ -88,22 +88,13 @@ export default {
         },
         "widget-to-trash": {
           "0%": { 
-            transform: "scale(1) rotate(0deg)",
+            transform: "translate(0, 0) rotate(0deg) scale(1)",
             opacity: "1"
           },
-          "50%": { 
-            transform: "scale(0.5) rotate(180deg)",
-            opacity: "0.5"
-          },
           "100%": { 
-            transform: "scale(0) rotate(360deg)",
+            transform: "translate(var(--trash-x), var(--trash-y)) rotate(180deg) scale(0)",
             opacity: "0"
           }
-        },
-        "button-pop": {
-          "0%": { transform: "scale(1)" },
-          "50%": { transform: "scale(0.95)" },
-          "100%": { transform: "scale(1)" }
         }
       },
       animation: {
@@ -113,8 +104,7 @@ export default {
         "slide-up": "slide-up 0.3s ease-out",
         "flow-colors": "flow-colors 3s ease infinite",
         "trash-open": "trash-open 0.5s ease-in-out",
-        "widget-to-trash": "widget-to-trash 0.5s ease-in-out forwards",
-        "button-pop": "button-pop 0.2s ease-in-out"
+        "widget-to-trash": "widget-to-trash 0.5s ease-in-out forwards"
       },
     },
   },

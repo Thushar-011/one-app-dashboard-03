@@ -20,11 +20,28 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDeleting(true);
-    // Trigger the trash can animation in the parent component
-    const trashButton = document.querySelector('.trash-button');
-    trashButton?.classList.add('animate-trash-open');
     
-    // Wait for the widget animation to complete before actually removing
+    // Get trash button position
+    const trashButton = document.querySelector('.trash-button');
+    const widgetElement = e.currentTarget.closest('.widget');
+    
+    if (trashButton && widgetElement) {
+      const trashRect = trashButton.getBoundingClientRect();
+      const widgetRect = widgetElement.getBoundingClientRect();
+      
+      // Calculate distance to trash
+      const trashX = trashRect.left - widgetRect.left + trashRect.width / 2;
+      const trashY = trashRect.top - widgetRect.top + trashRect.height / 2;
+      
+      // Set CSS variables for the animation
+      widgetElement.style.setProperty('--trash-x', `${trashX}px`);
+      widgetElement.style.setProperty('--trash-y', `${trashY}px`);
+      
+      // Trigger trash can animation
+      trashButton.classList.add('animate-trash-open');
+    }
+    
+    // Wait for the widget animation to complete before removing
     setTimeout(() => {
       removeWidget(id);
       trashButton?.classList.remove('animate-trash-open');
