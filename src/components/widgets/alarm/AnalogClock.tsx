@@ -38,7 +38,7 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     if (angle < 0) angle += 360;
 
     if (mode === 'hour') {
-      let hour = Math.round(angle / 30);
+      let hour = Math.round(angle / 30); // 360° / 12 = 30° per hour
       if (hour === 0 || hour > 12) hour = 12;
       onChange(hour);
     } else {
