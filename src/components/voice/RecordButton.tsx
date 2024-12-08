@@ -24,9 +24,9 @@ export default function RecordButton({ isRecording, isProcessing, onClick }: Rec
       {isProcessing ? (
         <span className="animate-spin">⏳</span>
       ) : isRecording ? (
-        <MicOff className="w-7 h-7 text-white stroke-[1.5]" />
+        <MicOff className="w-6 h-6 text-white" />
       ) : (
-        <Mic className="w-7 h-7 text-white stroke-[1.5]" />
+        <Mic className="w-6 h-6 text-white" />
       )}
     </Button>
   );
