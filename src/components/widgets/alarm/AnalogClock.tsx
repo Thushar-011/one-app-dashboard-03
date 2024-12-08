@@ -20,9 +20,9 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
 
   const getHandRotation = () => {
     if (mode === 'hour') {
-      return value * 30 - 90;
+      return (value * 30) - 90; // 360° / 12 = 30° per hour, -90° to start at 12 o'clock
     } else {
-      return value * 6 - 90;
+      return (value * 6) - 90; // 360° / 60 = 6° per minute, -90° to start at 12 o'clock
     }
   };
 
@@ -39,8 +39,7 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
 
     if (mode === 'hour') {
       let hour = Math.round(angle / 30);
-      if (hour === 0) hour = 12;
-      if (hour > 12) hour = 1;
+      if (hour === 0 || hour > 12) hour = 12;
       onChange(hour);
     } else {
       let minute = Math.round(angle / 6);
@@ -53,26 +52,30 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
   return (
     <div className="relative w-64 h-64 mx-auto">
       <div 
-        className="absolute inset-0 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700 cursor-pointer"
+        className="absolute inset-0 rounded-full bg-white border-4 border-primary/20 cursor-pointer shadow-inner"
         onClick={handleClockClick}
       >
+        {/* Clock face with numbers */}
         {getNumbers().map((num) => {
           const angle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
-          // Increased radius to 49 to perfectly align with the boundary
-          const radius = 49;
+          const radius = 44; // Adjusted for perfect boundary alignment
           const x = 50 + radius * Math.cos(angle);
           const y = 50 + radius * Math.sin(angle);
           
+          const isSelected = mode === 'hour' ? 
+            value === num : 
+            value === num;
+
           return (
             <div
               key={num}
               className={`absolute text-base font-semibold transition-colors ${
-                value === num ? 'text-primary' : 'text-gray-300'
+                isSelected ? 'text-primary scale-125' : 'text-gray-600'
               }`}
               style={{
                 left: `${x}%`,
                 top: `${y}%`,
-                transform: 'translate(-50%, -50%)'
+                transform: 'translate(-50%, -50%)',
               }}
             >
               {num.toString().padStart(2, '0')}
@@ -80,26 +83,54 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
           );
         })}
 
+        {/* Clock center dot */}
+        <div className="absolute left-1/2 top-1/2 w-3 h-3 bg-primary rounded-full -translate-x-1/2 -translate-y-1/2 z-20" />
+
+        {/* Clock hands */}
         <motion.div
-          className="absolute w-1 bg-primary origin-bottom rounded-full"
+          className="absolute left-1/2 top-1/2 origin-center z-10"
           style={{
-            height: mode === 'hour' ? '35%' : '40%',
-            left: '50%',
-            bottom: '50%',
-            transformOrigin: 'bottom center'
+            width: '2px',
+            height: mode === 'hour' ? '30%' : '40%',
+            backgroundColor: 'rgb(139, 92, 246)', // primary color
+            transformOrigin: '50% 100%',
+            rotate: getHandRotation(),
           }}
-          animate={{ rotate: getHandRotation() }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
 
-        <div className="absolute w-3 h-3 bg-primary rounded-full left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10" />
+        {/* Minute markers */}
+        {mode === 'minute' && Array.from({ length: 60 }).map((_, i) => {
+          if (i % 5 === 0) return null; // Skip positions where numbers are
+          const angle = (i * 6 - 90) * (Math.PI / 180);
+          const outerRadius = 46;
+          const innerRadius = 44;
+          const x1 = 50 + outerRadius * Math.cos(angle);
+          const y1 = 50 + outerRadius * Math.sin(angle);
+          const x2 = 50 + innerRadius * Math.cos(angle);
+          const y2 = 50 + innerRadius * Math.sin(angle);
+          
+          return (
+            <div
+              key={i}
+              className="absolute w-[1px] h-[1px] bg-gray-300"
+              style={{
+                left: `${x1}%`,
+                top: `${y1}%`,
+                width: '1px',
+                height: '3px',
+                transform: `rotate(${i * 6}deg)`,
+              }}
+            />
+          );
+        })}
       </div>
 
+      {/* Mode switch button */}
       <button
         onClick={onSwitchMode}
-        className="absolute bottom-4 left-4 p-2 rounded-full hover:bg-gray-700/50 transition-colors"
+        className="absolute bottom-4 left-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
       >
-        <Keyboard className="w-5 h-5 text-gray-300" />
+        <Keyboard className="w-5 h-5 text-gray-600" />
       </button>
     </div>
   );
