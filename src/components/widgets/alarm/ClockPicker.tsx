@@ -25,27 +25,27 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
     
     // Calculate angle in radians and convert to degrees
     let angle = Math.atan2(y, x) * (180 / Math.PI);
-    // Normalize angle to 0-360 range
-    angle = (angle + 360) % 360;
+    // Normalize angle to 0-360 range and adjust to start from 12 o'clock
+    angle = ((angle + 360 + 90) % 360);
     
     if (mode === 'hour') {
       // Convert angle to 12-hour format (30 degrees per hour)
-      const hour = Math.round(((angle + 90) % 360) / 30);
+      const hour = Math.round(angle / 30);
       onChange({ ...value, hour: hour === 0 ? 12 : hour });
     } else {
       // Convert angle to minutes (6 degrees per minute)
-      const minute = Math.round(((angle + 90) % 360) / 6);
+      const minute = Math.round(angle / 6);
       onChange({ ...value, minute: minute === 60 ? 0 : minute });
     }
   };
 
   const getHandRotation = () => {
     if (mode === 'hour') {
-      // For hours: multiply by 30 (360/12) and subtract 90 to align with 12 o'clock
-      return (value.hour % 12) * 30 - 90;
+      // For hours: multiply by 30 (360/12) and add 180 to start from 12 o'clock
+      return ((value.hour % 12) * 30) - 90;
     }
-    // For minutes: multiply by 6 (360/60) and subtract 90 to align with 12 o'clock
-    return value.minute * 6 - 90;
+    // For minutes: multiply by 6 (360/60) and add 180 to start from 12 o'clock
+    return (value.minute * 6) - 90;
   };
 
   return (
