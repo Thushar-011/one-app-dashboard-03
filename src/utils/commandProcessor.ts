@@ -38,10 +38,14 @@ export const processCommand = async (
       const minutes = timeMatch[2] ? parseInt(timeMatch[2]) : 0;
       const period = timeMatch[3]?.toLowerCase();
 
+      // Properly handle AM/PM conversion
       if (period === "pm" && hours < 12) hours += 12;
       if (period === "am" && hours === 12) hours = 0;
 
+      // Ensure minutes are included in the time string
       const time = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+      
+      console.log("Setting alarm for:", time); // Debug log
       
       let alarmWidget = widgets.find(w => w.type === "alarm");
       if (!alarmWidget) {

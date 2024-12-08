@@ -11,7 +11,6 @@ interface AnalogClockProps {
 
 export default function AnalogClock({ mode, value, onChange, onSwitchMode }: AnalogClockProps) {
   const [angle, setAngle] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
 
   // Generate clock numbers based on mode
   const getNumbers = () => {
@@ -22,56 +21,69 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     }
   };
 
-  // Convert angle to value with improved accuracy
-  const getValueFromAngle = (angle: number) => {
-    const normalizedAngle = ((angle + 360) % 360);
-    if (mode === 'hour') {
-      const hourValue = Math.round(normalizedAngle / 30) || 12;
-      return hourValue === 0 ? 12 : hourValue;
-    } else {
-      return Math.round(normalizedAngle / 6) % 60;
-    }
-  };
-
-  // Handle pointer drag with improved accuracy
-  const handleDrag = (event: any, info: any) => {
-    const rect = event.target.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const x = info.point.x - centerX;
-    const y = info.point.y - centerY;
-    const newAngle = (Math.atan2(y, x) * 180) / Math.PI + 90;
-    setAngle(newAngle);
+  // Convert mouse position to clock value
+  const getValueFromPosition = (x: number, y: number, rect: DOMRect) => {
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
     
-    if (isDragging) {
-      onChange(getValueFromAngle(newAngle));
+    // Calculate angle in radians
+    const angleRad = Math.atan2(y - centerY, x - centerX);
+    // Convert to degrees and normalize
+    let angleDeg = (angleRad * 180 / Math.PI + 90 + 360) % 360;
+    
+    if (mode === 'hour') {
+      // Convert angle to hour (1-12)
+      const hour = Math.round(angleDeg / 30);
+      return hour === 0 ? 12 : hour;
+    } else {
+      // Convert angle to minutes (0-55, step 5)
+      return Math.round(angleDeg / 6) % 60;
     }
   };
 
-  // Initialize angle based on current value with improved accuracy
+  // Handle clock face click
+  const handleClockClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const newValue = getValueFromPosition(x, y, rect);
+    onChange(newValue);
+    
+    // Calculate precise angle for visual feedback
+    const angleRad = Math.atan2(y - rect.height / 2, x - rect.width / 2);
+    const newAngle = (angleRad * 180 / Math.PI + 90 + 360) % 360;
+    setAngle(newAngle);
+  };
+
+  // Update angle when value changes
   useEffect(() => {
-    let newAngle;
-    if (mode === 'hour') {
-      newAngle = ((value % 12 || 12) - 3) * 30;
-    } else {
-      newAngle = (value - 15) * 6;
-    }
+    const newAngle = mode === 'hour'
+      ? ((value % 12 || 12) - 3) * 30
+      : (value - 15) * 6;
     setAngle(newAngle);
   }, [value, mode]);
 
   return (
     <div className="relative w-64 h-64 mx-auto">
-      <div className="absolute inset-0 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700">
+      <div 
+        className="absolute inset-0 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700 cursor-pointer"
+        onClick={handleClockClick}
+      >
         {getNumbers().map((num) => {
-          const angle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
-          const radius = 40; // Percentage from center
+          const numAngle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
+          const radius = 40;
           return (
             <div
               key={num}
-              className="absolute text-sm font-medium text-gray-300"
+              className={`absolute text-sm font-medium ${
+                (mode === 'hour' ? value : Math.floor(value / 5) * 5) === num
+                  ? 'text-primary'
+                  : 'text-gray-300'
+              }`}
               style={{
-                left: `${50 + radius * Math.cos(angle)}%`,
-                top: `${50 + radius * Math.sin(angle)}%`,
+                left: `${50 + radius * Math.cos(numAngle)}%`,
+                top: `${50 + radius * Math.sin(numAngle)}%`,
                 transform: 'translate(-50%, -50%)'
               }}
             >
@@ -81,13 +93,7 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
         })}
 
         <motion.div
-          drag
-          dragElastic={0}
-          dragMomentum={false}
-          onDragStart={() => setIsDragging(true)}
-          onDragEnd={() => setIsDragging(false)}
-          onDrag={handleDrag}
-          className="absolute w-1 h-24 bg-primary origin-bottom rounded-full cursor-pointer"
+          className="absolute w-1 h-24 bg-primary origin-bottom rounded-full"
           style={{
             left: '50%',
             bottom: '50%',
