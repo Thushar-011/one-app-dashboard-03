@@ -80,10 +80,10 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
         })}
 
         <motion.div
-          className="absolute left-1/2 top-1/2 w-1 bg-primary origin-bottom"
+          className="absolute left-1/2 top-1/2 w-[2px] bg-primary"
           style={{
             height: '40%',
-            transformOrigin: '50% 100%',
+            transformOrigin: '50% 0%',
             rotate: mode === 'hour'
               ? value.hour * 30 - 90
               : value.minute * 6 - 90,
