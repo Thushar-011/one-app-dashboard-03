@@ -34,12 +34,11 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
       let hour = Math.round(angleDeg / 30);
       // Normalize hour to 1-12 range
       hour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-      console.log('Hour selected:', hour, 'from angle:', angleDeg);
       return hour;
     } else {
       // For minutes, divide by 6 (360/60) and round to nearest 5
-      const minute = Math.round(angleDeg / 6);
-      return (minute % 60);
+      const minute = Math.round(angleDeg / 6) % 60;
+      return minute;
     }
   };
 
@@ -67,10 +66,12 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     // Update angle when value changes
     let newAngle;
     if (mode === 'hour') {
-      // For hours, each number represents 30 degrees (360/12)
+      // For hours, each hour represents 30 degrees (360/12)
+      // Subtract 3 to align with the coordinate system (3 o'clock is 0 degrees)
       newAngle = ((value % 12 || 12) - 3) * 30;
     } else {
-      // For minutes, each mark represents 6 degrees (360/60)
+      // For minutes, each minute represents 6 degrees (360/60)
+      // Subtract 15 to align with the coordinate system
       newAngle = (value - 15) * 6;
     }
     setAngle(newAngle);
@@ -83,15 +84,16 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
         onClick={handleClockClick}
       >
         {getNumbers().map((num) => {
-          const angle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
-          const radius = 40;
-          const x = 50 + radius * Math.cos(angle);
-          const y = 50 + radius * Math.sin(angle);
+          // Calculate position for numbers
+          const numberAngle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
+          const radius = mode === 'hour' ? 45 : 42; // Slightly different radius for hours and minutes
+          const x = 50 + radius * Math.cos(numberAngle);
+          const y = 50 + radius * Math.sin(numberAngle);
           
           return (
             <div
               key={num}
-              className={`absolute text-sm font-medium ${
+              className={`absolute text-sm font-medium transition-colors ${
                 (mode === 'hour' ? value : Math.floor(value / 5) * 5) === num
                   ? 'text-primary'
                   : 'text-gray-300'
@@ -108,8 +110,9 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
         })}
 
         <motion.div
-          className="absolute w-1 h-24 bg-primary origin-bottom rounded-full"
+          className="absolute w-1 bg-primary origin-bottom rounded-full"
           style={{
+            height: mode === 'hour' ? '35%' : '40%', // Shorter hand for hours
             left: '50%',
             bottom: '50%',
             transformOrigin: 'bottom center'
