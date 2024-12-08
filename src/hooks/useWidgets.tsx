@@ -15,6 +15,10 @@ interface WidgetsContextType {
 
 const WidgetsContext = createContext<WidgetsContextType | null>(null);
 
+const WIDGET_VERTICAL_SPACING = 170;
+const WIDGET_HORIZONTAL_SPACING = 170;
+const MAX_WIDGETS_PER_ROW = 2;
+
 export function WidgetsProvider({ children }: { children: ReactNode }) {
   const [widgets, setWidgets] = useState<Widget[]>([]);
   const [trashedWidgets, setTrashedWidgets] = useState<Widget[]>([]);
@@ -22,11 +26,43 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
 
   const toggleEditMode = () => setEditMode(!editMode);
 
+  const findOptimalPosition = () => {
+    const positions = widgets.map(w => ({
+      x: w.position.x,
+      y: w.position.y
+    }));
+
+    let row = 0;
+    let col = 0;
+    let position = { x: 0, y: 0 };
+
+    while (true) {
+      position = {
+        x: col * WIDGET_HORIZONTAL_SPACING,
+        y: row * WIDGET_VERTICAL_SPACING
+      };
+
+      const isPositionTaken = positions.some(
+        p => p.x === position.x && p.y === position.y
+      );
+
+      if (!isPositionTaken) break;
+
+      col++;
+      if (col >= MAX_WIDGETS_PER_ROW) {
+        col = 0;
+        row++;
+      }
+    }
+
+    return position;
+  };
+
   const addWidget = (type: WidgetType, position?: { x: number; y: number }) => {
     const newWidget: Widget = {
       id: `${type}-${Date.now()}`,
       type,
-      position: position || { x: 0, y: widgets.length * 170 },
+      position: position || findOptimalPosition(),
       size: { width: 150, height: 150 },
       data: type === "alarm" 
         ? { alarms: [] } 
@@ -54,30 +90,9 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
   const restoreWidget = (id: string) => {
     const widgetToRestore = trashedWidgets.find(w => w.id === id);
     if (widgetToRestore) {
+      const newPosition = findOptimalPosition();
       setTrashedWidgets(trashedWidgets.filter(w => w.id !== id));
-      
-      // Find optimal position for restored widget
-      const existingPositions = widgets.map(w => w.position.y);
-      let newY = 0;
-      
-      if (existingPositions.length > 0) {
-        const sortedPositions = existingPositions.sort((a, b) => a - b);
-        for (let i = 0; i < sortedPositions.length; i++) {
-          const currentPos = sortedPositions[i];
-          const nextPos = sortedPositions[i + 1];
-          
-          if (nextPos && nextPos - currentPos >= 170) {
-            newY = currentPos + 170;
-            break;
-          }
-        }
-        
-        if (newY === 0) {
-          newY = sortedPositions[sortedPositions.length - 1] + 170;
-        }
-      }
-      
-      setWidgets([...widgets, { ...widgetToRestore, position: { x: 0, y: newY } }]);
+      setWidgets([...widgets, { ...widgetToRestore, position: newPosition }]);
     }
   };
 

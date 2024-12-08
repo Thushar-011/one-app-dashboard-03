@@ -11,6 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 interface TrashListProps {
   isOpen: boolean;
@@ -31,6 +32,23 @@ export default function TrashList({ isOpen, onClose }: TrashListProps) {
     restoreWidget(widgetId);
     onClose();
     toast.success("Widget restored successfully", { duration: 1000 });
+  };
+
+  const handleRestoreAll = () => {
+    const canRestoreAll = trashedWidgets.every(
+      trashedWidget => !widgets.some(w => w.type === trashedWidget.type)
+    );
+
+    if (!canRestoreAll) {
+      toast.error("Cannot restore all widgets. Some widget types already exist on the dashboard.", {
+        duration: 2000,
+      });
+      return;
+    }
+
+    trashedWidgets.forEach(widget => restoreWidget(widget.id));
+    onClose();
+    toast.success("All widgets restored successfully", { duration: 1000 });
   };
 
   return (
@@ -66,18 +84,27 @@ export default function TrashList({ isOpen, onClose }: TrashListProps) {
           )}
         </div>
 
-        <AlertDialogFooter>
+        <AlertDialogFooter className="flex-col sm:flex-row gap-2">
           <AlertDialogCancel>Close</AlertDialogCancel>
           {trashedWidgets.length > 0 && (
-            <AlertDialogAction
-              onClick={() => {
-                clearTrash();
-                toast.success("Trash cleared successfully", { duration: 1000 });
-              }}
-              className="bg-destructive hover:bg-destructive/90"
-            >
-              Clear All
-            </AlertDialogAction>
+            <>
+              <Button
+                onClick={handleRestoreAll}
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
+                Restore All
+              </Button>
+              <AlertDialogAction
+                onClick={() => {
+                  clearTrash();
+                  toast.success("Trash cleared successfully", { duration: 1000 });
+                }}
+                className="bg-destructive hover:bg-destructive/90 w-full sm:w-auto"
+              >
+                Clear All
+              </AlertDialogAction>
+            </>
           )}
         </AlertDialogFooter>
       </AlertDialogContent>
