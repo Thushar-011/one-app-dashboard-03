@@ -30,13 +30,16 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     let angleDeg = ((angleRad * 180 / Math.PI) + 90 + 360) % 360;
     
     if (mode === 'hour') {
-      // Convert angle to hour (1-12)
-      const hour = Math.round(angleDeg / 30);
-      return hour === 0 ? 12 : hour;
+      // For hours, divide by 30 (360/12) and round to nearest hour
+      let hour = Math.round(angleDeg / 30);
+      // Normalize hour to 1-12 range
+      hour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+      console.log('Hour selected:', hour, 'from angle:', angleDeg);
+      return hour;
     } else {
-      // Convert angle to minutes (0-55, step 5)
+      // For minutes, divide by 6 (360/60) and round to nearest 5
       const minute = Math.round(angleDeg / 6);
-      return minute % 60;
+      return (minute % 60);
     }
   };
 
@@ -48,9 +51,15 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     const newValue = getValueFromPosition(x, y, rect);
     onChange(newValue);
     
-    // Calculate angle for hand position
-    const angleRad = Math.atan2(y - rect.height / 2, x - rect.width / 2);
-    let newAngle = ((angleRad * 180 / Math.PI) + 90 + 360) % 360;
+    // Calculate angle for hand position based on the actual value
+    let newAngle;
+    if (mode === 'hour') {
+      // For hours, multiply by 30 degrees (360/12)
+      newAngle = ((newValue % 12 || 12) - 3) * 30;
+    } else {
+      // For minutes, multiply by 6 degrees (360/60)
+      newAngle = (newValue - 15) * 6;
+    }
     setAngle(newAngle);
   };
 
