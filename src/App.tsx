@@ -21,15 +21,15 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <WidgetsProvider>
-        <Toaster />
-        <Sonner duration={1000} />
-        <BrowserRouter>
+      <BrowserRouter>
+        <WidgetsProvider>
+          <Toaster />
+          <Sonner duration={1000} />
           <Routes>
             <Route path="/" element={<Index />} />
           </Routes>
-        </BrowserRouter>
-      </WidgetsProvider>
+        </WidgetsProvider>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
