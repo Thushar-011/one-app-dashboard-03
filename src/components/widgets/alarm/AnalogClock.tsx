@@ -20,8 +20,7 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
   // Function to calculate hand rotation
   const getHandRotation = () => {
     if (mode === 'hour') {
-      // Adjust hour hand to match perfectly with selected hour
-      return (value % 12) * 30 - 90; // 30° per hour (0° starts at 12 o'clock)
+      return (value % 12) * 30 - 90; // 30° per hour, -90° offset to start at 12 o'clock
     } else {
       return value * 6 - 90; // 6° per minute
     }
@@ -37,15 +36,17 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     const y = e.clientY - rect.top - centerY;
 
     // Calculate angle from the center of the clock
-    let angle = (Math.atan2(y, x) * 180) / Math.PI + 90;
-    if (angle < 0) angle += 360;
+    let angle = Math.atan2(y, x) * (180 / Math.PI);
+    // Normalize angle to 0-360 range, with 0 at 12 o'clock
+    angle = (angle + 360 + 90) % 360;
 
     if (mode === 'hour') {
-      // For hours, divide by 30° and adjust for 12-hour format
-      let hour = Math.round(angle / 30) % 12 || 12;
+      // Convert angle to hour (1-12)
+      let hour = Math.floor((angle + 15) / 30);
+      if (hour === 0) hour = 12;
       onChange(hour);
     } else {
-      // For minutes, divide by 6° for exact minute calculation
+      // Convert angle to minute (0-59)
       let minute = Math.round(angle / 6) % 60;
       onChange(minute);
     }
@@ -53,18 +54,16 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
 
   return (
     <div className="relative w-64 h-64 mx-auto">
-      {/* Clock face */}
       <div
         className="absolute inset-0 rounded-full bg-white border-4 border-primary/20 cursor-pointer shadow-inner"
         onClick={handleClockClick}
       >
         {/* Clock numbers */}
         {getNumbers().map((num) => {
-          // Calculate precise positions for numbers using trigonometry
           const angle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
           const radius = 48; // Adjusted radius for exact boundary alignment
-          const x = 50 + radius * Math.cos(angle); // X position
-          const y = 50 + radius * Math.sin(angle); // Y position
+          const x = 50 + radius * Math.cos(angle);
+          const y = 50 + radius * Math.sin(angle);
 
           const isSelected = mode === 'hour' ? value === num : value === num;
 
@@ -100,13 +99,12 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
           }}
         />
 
-        {/* Minute markers (for minute mode) */}
+        {/* Minute markers */}
         {mode === 'minute' &&
           Array.from({ length: 60 }).map((_, i) => {
-            if (i % 5 === 0) return null; // Skip positions where numbers are
+            if (i % 5 === 0) return null;
             const angle = (i * 6 - 90) * (Math.PI / 180);
-            const outerRadius = 46; // Outer radius for markers
-            const innerRadius = 44; // Inner radius for spacing
+            const outerRadius = 46;
             const x1 = 50 + outerRadius * Math.cos(angle);
             const y1 = 50 + outerRadius * Math.sin(angle);
 
@@ -119,7 +117,7 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
                   top: `${y1}%`,
                   width: '1px',
                   height: '3px',
-                  transform: `translate(-50%, -50%)`,
+                  transform: 'translate(-50%, -50%)',
                 }}
               />
             );
