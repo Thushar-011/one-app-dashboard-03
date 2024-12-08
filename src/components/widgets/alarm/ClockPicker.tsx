@@ -23,8 +23,8 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
     const x = e.clientX - rect.left - centerX;
     const y = e.clientY - rect.top - centerY;
     
-    // Calculate angle from 12 o'clock position clockwise
-    let angle = (Math.atan2(y, x) * (180 / Math.PI) + 90);
+    // Calculate angle from 12 o'clock position
+    let angle = Math.atan2(-y, x) * (180 / Math.PI) + 90;
     if (angle < 0) angle += 360;
     
     console.log('Raw angle:', angle);
@@ -32,7 +32,7 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
     if (mode === 'hour') {
       // Convert angle to hour (30 degrees per hour)
       let hour = Math.round(angle / 30);
-      if (hour === 0 || hour === 12) hour = 12;
+      if (hour === 0) hour = 12;
       
       console.log('Selected hour:', hour);
       onChange({ ...value, hour });
@@ -48,7 +48,9 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
 
   const getHandRotation = () => {
     if (mode === 'hour') {
-      return (value.hour % 12) * 30;
+      // Convert hour to degrees, considering 12 as 0 degrees
+      const hour = value.hour === 12 ? 0 : value.hour;
+      return hour * 30;
     }
     return value.minute * 6;
   };
