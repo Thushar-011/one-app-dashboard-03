@@ -49,20 +49,23 @@ export default function LoadingScreen({ onLoadingComplete }: { onLoadingComplete
             }
           }}
           style={{
-            top: "0%",
+            top: "15%", // Adjusted to match the red circle path
             left: "50%",
             translateX: "-50%",
-            transformOrigin: "50% 150%"
+            transformOrigin: "50% 120%" // Adjusted to match the red circle path
           }}
         />
       </div>
 
       <motion.p
-        className="mt-8 text-xl font-display text-black/80"
+        className="mt-4 text-xl font-display text-black/80 tracking-tight"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.8 }}
-        style={{ fontFamily: 'Satoshi, sans-serif' }}
+        style={{ 
+          fontFamily: 'Satoshi, sans-serif',
+          letterSpacing: '-0.05em' // Reduced spacing between letters
+        }}
       >
         Your all-in-one productivity app
       </motion.p>
