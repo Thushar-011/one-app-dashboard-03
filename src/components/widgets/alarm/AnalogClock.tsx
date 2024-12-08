@@ -72,15 +72,14 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
       >
         {getNumbers().map((num) => {
           const numberAngle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
-          // Adjusted radius to perfectly align with the purple boundary
-          const radius = 47; // Increased radius to push numbers closer to the boundary
+          const radius = 47;
           const x = 50 + radius * Math.cos(numberAngle);
           const y = 50 + radius * Math.sin(numberAngle);
           
           return (
             <div
               key={num}
-              className={`absolute text-sm font-medium transition-colors ${
+              className={`absolute text-base font-semibold transition-colors ${
                 (mode === 'hour' ? value : Math.floor(value / 5) * 5) === num
                   ? 'text-primary'
                   : 'text-gray-300'
@@ -108,7 +107,7 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
 
-        <div className="absolute w-3 h-3 bg-primary rounded-full left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute w-3 h-3 bg-primary rounded-full left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10" />
       </div>
 
       <button
