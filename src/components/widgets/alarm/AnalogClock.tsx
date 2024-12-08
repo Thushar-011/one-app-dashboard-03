@@ -20,11 +20,11 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
 
   const getHandRotation = () => {
     if (mode === 'hour') {
-      // Adjust hour hand rotation to point exactly at the hour
-      return ((value % 12 || 12) - 3) * 30;
+      // Calculate exact hour hand position (30 degrees per hour)
+      return value * 30 - 90;
     } else {
-      // Adjust minute hand rotation to point exactly at the minute
-      return (value - 15) * 6;
+      // Calculate exact minute hand position (6 degrees per minute)
+      return value * 6 - 90;
     }
   };
 
@@ -36,18 +36,20 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     const x = e.clientX - rect.left - centerX;
     const y = e.clientY - rect.top - centerY;
     
-    // Calculate angle from center, adjusting for the coordinate system
+    // Calculate angle from center
     let angle = Math.atan2(y, x) * 180 / Math.PI + 90;
     if (angle < 0) angle += 360;
 
     if (mode === 'hour') {
       // Convert angle to hour (1-12)
       let hour = Math.round(angle / 30);
-      hour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+      if (hour === 0) hour = 12;
+      if (hour > 12) hour = 1;
       onChange(hour);
     } else {
       // Convert angle to minutes (0-55, step 5)
-      const minute = Math.round(angle / 6) % 60;
+      let minute = Math.round(angle / 6);
+      if (minute === 60) minute = 0;
       onChange(minute);
     }
   };
@@ -59,18 +61,17 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
         onClick={handleClockClick}
       >
         {getNumbers().map((num) => {
-          const numberAngle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
-          const radius = 47;
-          const x = 50 + radius * Math.cos(numberAngle);
-          const y = 50 + radius * Math.sin(numberAngle);
+          // Calculate position for perfect circle alignment
+          const angle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
+          const radius = 45; // Slightly adjusted for perfect boundary alignment
+          const x = 50 + radius * Math.cos(angle);
+          const y = 50 + radius * Math.sin(angle);
           
           return (
             <div
               key={num}
               className={`absolute text-base font-semibold transition-colors ${
-                (mode === 'hour' ? value : Math.floor(value / 5) * 5) === num
-                  ? 'text-primary'
-                  : 'text-gray-300'
+                value === num ? 'text-primary' : 'text-gray-300'
               }`}
               style={{
                 left: `${x}%`,
