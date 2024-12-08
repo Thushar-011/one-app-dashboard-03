@@ -1,5 +1,5 @@
 import { useWidgets } from "@/hooks/useWidgets";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { Widget as WidgetType } from "@/types/widget";
@@ -16,6 +16,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
   const [isDragging, setIsDragging] = useState(false);
   const [isDetailView, setIsDetailView] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const widgetRef = useRef<HTMLDivElement>(null);
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -23,29 +24,28 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
     
     // Get trash button position
     const trashButton = document.querySelector('.trash-button');
-    const widgetElement = e.currentTarget.closest('.widget');
     
-    if (trashButton && widgetElement) {
+    if (trashButton && widgetRef.current) {
       const trashRect = trashButton.getBoundingClientRect();
-      const widgetRect = widgetElement.getBoundingClientRect();
+      const widgetRect = widgetRef.current.getBoundingClientRect();
       
       // Calculate distance to trash
-      const trashX = trashRect.left - widgetRect.left + trashRect.width / 2;
-      const trashY = trashRect.top - widgetRect.top + trashRect.height / 2;
+      const trashX = trashRect.left - widgetRect.left + (trashRect.width / 2);
+      const trashY = trashRect.top - widgetRect.top + (trashRect.height / 2);
       
       // Set CSS variables for the animation
-      widgetElement.style.setProperty('--trash-x', `${trashX}px`);
-      widgetElement.style.setProperty('--trash-y', `${trashY}px`);
+      widgetRef.current.style.setProperty('--trash-x', `${trashX}px`);
+      widgetRef.current.style.setProperty('--trash-y', `${trashY}px`);
       
       // Trigger trash can animation
       trashButton.classList.add('animate-trash-open');
+      
+      // Wait for the widget animation to complete before removing
+      setTimeout(() => {
+        removeWidget(id);
+        trashButton.classList.remove('animate-trash-open');
+      }, 500);
     }
-    
-    // Wait for the widget animation to complete before removing
-    setTimeout(() => {
-      removeWidget(id);
-      trashButton?.classList.remove('animate-trash-open');
-    }, 500);
   };
 
   const renderWidgetContent = () => {
@@ -68,6 +68,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
   return (
     <>
       <motion.div
+        ref={widgetRef}
         className={`widget absolute ${isDeleting ? 'animate-widget-to-trash' : ''}`}
         style={{
           width: size.width,

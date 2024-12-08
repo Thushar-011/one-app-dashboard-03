@@ -83,13 +83,17 @@ export default {
         },
         "trash-open": {
           "0%": { transform: "scale(1)" },
-          "50%": { transform: "scale(1.2) rotate(5deg)" },
+          "50%": { transform: "scale(1.2) rotate(-15deg)" },
           "100%": { transform: "scale(1)" }
         },
         "widget-to-trash": {
           "0%": { 
             transform: "translate(0, 0) rotate(0deg) scale(1)",
             opacity: "1"
+          },
+          "50%": {
+            transform: "translate(calc(var(--trash-x) * 0.5), calc(var(--trash-y) * 0.3)) rotate(90deg) scale(0.8)",
+            opacity: "0.8"
           },
           "100%": { 
             transform: "translate(var(--trash-x), var(--trash-y)) rotate(180deg) scale(0)",
@@ -104,7 +108,7 @@ export default {
         "slide-up": "slide-up 0.3s ease-out",
         "flow-colors": "flow-colors 3s ease infinite",
         "trash-open": "trash-open 0.5s ease-in-out",
-        "widget-to-trash": "widget-to-trash 0.5s ease-in-out forwards"
+        "widget-to-trash": "widget-to-trash 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards"
       },
     },
   },

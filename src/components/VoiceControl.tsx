@@ -17,7 +17,7 @@ export default function VoiceControl() {
   } = useVoiceRecorder();
 
   // Check if any widget is in detail view by looking for the backdrop
-  const isWidgetDetailOpen = document.querySelector('.backdrop-blur-sm') !== null;
+  const isWidgetDetailOpen = document.querySelector('.bg-background.fixed.inset-0') !== null;
 
   const handleConfirm = async () => {
     if (transcription) {
