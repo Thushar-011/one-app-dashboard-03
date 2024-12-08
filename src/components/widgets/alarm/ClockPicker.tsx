@@ -24,26 +24,25 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
     const y = e.clientY - rect.top - centerY;
     
     // Calculate angle from center, with 0 degrees at 12 o'clock
-    let angle = Math.atan2(y, x) * (180 / Math.PI) - 90;
+    let angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
     if (angle < 0) angle += 360;
     
     if (mode === 'hour') {
       // Convert angle to hour (30 degrees per hour)
       let hour = Math.round(angle / 30);
-      // Adjust for 12 o'clock position
-      if (hour === 0) hour = 12;
-      if (hour === 12) hour = 12;
+      if (hour === 0 || hour === 12) hour = 12;
+      console.log('Clicked angle:', angle, 'Selected hour:', hour);
       onChange({ ...value, hour });
     } else {
       const minute = Math.round(angle / 6) % 60;
+      console.log('Clicked angle:', angle, 'Selected minute:', minute);
       onChange({ ...value, minute });
     }
   };
 
   const getHandRotation = () => {
     if (mode === 'hour') {
-      const hour = value.hour % 12 || 12;
-      return hour * 30;
+      return (value.hour % 12) * 30;
     }
     return value.minute * 6;
   };
@@ -70,7 +69,6 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
         className="relative w-64 h-64 rounded-full border-2 border-gray-200 cursor-pointer"
         onClick={handleClick}
       >
-        {/* Minute markers */}
         {mode === 'minute' && minuteMarkers.map((marker) => {
           const angle = (marker * 6) * (Math.PI / 180);
           const isMainMarker = marker % 5 === 0;
@@ -93,7 +91,6 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
           );
         })}
 
-        {/* Hour/Minute numbers */}
         {numbers.map((number) => {
           const angle = ((number * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
           const radius = 40;
@@ -116,12 +113,11 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
                 transform: 'translate(-50%, -50%)',
               }}
             >
-              {number}
+              {mode === 'minute' ? String(number).padStart(2, '0') : number}
             </div>
           );
         })}
 
-        {/* Clock hand */}
         <motion.div
           className="absolute left-1/2 top-1/2 w-[2px] bg-primary"
           style={{
@@ -138,7 +134,6 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
           }}
         />
 
-        {/* Center dot */}
         <div className="absolute left-1/2 top-1/2 w-3 h-3 bg-primary rounded-full -translate-x-1/2 -translate-y-1/2" />
       </div>
     </div>

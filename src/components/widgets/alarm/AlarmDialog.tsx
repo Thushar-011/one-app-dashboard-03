@@ -15,6 +15,7 @@ export default function AlarmDialog({ showDialog, setShowDialog, onSave }: Alarm
   const [isPM, setIsPM] = useState(false);
 
   const handleSave = () => {
+    // No conversion needed here - we'll pass the raw hour value
     onSave(
       String(time.hour),
       String(time.minute).padStart(2, '0'),

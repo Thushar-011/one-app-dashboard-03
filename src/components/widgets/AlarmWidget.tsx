@@ -46,6 +46,8 @@ export default function AlarmWidget({ id, data, isDetailView }: AlarmWidgetProps
     if (isPM && hour24 !== 12) hour24 += 12;
     if (!isPM && hour24 === 12) hour24 = 0;
 
+    console.log('Saving alarm with hour:', hour, 'isPM:', isPM, 'converted to 24h:', hour24);
+
     const newAlarm = {
       id: Date.now().toString(),
       time: `${hour24.toString().padStart(2, '0')}:${minute.padStart(2, '0')}`,
