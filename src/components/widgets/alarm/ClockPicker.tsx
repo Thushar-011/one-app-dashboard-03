@@ -38,9 +38,11 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
   const getHandRotation = () => {
     if (mode === 'hour') {
       const hour = value.hour % 12 || 12;
-      return ((hour - 3) * 30);
+      // Adjust rotation to start from 12 o'clock (90 degrees offset)
+      return (hour * 30) - 90;
     }
-    return (value.minute - 15) * 6;
+    // For minutes, also adjust to start from 12 o'clock
+    return (value.minute * 6) - 90;
   };
 
   return (
