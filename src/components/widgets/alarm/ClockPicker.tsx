@@ -13,13 +13,18 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
     ? Array.from({ length: 12 }, (_, i) => i + 1)
     : Array.from({ length: 12 }, (_, i) => i * 5);
 
+  const minuteMarkers = Array.from({ length: 60 }, (_, i) => i);
+
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const x = e.clientX - rect.left - centerX;
+    const y = e.clientY - rect.top - centerY;
     
     let angle = Math.atan2(y, x) * (180 / Math.PI);
-    angle = angle < 0 ? angle + 360 : angle;
+    angle = (angle + 360) % 360;
     
     if (mode === 'hour') {
       const hour = Math.round(((angle + 90) % 360) / 30);
@@ -28,6 +33,13 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
       const minute = Math.round(((angle + 90) % 360) / 6);
       onChange({ ...value, minute: minute === 60 ? 0 : minute });
     }
+  };
+
+  const getHandRotation = () => {
+    if (mode === 'hour') {
+      return value.hour * 30 - 90;
+    }
+    return value.minute * 6 - 90;
   };
 
   return (
@@ -52,6 +64,30 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
         className="relative w-64 h-64 rounded-full border-2 border-gray-200 cursor-pointer"
         onClick={handleClick}
       >
+        {/* Minute markers */}
+        {mode === 'minute' && minuteMarkers.map((marker) => {
+          const isMainMarker = marker % 5 === 0;
+          const angle = (marker * 6 - 90) * (Math.PI / 180);
+          const radius = isMainMarker ? 48 : 46; // Slightly different positions for main and sub markers
+          const x = 50 + radius * Math.cos(angle);
+          const y = 50 + radius * Math.sin(angle);
+          
+          return (
+            <div
+              key={marker}
+              className={`absolute rounded-full ${
+                isMainMarker ? 'w-1 h-1 bg-gray-400' : 'w-0.5 h-0.5 bg-gray-300'
+              }`}
+              style={{
+                left: `${x}%`,
+                top: `${y}%`,
+                transform: 'translate(-50%, -50%)',
+              }}
+            />
+          );
+        })}
+
+        {/* Hour/Minute numbers */}
         {numbers.map((number) => {
           const angle = ((number * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
           const radius = 40;
@@ -84,9 +120,14 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
           style={{
             height: '40%',
             transformOrigin: '50% 0%',
-            rotate: mode === 'hour'
-              ? value.hour * 30 - 90
-              : value.minute * 6 - 90,
+          }}
+          animate={{
+            rotate: getHandRotation(),
+          }}
+          transition={{
+            type: "spring",
+            stiffness: 100,
+            damping: 15
           }}
         />
 
