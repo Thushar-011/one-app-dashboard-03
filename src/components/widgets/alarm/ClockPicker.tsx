@@ -38,7 +38,7 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
       onChange({ ...value, hour });
     } else {
       // Convert angle to minutes (6 degrees per minute)
-      let minute = Math.round(angle / 6);
+      let minute = Math.round(angle / 6) % 60;
       if (minute === 60) minute = 0;
       
       console.log('Selected minute:', minute);
@@ -48,11 +48,11 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
 
   const getHandRotation = () => {
     if (mode === 'hour') {
-      // For hours, convert 12 to 0 degrees, all other hours follow clockwise
-      return value.hour === 12 ? 0 : value.hour * 30;
+      // For hours, add 180 degrees to point to 6 initially
+      return ((value.hour === 12 ? 0 : value.hour) * 30) + 180;
     }
-    // For minutes, each minute is 6 degrees clockwise from 12 o'clock
-    return value.minute * 6;
+    // For minutes, add 180 degrees to point to 6 initially
+    return (value.minute * 6) + 180;
   };
 
   return (
