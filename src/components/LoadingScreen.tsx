@@ -21,14 +21,18 @@ export default function LoadingScreen({ onLoadingComplete }: { onLoadingComplete
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center"
     >
-      <div className="relative w-48 h-48">
-        {/* New Logo image */}
+      <motion.div 
+        className="relative w-48 h-48"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <img 
           src="/lovable-uploads/df90b244-875b-4c4b-972f-7cf015dcf0fb.png" 
           alt="OneApp Logo" 
           className="w-full h-full"
         />
-      </div>
+      </motion.div>
 
       <motion.p
         className="mt-4 text-xl font-display text-black/80"
@@ -37,7 +41,7 @@ export default function LoadingScreen({ onLoadingComplete }: { onLoadingComplete
         transition={{ duration: 0.5, delay: 0.8 }}
         style={{ 
           fontFamily: 'Satoshi, sans-serif',
-          letterSpacing: '-0.075em' // Further reduced spacing between letters
+          letterSpacing: '-0.075em'
         }}
       >
         Your all-in-one productivity app
