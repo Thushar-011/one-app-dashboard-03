@@ -15,6 +15,21 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
   const { editMode, updateWidget, removeWidget } = useWidgets();
   const [isDragging, setIsDragging] = useState(false);
   const [isDetailView, setIsDetailView] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDeleting(true);
+    // Trigger the trash can animation in the parent component
+    const trashButton = document.querySelector('.trash-button');
+    trashButton?.classList.add('animate-trash-open');
+    
+    // Wait for the widget animation to complete before actually removing
+    setTimeout(() => {
+      removeWidget(id);
+      trashButton?.classList.remove('animate-trash-open');
+    }, 500);
+  };
 
   const renderWidgetContent = () => {
     switch (type) {
@@ -36,7 +51,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
   return (
     <>
       <motion.div
-        className="widget absolute"
+        className={`widget absolute ${isDeleting ? 'animate-widget-to-trash' : ''}`}
         style={{
           width: size.width,
           height: size.height,
@@ -51,7 +66,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
           x: position.x,
           y: position.y,
           scale: isDragging ? 1.05 : 1,
-          opacity: 1
+          opacity: isDeleting ? 0 : 1
         }}
         transition={{
           type: "spring",
@@ -78,10 +93,7 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
           <WidgetHeader
             type={type}
             editMode={editMode}
-            onDelete={(e) => {
-              e.stopPropagation();
-              removeWidget(id);
-            }}
+            onDelete={handleDelete}
           />
           {renderWidgetContent()}
         </div>
@@ -108,17 +120,14 @@ export default function Widget({ id, type, position, size, data }: WidgetType) {
                       variant="ghost"
                       size="icon"
                       onClick={() => setIsDetailView(false)}
-                      className="shrink-0"
+                      className="shrink-0 hover:scale-110 transition-transform active:scale-95"
                     >
                       <ArrowLeft className="w-5 h-5" />
                     </Button>
                     <WidgetHeader
                       type={type}
                       editMode={editMode}
-                      onDelete={(e) => {
-                        e.stopPropagation();
-                        removeWidget(id);
-                      }}
+                      onDelete={handleDelete}
                     />
                   </div>
                 </div>

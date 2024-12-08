@@ -71,12 +71,50 @@ export default {
           "0%": { transform: "translateY(100%)" },
           "100%": { transform: "translateY(0)" }
         },
+        "flow-colors": {
+          "0%, 100%": {
+            "background-size": "200% 200%",
+            "background-position": "0% 50%"
+          },
+          "50%": {
+            "background-size": "200% 200%",
+            "background-position": "100% 50%"
+          }
+        },
+        "trash-open": {
+          "0%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.2) rotate(5deg)" },
+          "100%": { transform: "scale(1)" }
+        },
+        "widget-to-trash": {
+          "0%": { 
+            transform: "scale(1) rotate(0deg)",
+            opacity: "1"
+          },
+          "50%": { 
+            transform: "scale(0.5) rotate(180deg)",
+            opacity: "0.5"
+          },
+          "100%": { 
+            transform: "scale(0) rotate(360deg)",
+            opacity: "0"
+          }
+        },
+        "button-pop": {
+          "0%": { transform: "scale(1)" },
+          "50%": { transform: "scale(0.95)" },
+          "100%": { transform: "scale(1)" }
+        }
       },
       animation: {
         "fade-in": "fade-in 0.3s ease-out",
         "scale-in": "scale-in 0.2s ease-out",
         "slide-in": "slide-in 0.3s ease-out",
         "slide-up": "slide-up 0.3s ease-out",
+        "flow-colors": "flow-colors 3s ease infinite",
+        "trash-open": "trash-open 0.5s ease-in-out",
+        "widget-to-trash": "widget-to-trash 0.5s ease-in-out forwards",
+        "button-pop": "button-pop 0.2s ease-in-out"
       },
     },
   },

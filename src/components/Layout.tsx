@@ -16,11 +16,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             variant="ghost"
             size="icon"
             onClick={() => setIsMenuOpen(true)}
-            className="shrink-0"
+            className="shrink-0 hover:scale-110 transition-transform active:scale-95"
           >
             <Menu className="w-6 h-6" />
           </Button>
-          <h1 className="text-xl font-semibold mx-auto">ONE APP</h1>
+          <h1 className="text-xl font-semibold mx-auto bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-flow-colors bg-clip-text text-transparent">
+            ONE APP
+          </h1>
           <WidgetSelector />
         </div>
       </header>

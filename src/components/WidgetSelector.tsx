@@ -10,6 +10,7 @@ import { useWidgets } from "@/hooks/useWidgets";
 import { Button } from "./ui/button";
 import { WidgetType } from "@/types/widget";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 
 const WIDGET_OPTIONS: Array<{ type: WidgetType; label: string }> = [
   { type: "alarm", label: "Alarm" },
@@ -63,35 +64,53 @@ export default function WidgetSelector() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="shrink-0"
+        <motion.div
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
         >
-          <Plus className="w-6 h-6" />
-        </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="shrink-0"
+          >
+            <Plus className="w-6 h-6" />
+          </Button>
+        </motion.div>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add Widget</DialogTitle>
+          <DialogTitle className="bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-flow-colors bg-clip-text text-transparent">
+            Add Widget
+          </DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-4 py-4">
-          {WIDGET_OPTIONS.map((option) => (
-            <Button
+        <motion.div 
+          className="grid grid-cols-2 gap-4 py-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {WIDGET_OPTIONS.map((option, index) => (
+            <motion.div
               key={option.type}
-              variant="outline"
-              className={`h-20 flex flex-col gap-2 transition-all duration-300 ${
-                widgets.some(w => w.type === option.type) || trashedWidgets.some(w => w.type === option.type)
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:scale-105"
-              }`}
-              onClick={() => handleAddWidget(option.type)}
-              disabled={widgets.some(w => w.type === option.type) || trashedWidgets.some(w => w.type === option.type)}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
             >
-              {option.label}
-            </Button>
+              <Button
+                variant="outline"
+                className={`h-20 w-full flex flex-col gap-2 transition-all duration-300 ${
+                  widgets.some(w => w.type === option.type) || trashedWidgets.some(w => w.type === option.type)
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:scale-105 hover:shadow-lg hover:border-primary/50"
+                }`}
+                onClick={() => handleAddWidget(option.type)}
+                disabled={widgets.some(w => w.type === option.type) || trashedWidgets.some(w => w.type === option.type)}
+              >
+                {option.label}
+              </Button>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </DialogContent>
     </Dialog>
   );

@@ -4,6 +4,7 @@ import { useWidgets } from "@/hooks/useWidgets";
 import Widget from "@/components/Widget";
 import TrashList from "@/components/TrashList";
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 export default function Index() {
   const { widgets, editMode, toggleEditMode } = useWidgets();
@@ -17,20 +18,24 @@ export default function Index() {
         ))}
 
         <div className="fixed bottom-4 right-4 flex flex-col gap-2">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             onClick={toggleEditMode}
             className="bg-primary text-white p-2 rounded-full shadow-lg hover:bg-primary/90 transition-colors"
             aria-label={editMode ? "Done editing" : "Edit widgets"}
           >
             <Pencil className="w-6 h-6" />
-          </button>
+          </motion.button>
           
-          <button
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             onClick={() => setIsTrashOpen(true)}
-            className="bg-gray-500 text-white p-2 rounded-full shadow-lg hover:bg-gray-600 transition-colors"
+            className="trash-button bg-gray-500 text-white p-2 rounded-full shadow-lg hover:bg-gray-600 transition-colors"
           >
             <Trash2 className="w-6 h-6" />
-          </button>
+          </motion.button>
         </div>
 
         <TrashList isOpen={isTrashOpen} onClose={() => setIsTrashOpen(false)} />
