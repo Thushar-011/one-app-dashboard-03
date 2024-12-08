@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Keyboard } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -10,8 +10,6 @@ interface AnalogClockProps {
 }
 
 export default function AnalogClock({ mode, value, onChange, onSwitchMode }: AnalogClockProps) {
-  const [angle, setAngle] = useState(0);
-
   const getNumbers = () => {
     if (mode === 'hour') {
       return Array.from({ length: 12 }, (_, i) => i + 1);
@@ -20,49 +18,39 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     }
   };
 
-  const getValueFromPosition = (x: number, y: number, rect: DOMRect) => {
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    
-    const angleRad = Math.atan2(y - centerY, x - centerX);
-    let angleDeg = ((angleRad * 180 / Math.PI) + 90 + 360) % 360;
-    
+  const getHandRotation = () => {
     if (mode === 'hour') {
-      let hour = Math.round(angleDeg / 30);
-      hour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-      return hour;
+      // Adjust hour hand rotation to point exactly at the hour
+      return ((value % 12 || 12) - 3) * 30;
     } else {
-      const minute = Math.round(angleDeg / 6) % 60;
-      return minute;
+      // Adjust minute hand rotation to point exactly at the minute
+      return (value - 15) * 6;
     }
   };
 
   const handleClockClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
     
-    const newValue = getValueFromPosition(x, y, rect);
-    onChange(newValue);
+    const x = e.clientX - rect.left - centerX;
+    const y = e.clientY - rect.top - centerY;
     
-    let newAngle;
-    if (mode === 'hour') {
-      newAngle = ((newValue % 12 || 12) - 3) * 30;
-    } else {
-      newAngle = (newValue - 15) * 6;
-    }
-    setAngle(newAngle);
-  };
+    // Calculate angle from center, adjusting for the coordinate system
+    let angle = Math.atan2(y, x) * 180 / Math.PI + 90;
+    if (angle < 0) angle += 360;
 
-  useEffect(() => {
-    let newAngle;
     if (mode === 'hour') {
-      newAngle = ((value % 12 || 12) - 3) * 30;
+      // Convert angle to hour (1-12)
+      let hour = Math.round(angle / 30);
+      hour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+      onChange(hour);
     } else {
-      newAngle = (value - 15) * 6;
+      // Convert angle to minutes (0-55, step 5)
+      const minute = Math.round(angle / 6) % 60;
+      onChange(minute);
     }
-    setAngle(newAngle);
-  }, [value, mode]);
+  };
 
   return (
     <div className="relative w-64 h-64 mx-auto">
@@ -103,7 +91,7 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
             bottom: '50%',
             transformOrigin: 'bottom center'
           }}
-          animate={{ rotate: angle }}
+          animate={{ rotate: getHandRotation() }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
 
