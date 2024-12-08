@@ -29,7 +29,7 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased touch-manipulation;
+    @apply bg-background text-foreground antialiased touch-manipulation overflow-x-hidden;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -94,5 +94,28 @@
   [data-radix-popper-content-wrapper] {
     background: white !important;
     z-index: 50 !important;
+  }
+
+  /* Add smooth page transitions */
+  .page-transition-enter {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  .page-transition-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
+  }
+
+  .page-transition-exit {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .page-transition-exit-active {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 300ms, transform 300ms;
   }
 }
