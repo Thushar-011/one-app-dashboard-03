@@ -28,8 +28,8 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     
     // Calculate angle in radians
     const angleRad = Math.atan2(y - centerY, x - centerX);
-    // Convert to degrees and normalize
-    let angleDeg = (angleRad * 180 / Math.PI + 90 + 360) % 360;
+    // Convert to degrees and normalize to 0-360 range
+    let angleDeg = ((angleRad * 180 / Math.PI) + 450) % 360;
     
     if (mode === 'hour') {
       // Convert angle to hour (1-12)
@@ -37,7 +37,8 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
       return hour === 0 ? 12 : hour;
     } else {
       // Convert angle to minutes (0-55, step 5)
-      return Math.round(angleDeg / 6) % 60;
+      const minute = Math.round(angleDeg / 6);
+      return minute % 60;
     }
   };
 
@@ -50,9 +51,9 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     const newValue = getValueFromPosition(x, y, rect);
     onChange(newValue);
     
-    // Calculate precise angle for visual feedback
+    // Calculate angle for hand position
     const angleRad = Math.atan2(y - rect.height / 2, x - rect.width / 2);
-    const newAngle = (angleRad * 180 / Math.PI + 90 + 360) % 360;
+    let newAngle = ((angleRad * 180 / Math.PI) + 450) % 360;
     setAngle(newAngle);
   };
 
@@ -71,8 +72,11 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
         onClick={handleClockClick}
       >
         {getNumbers().map((num) => {
-          const numAngle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
+          const angle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
           const radius = 40;
+          const x = 50 + radius * Math.cos(angle);
+          const y = 50 + radius * Math.sin(angle);
+          
           return (
             <div
               key={num}
@@ -82,8 +86,8 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
                   : 'text-gray-300'
               }`}
               style={{
-                left: `${50 + radius * Math.cos(numAngle)}%`,
-                top: `${50 + radius * Math.sin(numAngle)}%`,
+                left: `${x}%`,
+                top: `${y}%`,
                 transform: 'translate(-50%, -50%)'
               }}
             >
@@ -100,6 +104,8 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
             transform: `rotate(${angle}deg)`,
             transformOrigin: 'bottom center'
           }}
+          animate={{ rotate: angle }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
 
         <div className="absolute w-3 h-3 bg-primary rounded-full left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2" />
