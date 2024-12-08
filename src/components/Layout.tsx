@@ -20,7 +20,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           >
             <Menu className="w-6 h-6" />
           </Button>
-          <h1 className="text-xl font-black mx-auto bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-flow-colors bg-clip-text text-transparent">
+          <h1 className="text-2xl font-black mx-auto bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-flow-colors bg-clip-text text-transparent">
             ONE APP
           </h1>
           <WidgetSelector />
