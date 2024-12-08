@@ -7,7 +7,7 @@ export default function LoadingScreen({ onLoadingComplete }: { onLoadingComplete
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(false);
-      setTimeout(onLoadingComplete, 500); // Allow exit animation to complete
+      setTimeout(onLoadingComplete, 500);
     }, 5000);
 
     return () => clearTimeout(timer);
@@ -17,15 +17,20 @@ export default function LoadingScreen({ onLoadingComplete }: { onLoadingComplete
 
   return (
     <motion.div
-      initial={{ opacity: 1 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
       className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center"
     >
       <motion.div 
         className="relative w-48 h-48"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ 
+          duration: 0.8,
+          ease: [0.16, 1, 0.3, 1]
+        }}
       >
         <img 
           src="/lovable-uploads/df90b244-875b-4c4b-972f-7cf015dcf0fb.png" 
