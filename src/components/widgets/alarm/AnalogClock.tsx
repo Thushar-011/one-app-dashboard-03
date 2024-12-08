@@ -24,19 +24,14 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
     
-    // Calculate angle in radians, adjusted to start from 12 o'clock
     const angleRad = Math.atan2(y - centerY, x - centerX);
-    // Convert to degrees and normalize to 0-360 range, with 0 at 12 o'clock
     let angleDeg = ((angleRad * 180 / Math.PI) + 90 + 360) % 360;
     
     if (mode === 'hour') {
-      // For hours, divide by 30 (360/12) and round to nearest hour
       let hour = Math.round(angleDeg / 30);
-      // Normalize hour to 1-12 range
       hour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
       return hour;
     } else {
-      // For minutes, divide by 6 (360/60) and round to nearest 5
       const minute = Math.round(angleDeg / 6) % 60;
       return minute;
     }
@@ -50,28 +45,20 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     const newValue = getValueFromPosition(x, y, rect);
     onChange(newValue);
     
-    // Calculate angle for hand position based on the actual value
     let newAngle;
     if (mode === 'hour') {
-      // For hours, multiply by 30 degrees (360/12)
       newAngle = ((newValue % 12 || 12) - 3) * 30;
     } else {
-      // For minutes, multiply by 6 degrees (360/60)
       newAngle = (newValue - 15) * 6;
     }
     setAngle(newAngle);
   };
 
   useEffect(() => {
-    // Update angle when value changes
     let newAngle;
     if (mode === 'hour') {
-      // For hours, each hour represents 30 degrees (360/12)
-      // Subtract 3 to align with the coordinate system (3 o'clock is 0 degrees)
       newAngle = ((value % 12 || 12) - 3) * 30;
     } else {
-      // For minutes, each minute represents 6 degrees (360/60)
-      // Subtract 15 to align with the coordinate system
       newAngle = (value - 15) * 6;
     }
     setAngle(newAngle);
@@ -84,9 +71,9 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
         onClick={handleClockClick}
       >
         {getNumbers().map((num) => {
-          // Calculate position for numbers
           const numberAngle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
-          const radius = mode === 'hour' ? 45 : 42; // Slightly different radius for hours and minutes
+          // Adjusted radius to perfectly align with the purple boundary
+          const radius = 47; // Increased radius to push numbers closer to the boundary
           const x = 50 + radius * Math.cos(numberAngle);
           const y = 50 + radius * Math.sin(numberAngle);
           
@@ -112,7 +99,7 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
         <motion.div
           className="absolute w-1 bg-primary origin-bottom rounded-full"
           style={{
-            height: mode === 'hour' ? '35%' : '40%', // Shorter hand for hours
+            height: mode === 'hour' ? '35%' : '40%',
             left: '50%',
             bottom: '50%',
             transformOrigin: 'bottom center'
