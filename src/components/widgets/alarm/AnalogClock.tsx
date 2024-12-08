@@ -20,13 +20,9 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
 
   const getHandRotation = () => {
     if (mode === 'hour') {
-      // For hours, each number represents 30 degrees (360/12)
-      // Subtract 90 to start from 12 o'clock position
-      return (value - 3) * 30;
+      return value * 30 - 90;
     } else {
-      // For minutes, each minute represents 6 degrees (360/60)
-      // Subtract 90 to start from 12 o'clock position
-      return (value / 5 - 3) * 30;
+      return value * 6 - 90;
     }
   };
 
@@ -38,18 +34,15 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
     const x = e.clientX - rect.left - centerX;
     const y = e.clientY - rect.top - centerY;
     
-    // Calculate angle from center
     let angle = Math.atan2(y, x) * 180 / Math.PI + 90;
     if (angle < 0) angle += 360;
 
     if (mode === 'hour') {
-      // Convert angle to hour (1-12)
       let hour = Math.round(angle / 30);
       if (hour === 0) hour = 12;
       if (hour > 12) hour = 1;
       onChange(hour);
     } else {
-      // Convert angle to minutes (0-55, step 5)
       let minute = Math.round(angle / 6);
       if (minute === 60) minute = 0;
       minute = Math.round(minute / 5) * 5;
@@ -64,11 +57,9 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
         onClick={handleClockClick}
       >
         {getNumbers().map((num) => {
-          // Calculate position for perfect circle alignment
-          // Adjust angle to start from 12 o'clock (subtract 90 degrees)
           const angle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
-          // Increase radius to 47 for perfect boundary alignment
-          const radius = 47;
+          // Increased radius to 49 to perfectly align with the boundary
+          const radius = 49;
           const x = 50 + radius * Math.cos(angle);
           const y = 50 + radius * Math.sin(angle);
           
