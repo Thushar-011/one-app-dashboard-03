@@ -20,10 +20,10 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
 
   const getHandRotation = () => {
     if (mode === 'hour') {
-      // For hours, we multiply by exactly 30 degrees (360/12)
-      return value * 30 - 90;
+      // Adjust to handle alignment offset more precisely
+      return (value % 12) * 30 - 90; // Ensures proper rotation even for boundary cases
     } else {
-      return (value * 6) - 90; // 360° / 60 = 6° per minute
+      return (value % 60) * 6 - 90;
     }
   };
 
@@ -41,15 +41,12 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
 
     if (mode === 'hour') {
       // For hours, we divide by exactly 30 degrees (360/12)
-      let hour = Math.round(angle / 30);
-      // Ensure hour is between 1 and 12
-      if (hour === 0 || hour > 12) hour = 12;
+      let hour = Math.round((angle % 360) / 30);
+      if (hour === 0) hour = 12; // Adjust for boundary case
       onChange(hour);
     } else {
-      let minute = Math.round(angle / 6);
-      if (minute === 60) minute = 0;
-      minute = Math.round(minute / 5) * 5;
-      onChange(minute);
+      let minute = Math.round((angle % 360) / 6);
+      onChange(minute % 60); // Ensure minute stays within 0-59 range
     }
   };
 
@@ -62,7 +59,7 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
         {/* Clock numbers */}
         {getNumbers().map((num) => {
           // Calculate exact positions for numbers using precise trigonometry
-          const angle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
+          const angle = ((num - 1) * 30 - 90) * (Math.PI / 180); // Adjust by subtracting 1 to align
           const radius = 44; // Adjusted for perfect boundary alignment
           const x = 50 + radius * Math.cos(angle);
           const y = 50 + radius * Math.sin(angle);
