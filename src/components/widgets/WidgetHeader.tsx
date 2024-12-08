@@ -1,4 +1,4 @@
-import { Trash2, AlarmClock, ListTodo, Calendar, FileText, IndianRupee, Pencil } from "lucide-react";
+import { Trash2, AlarmClock, ListTodo, Calendar, FileText, IndianRupee } from "lucide-react";
 import { WidgetType } from "@/types/widget";
 
 interface WidgetHeaderProps {
@@ -48,11 +48,6 @@ export default function WidgetHeader({ type, editMode, onDelete }: WidgetHeaderP
       </div>
       {editMode && (
         <div className="flex items-center gap-2">
-          <button
-            className="p-1.5 hover:bg-primary/10 rounded-full transition-colors"
-          >
-            <Pencil className="w-4 h-4 text-primary" />
-          </button>
           <button
             onClick={onDelete}
             className="p-1.5 hover:bg-red-100 rounded-full transition-colors"
