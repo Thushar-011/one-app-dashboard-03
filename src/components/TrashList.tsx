@@ -19,7 +19,7 @@ interface TrashListProps {
 }
 
 export default function TrashList({ isOpen, onClose }: TrashListProps) {
-  const { widgets, trashedWidgets, restoreWidget, clearTrash } = useWidgets();
+  const { widgets, trashedWidgets, restoreWidget, clearTrash, restoreAllWidgets } = useWidgets();
 
   const handleRestore = (widgetId: string) => {
     const widgetToRestore = trashedWidgets.find(w => w.id === widgetId);
@@ -46,7 +46,7 @@ export default function TrashList({ isOpen, onClose }: TrashListProps) {
       return;
     }
 
-    trashedWidgets.forEach(widget => restoreWidget(widget.id));
+    restoreAllWidgets();
     onClose();
     toast.success("All widgets restored successfully", { duration: 1000 });
   };

@@ -26,7 +26,8 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
   const getValueFromAngle = (angle: number) => {
     const normalizedAngle = ((angle + 360) % 360);
     if (mode === 'hour') {
-      return Math.round(normalizedAngle / 30) || 12;
+      const hourValue = Math.round(normalizedAngle / 30) || 12;
+      return hourValue === 0 ? 12 : hourValue;
     } else {
       return Math.round(normalizedAngle / 6) % 60;
     }
@@ -61,19 +62,23 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
   return (
     <div className="relative w-64 h-64 mx-auto">
       <div className="absolute inset-0 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700">
-        {getNumbers().map((num) => (
-          <div
-            key={num}
-            className="absolute text-sm font-medium text-gray-300"
-            style={{
-              left: `${50 + 40 * Math.cos(((num * (mode === 'hour' ? 30 : 6) - 90) * Math.PI) / 180)}%`,
-              top: `${50 + 40 * Math.sin(((num * (mode === 'hour' ? 30 : 6) - 90) * Math.PI) / 180)}%`,
-              transform: 'translate(-50%, -50%)'
-            }}
-          >
-            {num.toString().padStart(2, '0')}
-          </div>
-        ))}
+        {getNumbers().map((num) => {
+          const angle = ((num * (mode === 'hour' ? 30 : 6)) - 90) * (Math.PI / 180);
+          const radius = 40; // Percentage from center
+          return (
+            <div
+              key={num}
+              className="absolute text-sm font-medium text-gray-300"
+              style={{
+                left: `${50 + radius * Math.cos(angle)}%`,
+                top: `${50 + radius * Math.sin(angle)}%`,
+                transform: 'translate(-50%, -50%)'
+              }}
+            >
+              {num.toString().padStart(2, '0')}
+            </div>
+          );
+        })}
 
         <motion.div
           drag
@@ -86,7 +91,8 @@ export default function AnalogClock({ mode, value, onChange, onSwitchMode }: Ana
           style={{
             left: '50%',
             bottom: '50%',
-            transform: `rotate(${angle}deg)`
+            transform: `rotate(${angle}deg)`,
+            transformOrigin: 'bottom center'
           }}
         />
 

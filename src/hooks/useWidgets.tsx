@@ -10,6 +10,7 @@ interface WidgetsContextType {
   removeWidget: (id: string) => void;
   updateWidget: (id: string, updates: Partial<Widget>) => void;
   restoreWidget: (id: string) => void;
+  restoreAllWidgets: () => void;
   clearTrash: () => void;
 }
 
@@ -26,36 +27,14 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
 
   const toggleEditMode = () => setEditMode(!editMode);
 
-  const findOptimalPosition = () => {
-    const positions = widgets.map(w => ({
-      x: w.position.x,
-      y: w.position.y
-    }));
-
-    let row = 0;
-    let col = 0;
-    let position = { x: 0, y: 0 };
-
-    while (true) {
-      position = {
-        x: col * WIDGET_HORIZONTAL_SPACING,
-        y: row * WIDGET_VERTICAL_SPACING
-      };
-
-      const isPositionTaken = positions.some(
-        p => p.x === position.x && p.y === position.y
-      );
-
-      if (!isPositionTaken) break;
-
-      col++;
-      if (col >= MAX_WIDGETS_PER_ROW) {
-        col = 0;
-        row++;
-      }
-    }
-
-    return position;
+  const findOptimalPosition = (index: number = widgets.length) => {
+    const row = Math.floor(index / MAX_WIDGETS_PER_ROW);
+    const col = index % MAX_WIDGETS_PER_ROW;
+    
+    return {
+      x: col * WIDGET_HORIZONTAL_SPACING,
+      y: row * WIDGET_VERTICAL_SPACING
+    };
   };
 
   const addWidget = (type: WidgetType, position?: { x: number; y: number }) => {
@@ -96,6 +75,26 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const restoreAllWidgets = () => {
+    const widgetsToRestore = trashedWidgets.filter(trashedWidget => 
+      !widgets.some(w => w.type === trashedWidget.type)
+    );
+
+    if (widgetsToRestore.length === 0) {
+      return;
+    }
+
+    const restoredWidgets = widgetsToRestore.map((widget, index) => ({
+      ...widget,
+      position: findOptimalPosition(widgets.length + index)
+    }));
+
+    setWidgets([...widgets, ...restoredWidgets]);
+    setTrashedWidgets(trashedWidgets.filter(w => 
+      !widgetsToRestore.some(rw => rw.id === w.id)
+    ));
+  };
+
   const clearTrash = () => {
     setTrashedWidgets([]);
   };
@@ -117,6 +116,7 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
         removeWidget,
         updateWidget,
         restoreWidget,
+        restoreAllWidgets,
         clearTrash,
       }}
     >
