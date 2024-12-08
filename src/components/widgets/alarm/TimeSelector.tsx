@@ -30,7 +30,7 @@ export default function TimeSelector({
       if (is12Hour) {
         hours = hours % 12 || 12;
       }
-      return hours * 30 + (time.getMinutes() / 2); // Add minute offset for smoother movement
+      return (hours * 30) + (time.getMinutes() / 2); // Add minute offset for smoother movement
     }
     return time.getMinutes() * 6; // 360 / 60 = 6 degrees per minute
   };

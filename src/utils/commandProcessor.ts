@@ -1,6 +1,7 @@
 import { Widget } from "@/types/widget";
 import { toast } from "sonner";
 import { handleReminderCommand } from "./commandHandlers/reminderHandler";
+import { handleAlarmCommand } from "./commandHandlers/alarmHandler";
 
 export interface WidgetData {
   alarms?: Array<{ id: string; time: string; enabled: boolean }>;
@@ -21,66 +22,16 @@ export const processCommand = async (
   console.log("Processing command:", lowerText);
 
   try {
-    // Reminder commands - check this first since it's more specific
-    if (lowerText.includes("reminder")) {
-      console.log("Handling reminder command");
-      const success = await handleReminderCommand(text, widgets, updateWidget, addWidget);
-      if (success) {
-        toast.success("Reminder set successfully");
-        return;
-      }
+    // Handle alarm commands
+    if (lowerText.includes("alarm") || lowerText.includes("wake") || lowerText.includes("remind me at")) {
+      const success = await handleAlarmCommand(text, widgets, updateWidget, addWidget);
+      if (success) return;
     }
 
-    // Enhanced time pattern matching for both hour:minute format and spoken format
-    if (lowerText.includes("alarm") || lowerText.includes("wake") || lowerText.includes("remind me at")) {
-      // Match patterns like "5:56 pm", "5 56 pm", "five fifty six pm"
-      const timePattern = /(\d{1,2})(?::|\s+)?(\d{2})?\s*(am|pm)?/i;
-      const timeMatch = lowerText.match(timePattern);
-
-      if (timeMatch) {
-        let hours = parseInt(timeMatch[1]);
-        let minutes = timeMatch[2] ? parseInt(timeMatch[2]) : 0;
-        const period = timeMatch[3]?.toLowerCase();
-
-        console.log(`Parsed time components - Hours: ${hours}, Minutes: ${minutes}, Period: ${period}`);
-
-        // Validate hours and minutes
-        if (hours < 1 || hours > 12) {
-          throw new Error("Please specify a valid hour between 1 and 12");
-        }
-        if (minutes < 0 || minutes > 59) {
-          throw new Error("Please specify valid minutes between 0 and 59");
-        }
-
-        // Convert to 24-hour format
-        if (period === "pm" && hours < 12) hours += 12;
-        if (period === "am" && hours === 12) hours = 0;
-
-        const time = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
-        console.log("Setting alarm for:", time);
-
-        let alarmWidget = widgets.find(w => w.type === "alarm");
-        if (!alarmWidget) {
-          addWidget("alarm", { x: 0, y: 0 });
-          alarmWidget = widgets[widgets.length - 1];
-        }
-
-        const newAlarm = {
-          id: Date.now().toString(),
-          time,
-          enabled: true,
-        };
-
-        const updatedAlarms = [...(alarmWidget?.data?.alarms || []), newAlarm];
-        updateWidget(alarmWidget.id, {
-          data: { alarms: updatedAlarms }
-        });
-
-        toast.success(`Alarm set for ${hours}:${minutes.toString().padStart(2, "0")} ${period?.toUpperCase() || 'AM'}`);
-        return;
-      }
-      
-      throw new Error("Could not understand the time format. Please try again with a specific time like '5:56 PM'");
+    // Handle reminder commands
+    if (lowerText.includes("reminder")) {
+      const success = await handleReminderCommand(text, widgets, updateWidget, addWidget);
+      if (success) return;
     }
 
     // Task commands
