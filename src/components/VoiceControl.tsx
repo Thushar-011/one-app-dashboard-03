@@ -151,9 +151,9 @@ export default function VoiceControl() {
           {isProcessing ? (
             <span className="animate-spin">⏳</span>
           ) : isRecording ? (
-            <MicOff className="w-6 h-6 text-white animate-bounce" />
+            <MicOff className="w-7 h-7 text-white" />
           ) : (
-            <Mic className="w-6 h-6 text-white transition-transform hover:scale-110" />
+            <Mic className="w-7 h-7 text-white stroke-[1.5]" />
           )}
         </Button>
       </div>
