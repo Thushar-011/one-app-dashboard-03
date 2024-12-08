@@ -23,13 +23,17 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
     const x = e.clientX - rect.left - centerX;
     const y = e.clientY - rect.top - centerY;
     
+    // Calculate angle in radians and convert to degrees
     let angle = Math.atan2(y, x) * (180 / Math.PI);
+    // Normalize angle to 0-360 range
     angle = (angle + 360) % 360;
     
     if (mode === 'hour') {
+      // Convert angle to 12-hour format (30 degrees per hour)
       const hour = Math.round(((angle + 90) % 360) / 30);
       onChange({ ...value, hour: hour === 0 ? 12 : hour });
     } else {
+      // Convert angle to minutes (6 degrees per minute)
       const minute = Math.round(((angle + 90) % 360) / 6);
       onChange({ ...value, minute: minute === 60 ? 0 : minute });
     }
@@ -37,8 +41,10 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
 
   const getHandRotation = () => {
     if (mode === 'hour') {
-      return value.hour * 30 - 90;
+      // For hours: multiply by 30 (360/12) and subtract 90 to align with 12 o'clock
+      return (value.hour % 12) * 30 - 90;
     }
+    // For minutes: multiply by 6 (360/60) and subtract 90 to align with 12 o'clock
     return value.minute * 6 - 90;
   };
 
@@ -66,9 +72,9 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
       >
         {/* Minute markers */}
         {mode === 'minute' && minuteMarkers.map((marker) => {
-          const isMainMarker = marker % 5 === 0;
           const angle = (marker * 6 - 90) * (Math.PI / 180);
-          const radius = isMainMarker ? 48 : 46; // Slightly different positions for main and sub markers
+          const isMainMarker = marker % 5 === 0;
+          const radius = isMainMarker ? 48 : 46;
           const x = 50 + radius * Math.cos(angle);
           const y = 50 + radius * Math.sin(angle);
           
@@ -115,6 +121,7 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
           );
         })}
 
+        {/* Clock hand */}
         <motion.div
           className="absolute left-1/2 top-1/2 w-[2px] bg-primary"
           style={{
@@ -131,6 +138,7 @@ export default function ClockPicker({ value, onChange, mode, onModeChange }: Clo
           }}
         />
 
+        {/* Center dot */}
         <div className="absolute left-1/2 top-1/2 w-3 h-3 bg-primary rounded-full -translate-x-1/2 -translate-y-1/2" />
       </div>
     </div>
