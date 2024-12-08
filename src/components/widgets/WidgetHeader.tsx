@@ -49,6 +49,11 @@ export default function WidgetHeader({ type, editMode, onDelete }: WidgetHeaderP
       {editMode && (
         <div className="flex items-center gap-2">
           <button
+            className="p-1.5 hover:bg-primary/10 rounded-full transition-colors"
+          >
+            <Pencil className="w-4 h-4 text-primary" />
+          </button>
+          <button
             onClick={onDelete}
             className="p-1.5 hover:bg-red-100 rounded-full transition-colors"
           >
