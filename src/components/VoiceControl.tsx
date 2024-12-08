@@ -139,10 +139,10 @@ export default function VoiceControl() {
         <Button
           size="lg"
           disabled={isProcessing}
-          className={`rounded-full w-14 h-14 transition-all duration-300 shadow-lg hover:shadow-xl 
+          className={`rounded-full w-14 h-14 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center
             ${isRecording 
               ? "bg-red-500 hover:bg-red-600 animate-pulse ring-4 ring-red-300" 
-              : "bg-primary hover:bg-primary/90 ring-4 ring-primary/30"
+              : "bg-black hover:bg-black/90 ring-4 ring-black/30"
             }
             ${isProcessing ? "animate-spin" : ""}
           `}
