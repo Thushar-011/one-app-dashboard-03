@@ -1,20 +1,10 @@
-import { Mic, MicOff } from "lucide-react";
 import { useState, useRef } from "react";
-import { Button } from "./ui/button";
+import { toast } from "sonner";
 import { useWidgets } from "@/hooks/useWidgets";
 import { pipeline } from "@huggingface/transformers";
-import { toast } from "sonner";
 import { processCommand } from "@/utils/commandProcessor";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import RecordButton from "./voice/RecordButton";
+import ConfirmationDialog from "./voice/ConfirmationDialog";
 
 export default function VoiceControl() {
   const [isRecording, setIsRecording] = useState(false);
@@ -50,27 +40,18 @@ export default function VoiceControl() {
         const audioUrl = URL.createObjectURL(audioBlob);
         
         try {
-          console.log("Initializing transcriber...");
           const transcriber = await pipeline(
             "automatic-speech-recognition",
             "onnx-community/whisper-tiny.en",
-            {
-              revision: "main"
-            }
+            { revision: "main" }
           );
 
-          console.log("Starting transcription...");
           const result = await transcriber(audioUrl);
-          console.log("Transcription result:", result);
-
+          
           if (typeof result === 'object' && 'text' in result) {
-            const cleanedText = result.text.trim().toLowerCase();
-            console.log("Cleaned transcription:", cleanedText);
-            setTranscription(cleanedText);
+            setTranscription(result.text.trim().toLowerCase());
           } else if (Array.isArray(result) && result.length > 0 && 'text' in result[0]) {
-            const cleanedText = result[0].text.trim().toLowerCase();
-            console.log("Cleaned transcription:", cleanedText);
-            setTranscription(cleanedText);
+            setTranscription(result[0].text.trim().toLowerCase());
           }
         } catch (error) {
           console.error("Error processing audio:", error);
@@ -103,7 +84,6 @@ export default function VoiceControl() {
   const handleConfirm = async () => {
     if (transcription) {
       try {
-        console.log("Executing command:", transcription);
         await processCommand(transcription, widgets, updateWidget, addWidget);
         toast.success("Task completed successfully");
       } catch (error) {
@@ -120,42 +100,18 @@ export default function VoiceControl() {
 
   return (
     <>
-      <AlertDialog open={transcription !== null}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Voice Command</AlertDialogTitle>
-            <AlertDialogDescription>
-              Did you mean: &quot;{transcription}&quot;?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirm}>OK</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmationDialog
+        transcription={transcription}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
 
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
-        <Button
-          size="lg"
-          disabled={isProcessing}
-          className={`rounded-full w-14 h-14 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center
-            ${isRecording 
-              ? "bg-red-500 hover:bg-red-600 animate-pulse ring-4 ring-red-300" 
-              : "bg-primary hover:bg-primary/90 ring-4 ring-primary/30"
-            }
-            ${isProcessing ? "animate-spin" : ""}
-          `}
+        <RecordButton
+          isRecording={isRecording}
+          isProcessing={isProcessing}
           onClick={isRecording ? stopRecording : startRecording}
-        >
-          {isProcessing ? (
-            <span className="animate-spin">⏳</span>
-          ) : isRecording ? (
-            <MicOff className="w-7 h-7 text-white" />
-          ) : (
-            <Mic className="w-7 h-7 text-white stroke-[1.5]" />
-          )}
-        </Button>
+        />
       </div>
     </>
   );
