@@ -25,11 +25,11 @@ export default function LoadingScreen({ onLoadingComplete }: { onLoadingComplete
     >
       <motion.div 
         className="relative w-48 h-48"
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ 
-          duration: 0.5,
-          ease: [0.16, 1, 0.3, 1]
+          duration: 0.8,
+          ease: "easeOut"
         }}
       >
         <img 
@@ -41,11 +41,12 @@ export default function LoadingScreen({ onLoadingComplete }: { onLoadingComplete
 
       <motion.p
         className="mt-4 text-xl font-display text-black/80"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ 
-          duration: 0.5, 
-          delay: 1.2 // Increased delay for the tagline to appear after the logo
+          duration: 0.5,
+          delay: 1.5,
+          ease: "easeOut"
         }}
         style={{ 
           fontFamily: 'Satoshi, sans-serif',
