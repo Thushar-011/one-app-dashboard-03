@@ -1,4 +1,4 @@
-import { Menu, MessageSquare } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useState } from "react";
 import SideMenu from "./SideMenu";
 import { Button } from "./ui/button";
@@ -45,8 +45,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </SheetTrigger>
-        <SheetContent side="right" className="w-[400px] sm:w-[540px] p-0">
-          <div className="h-full">
+        <SheetContent 
+          side="right" 
+          className="w-[70vw] sm:w-[400px] max-w-[95vw] h-[100dvh] overflow-hidden p-0"
+        >
+          <div className="h-full max-h-[100dvh]">
             <Chatbot />
           </div>
         </SheetContent>
