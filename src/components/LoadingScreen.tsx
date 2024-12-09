@@ -45,7 +45,7 @@ export default function LoadingScreen({ onLoadingComplete }: { onLoadingComplete
         animate={{ opacity: 1 }}
         transition={{ 
           duration: 0.5, 
-          delay: 0.6 
+          delay: 1.2 // Increased delay for the tagline to appear after the logo
         }}
         style={{ 
           fontFamily: 'Satoshi, sans-serif',
