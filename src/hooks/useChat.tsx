@@ -28,6 +28,9 @@ export function useChat() {
 
       if (error) {
         console.error('Error loading chat history:', error);
+        if (error.message?.includes('security policy')) {
+          console.error('RLS policy error - please check Supabase policies');
+        }
         throw error;
       }
 
@@ -41,7 +44,7 @@ export function useChat() {
       }
     } catch (error) {
       console.error('Error loading chat history:', error);
-      toast.error('Failed to load chat history');
+      toast.error('Failed to load chat history. Please check console for details.');
     }
   };
 
@@ -95,14 +98,21 @@ export function useChat() {
 
       if (dbError) {
         console.error('Database error:', dbError);
-        toast.error('Failed to save message to history');
+        if (dbError.message?.includes('security policy')) {
+          console.error('RLS policy error - please check Supabase policies');
+          toast.error('Database permission error. Please contact support.');
+        } else {
+          toast.error('Failed to save message to history');
+        }
       }
 
     } catch (error) {
       console.error('Error sending message:', error);
       
       // Provide more specific error messages
-      if (error.message?.includes('quota')) {
+      if (error.message?.includes('security policy')) {
+        toast.error('Database permission error. Please contact support.');
+      } else if (error.message?.includes('quota')) {
         toast.error('The AI service is temporarily unavailable. Please try again later.');
       } else {
         toast.error('Failed to send message. Please try again.');
