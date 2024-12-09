@@ -25,10 +25,10 @@ export default function LoadingScreen({ onLoadingComplete }: { onLoadingComplete
     >
       <motion.div 
         className="relative w-48 h-48"
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
         transition={{ 
-          duration: 0.8,
+          duration: 0.5,
           ease: [0.16, 1, 0.3, 1]
         }}
       >
@@ -41,9 +41,12 @@ export default function LoadingScreen({ onLoadingComplete }: { onLoadingComplete
 
       <motion.p
         className="mt-4 text-xl font-display text-black/80"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.8 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ 
+          duration: 0.5, 
+          delay: 0.6 
+        }}
         style={{ 
           fontFamily: 'Satoshi, sans-serif',
           letterSpacing: '-0.075em'

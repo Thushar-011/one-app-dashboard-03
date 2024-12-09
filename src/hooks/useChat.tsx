@@ -28,10 +28,7 @@ export function useChat() {
 
       if (error) {
         console.error('Error loading chat history:', error);
-        if (error.message?.includes('security policy')) {
-          console.error('RLS policy error - please check Supabase policies');
-        }
-        throw error;
+        return;
       }
 
       console.log('Loaded messages:', messages);
@@ -44,7 +41,6 @@ export function useChat() {
       }
     } catch (error) {
       console.error('Error loading chat history:', error);
-      toast.error('Failed to load chat history. Please check console for details.');
     }
   };
 
@@ -53,11 +49,9 @@ export function useChat() {
       setIsLoading(true);
       console.log('Sending message:', message);
       
-      // Add user message to UI immediately
       const userMessage: Message = { sender: 'user', text: message };
       setMessages(prev => [...prev, userMessage]);
 
-      // Call Supabase Edge Function for AI response
       const { data, error } = await supabase.functions.invoke('chat', {
         body: { message }
       });
@@ -66,18 +60,19 @@ export function useChat() {
 
       if (error) {
         console.error('Edge function error:', error);
-        throw error;
+        setMessages(prev => prev.slice(0, -1));
+        return;
       }
 
-      // Handle quota exceeded error
       if (data?.isQuotaError) {
         toast.error('The AI service is temporarily unavailable. Please try again later.');
-        setMessages(prev => prev.slice(0, -1)); // Remove user message
+        setMessages(prev => prev.slice(0, -1));
         return;
       }
 
       if (!data?.response) {
-        throw new Error('No response received from AI');
+        setMessages(prev => prev.slice(0, -1));
+        return;
       }
 
       const botMessage: Message = { 
@@ -85,40 +80,17 @@ export function useChat() {
         text: data.response
       };
 
-      // Add bot message to UI
       setMessages(prev => [...prev, botMessage]);
 
-      // Save to database
-      const { error: dbError } = await supabase
+      await supabase
         .from('chat_messages')
         .insert({
           message: message,
           response: botMessage.text
         });
 
-      if (dbError) {
-        console.error('Database error:', dbError);
-        if (dbError.message?.includes('security policy')) {
-          console.error('RLS policy error - please check Supabase policies');
-          toast.error('Database permission error. Please contact support.');
-        } else {
-          toast.error('Failed to save message to history');
-        }
-      }
-
     } catch (error) {
       console.error('Error sending message:', error);
-      
-      // Provide more specific error messages
-      if (error.message?.includes('security policy')) {
-        toast.error('Database permission error. Please contact support.');
-      } else if (error.message?.includes('quota')) {
-        toast.error('The AI service is temporarily unavailable. Please try again later.');
-      } else {
-        toast.error('Failed to send message. Please try again.');
-      }
-      
-      // Remove the user message if the AI response failed
       setMessages(prev => prev.slice(0, -1));
     } finally {
       setIsLoading(false);

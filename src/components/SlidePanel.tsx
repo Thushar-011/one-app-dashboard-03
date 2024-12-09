@@ -10,8 +10,8 @@ export default function SlidePanel() {
           aria-label="Open slide panel"
           style={{
             clipPath: "polygon(100% 0, 100% 100%, 30% 50%)",
-            width: "28px",
-            height: "56px",
+            width: "24px",
+            height: "48px",
             background: "linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)",
             borderTopLeftRadius: "4px",
             borderBottomLeftRadius: "4px"
@@ -22,7 +22,7 @@ export default function SlidePanel() {
       </SheetTrigger>
       <SheetContent 
         side="right"
-        className="w-[90%] sm:w-[540px] p-0 bg-white/95 backdrop-blur-md border-l shadow-xl"
+        className="w-[85%] sm:w-[400px] p-0 bg-white/95 backdrop-blur-md border-l shadow-xl"
       >
         <div className="h-full relative">
           <Chatbot />
