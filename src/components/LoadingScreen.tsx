@@ -52,7 +52,7 @@ export default function LoadingScreen({ onLoadingComplete }: { onLoadingComplete
           letterSpacing: '-0.075em'
         }}
       >
-        Your all-in-one productivity app
+        Your all-in-one productivity solution
       </motion.p>
     </motion.div>
   );
