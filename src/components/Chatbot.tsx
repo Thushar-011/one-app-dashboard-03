@@ -37,10 +37,10 @@ export const Chatbot = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white/50 backdrop-blur-sm rounded-lg">
-      <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-[calc(100vh-120px)] px-4">
-          <div className="space-y-4 py-4">
+    <div className="flex flex-col h-[calc(100vh-2rem)] bg-white/50 backdrop-blur-sm rounded-lg relative">
+      <div className="flex-1 overflow-hidden pt-8"> {/* Added pt-8 to prevent overlap with close button */}
+        <ScrollArea className="h-[calc(100vh-8rem)]"> {/* Adjusted height to account for input area */}
+          <div className="space-y-4 px-4 pb-4">
             {messages.length === 0 && (
               <div className="text-center text-muted-foreground py-8">
                 <p className="text-lg font-medium">Welcome to AI Assistant</p>
@@ -71,7 +71,7 @@ export const Chatbot = () => {
         </ScrollArea>
       </div>
 
-      <div className="p-4 border-t bg-white/80 backdrop-blur-sm mt-auto">
+      <div className="p-4 border-t bg-white/80 backdrop-blur-sm mt-auto w-full">
         <div className="flex gap-2">
           <Input
             ref={inputRef}
@@ -85,7 +85,7 @@ export const Chatbot = () => {
           <Button 
             onClick={handleSend} 
             disabled={isLoading || !input.trim()}
-            className="px-6 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white"
+            className="px-6 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white shrink-0"
           >
             {isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />

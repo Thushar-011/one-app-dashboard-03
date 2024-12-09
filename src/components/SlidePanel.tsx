@@ -22,7 +22,7 @@ export default function SlidePanel() {
       </SheetTrigger>
       <SheetContent 
         side="right"
-        className="w-[85%] sm:w-[400px] p-0 bg-white/95 backdrop-blur-md border-l shadow-xl"
+        className="w-[90vw] sm:w-[400px] p-0 bg-white/95 backdrop-blur-md border-l shadow-xl"
       >
         <div className="h-full relative">
           <Chatbot />
