@@ -37,44 +37,41 @@ export const Chatbot = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-12rem)] bg-background border rounded-lg shadow-lg">
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-        <div className="space-y-4">
-          {messages.length === 0 && (
-            <div className="text-center text-muted-foreground py-8">
-              <p className="text-lg font-medium">Welcome to AI Assistant</p>
-              <p className="text-sm">How can I help you today?</p>
-            </div>
-          )}
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={cn(
-                "flex",
-                msg.sender === 'user' ? "justify-end" : "justify-start"
-              )}
-            >
+    <div className="flex flex-col h-full bg-white/50 backdrop-blur-sm rounded-lg">
+      <div className="flex-1 overflow-hidden">
+        <ScrollArea className="h-[calc(100vh-120px)] px-4">
+          <div className="space-y-4 py-4">
+            {messages.length === 0 && (
+              <div className="text-center text-muted-foreground py-8">
+                <p className="text-lg font-medium">Welcome to AI Assistant</p>
+                <p className="text-sm">How can I help you today?</p>
+              </div>
+            )}
+            {messages.map((msg, index) => (
               <div
+                key={index}
                 className={cn(
-                  "max-w-[80%] p-3 rounded-lg shadow-sm",
-                  msg.sender === 'user' 
-                    ? "bg-[#8B5CF6] text-white rounded-br-none" 
-                    : "bg-[#F3F4F6] dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-bl-none border border-[#E5E7EB] dark:border-zinc-700"
+                  "flex",
+                  msg.sender === 'user' ? "justify-end" : "justify-start"
                 )}
               >
-                {msg.text}
+                <div
+                  className={cn(
+                    "max-w-[80%] p-3 rounded-lg shadow-sm",
+                    msg.sender === 'user' 
+                      ? "bg-[#8B5CF6] text-white rounded-br-none" 
+                      : "bg-[#F3F4F6] dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-bl-none border border-[#E5E7EB] dark:border-zinc-700"
+                  )}
+                >
+                  {msg.text}
+                </div>
               </div>
-            </div>
-          ))}
-          {isLoading && (
-            <div className="flex justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-[#8B5CF6]" />
-            </div>
-          )}
-        </div>
-      </ScrollArea>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
 
-      <div className="p-4 border-t bg-background">
+      <div className="p-4 border-t bg-white/80 backdrop-blur-sm mt-auto">
         <div className="flex gap-2">
           <Input
             ref={inputRef}
