@@ -1,4 +1,5 @@
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Chatbot } from "./Chatbot";
 
 export default function SlidePanel() {
   return (
@@ -21,14 +22,10 @@ export default function SlidePanel() {
       </SheetTrigger>
       <SheetContent 
         side="right"
-        className="w-[90%] sm:w-[400px] p-0 bg-white"
+        className="w-[90%] sm:w-[540px] p-0 bg-white"
       >
-        <div className="h-full w-full flex flex-col">
-          <div className="flex-1 overflow-y-auto p-4">
-            <div className="text-muted-foreground text-center">
-              Empty Panel Content
-            </div>
-          </div>
+        <div className="h-full">
+          <Chatbot />
         </div>
       </SheetContent>
     </Sheet>
