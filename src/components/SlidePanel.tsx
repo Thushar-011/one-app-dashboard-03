@@ -20,10 +20,15 @@ export default function SlidePanel() {
         </button>
       </SheetTrigger>
       <SheetContent 
-        className="w-[80%] sm:w-[400px] bg-white animate-slide-in-right"
+        side="right"
+        className="w-[90%] sm:w-[400px] p-0 bg-white"
       >
-        <div className="h-full w-full flex items-center justify-center text-muted-foreground">
-          Empty Panel Content
+        <div className="h-full w-full flex flex-col">
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="text-muted-foreground text-center">
+              Empty Panel Content
+            </div>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
