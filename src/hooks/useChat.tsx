@@ -19,14 +19,19 @@ export function useChat() {
 
   const loadChatHistory = async () => {
     try {
+      console.log('Loading chat history...');
       const { data: messages, error } = await supabase
         .from('chat_messages')
         .select('*')
         .order('created_at', { ascending: true })
         .limit(50);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading chat history:', error);
+        throw error;
+      }
 
+      console.log('Loaded messages:', messages);
       if (messages) {
         const formattedMessages = messages.map((msg) => ([
           { sender: 'user' as const, text: msg.message },
