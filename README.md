@@ -1,69 +1,133 @@
-# Welcome to your Lovable project
 
-## Project info
+# 📱 ALL-IN-ONE PRODUCTIVITY APP
 
-**URL**: https://lovable.dev/projects/33ccec6d-c2c3-4258-817b-36292aef12d7
+### A Smart Lifestyle Productivity Tool
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🧠 Overview
 
-**Use Lovable**
+**OneApp** is a unified productivity application designed to simplify and enhance everyday life by combining essential features like:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/33ccec6d-c2c3-4258-817b-36292aef12d7) and start prompting.
+- 🕒 **Alarms**
+- ✅ **To-Do List**
+- 📝 **Notes**
+- 🔔 **Reminders**
+- 💰 **Expense Tracker**
+- 🎙️ **Voice Command Integration**
+- 🤖 **AI Chatbot Assistance**
 
-Changes made via Lovable will be committed automatically to this repo.
+Everything is bundled into one seamless, intuitive, and intelligent interface built for modern users.
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🎯 Objectives
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- 🧹 Organize tasks, finances, and reminders under one roof.
+- 🧠 Use AI to automate daily life (like expense suggestions or task reminders).
+- 🔊 Enable hands-free interaction using voice commands.
+- 💬 Provide a responsive AI chatbot for smart query handling.
+- 📊 Offer visual insights into expenses and productivity.
+- 🧑‍💻 Empower users with a highly customizable and accessible interface.
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🔧 Features
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+| Module         | Description |
+|----------------|-------------|
+| **Alarms**     | Set alarms with snooze, repeat, and tones. |
+| **To-Do List** | Add, view, edit, and delete tasks. |
+| **Notes**      | Create timestamped notes and manage them intuitively. |
+| **Reminders**  | Schedule tasks and get timely alerts. |
+| **Expenses**   | Add, view, and analyze categorized spending data. |
+| **Voice Control** | Add tasks, notes, reminders, and alarms using natural voice. |
+| **AI Assistant** | Ask questions or get task suggestions instantly. |
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+## 📱 Tech Stack
+
+- **Frontend**: React + Tailwind CSS
+- **Voice Recognition**: Custom hook for real-time speech-to-text
+- **AI Assistant**: Gemini API integration
+- **Chatbot Engine**: Custom AI chatbot using NLP
+- **Storage**: Local data management with extensible backend support
+- **Platform**: Android support (via WebView or PWA)
+
+---
+
+## 🖼️ UI Highlights
+
+- Dashboard with draggable widgets
+- Separate views for detailed or summarized widgets
+- Trash bin system for managing deleted widgets
+- Voice command overlay with confirmation prompts
+- AI assistant with chat interface
+
+---
+
+## 📦 Installation & Setup
+
+> Currently designed as a web-based app (PWA or WebView integration for Android)
+
+### Prerequisites
+- Node.js (v16+)
+- npm or yarn
+
+### Steps
+
+```bash
+git clone https://github.com/your-username/oneapp-productivity.git
+cd oneapp-productivity
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+To build for production:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+npm run build
+```
 
-**Use GitHub Codespaces**
+---
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## ✅ Testing Summary
 
-## What technologies are used for this project?
+- ✅ Voice command precision across accents and background noise
+- ✅ Functional unit tests for widgets and features
+- ✅ Usability tested on various Android devices
+- ✅ Load tested with multiple widget updates and speech commands
+- ✅ Regression tested after integrating AI/voice features
 
-This project is built with .
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🚀 Future Enhancements
 
-## How can I deploy this project?
+- 🔐 Add a Password Manager widget
+- ⛅ Integrate Weather Updates
+- 📱 Permanent Mic Button in Notification Bar
+- 🧠 Smart AI Chat Buddy with conversational memory
+- 🔄 Cloud sync for backup and cross-device access
 
-Simply open [Lovable](https://lovable.dev/projects/33ccec6d-c2c3-4258-817b-36292aef12d7) and click on Share -> Publish.
+---
 
-## I want to use a custom domain - is that possible?
+## 👨‍💻 Contributors
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+- **Vishnu M T** – 1AY22IS129  
+- **Thushar Raj S G** – 1AY22IS117  
+- **Vishal M Bharadwaj** – 1AY22IS128  
+- **Rakshith Gowda M** – 1AY22IS074  
+> Under the guidance of **Prof. Vinutha Raghu**, Acharya Institute of Technology
+
+---
+
+## 📚 References
+
+See full bibliography in the [Project Report](./ALL_IN_PRODUCTIVITY_APP.pdf) for academic and technical resources.
+
+---
+
+## 📄 License
+
+This project is for educational purposes only and not intended for commercial distribution. For personal or academic use only.
