@@ -114,8 +114,8 @@ npm run build
 
 ## 👨‍💻 Contributors
 
-- **Vishnu M T** – 1AY22IS129  
-- **Thushar Raj S G** – 1AY22IS117  
+- **Thushar Raj S G** – 1AY22IS117
+- **Vishnu M T** – 1AY22IS129   
 - **Vishal M Bharadwaj** – 1AY22IS128  
 - **Rakshith Gowda M** – 1AY22IS074  
 > Under the guidance of **Prof. Vinutha Raghu**, Acharya Institute of Technology
