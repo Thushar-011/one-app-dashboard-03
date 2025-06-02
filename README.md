@@ -1,5 +1,5 @@
 
-# 📱 ALL-IN-ONE PRODUCTIVITY APP
+# 📱 ONE APP - ALL IN ONE PRODUCTIVITY APP
 
 ### A Smart Lifestyle Productivity Tool
 
